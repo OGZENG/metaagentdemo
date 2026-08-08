@@ -1,0 +1,6 @@
+packages:
+    - 'packages/*'
+
+onlyBuiltDependencies:
+    - faiss-node
+    - sqlite3
