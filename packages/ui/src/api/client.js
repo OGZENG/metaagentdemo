@@ -16,7 +16,10 @@ apiClient.interceptors.response.use(
         return response
     },
     async (error) => {
-        if (error.response.status === 401) {
+        // A timeout or a dropped connection produces an error with no response.
+        // Reading `.status` off it threw "Cannot read properties of undefined",
+        // which then masked every real network failure in the app.
+        if (error.response?.status === 401) {
             // check if refresh is needed
             if (error.response.data.message === ErrorMessage.TOKEN_EXPIRED && error.response.data.retry === true) {
                 const originalRequest = error.config

@@ -1,0 +1,129 @@
+{
+  "runId": "workflow-benchmark-2026-08-14T15-33-36-190Z",
+  "datasetPath": "C:\\Users\\zengy\\Documents\\Codex\\2026-07-18\\github-plugin-github-openai-curated-remote-2\\flowise-mvp\\Flowise-main\\benchmarks\\workflow-optimization\\math-mcq-20.json",
+  "baseUrl": "http://localhost:3000/api/v1",
+  "repetitions": 1,
+  "workflows": [
+    {
+      "name": "Baseline",
+      "flowId": "560940e4-3030-404a-ab58-d5b911f388a5",
+      "summary": {
+        "requestedRuns": 1,
+        "completedRuns": 1,
+        "failedRuns": 0,
+        "scoredRuns": 1,
+        "answerExtractionRate": 1,
+        "accuracy": 1,
+        "validationPassRate": 1,
+        "revisionRate": 0,
+        "averageRevisionRounds": 0,
+        "averageInputTokens": 2490,
+        "averageOutputTokens": 885,
+        "averageTotalTokens": 3375,
+        "totalTokens": 3375,
+        "averageCost": 0.00585,
+        "totalCost": 0.00585,
+        "averageDurationMs": 17899,
+        "averageModelCalls": 7,
+        "qualityPer1kTokens": 0.2962962962962963
+      },
+      "results": [
+        {
+          "workflow": "Baseline",
+          "flowId": "560940e4-3030-404a-ab58-d5b911f388a5",
+          "taskId": "math_001",
+          "difficulty": "easy",
+          "repetition": 1,
+          "sessionId": "workflow-benchmark-2026-08-14T15-33-36-190Z-Baseline-math_001-r1",
+          "predictedAnswer": "B",
+          "referenceAnswer": "B",
+          "correct": true,
+          "answerText": "Final answer: B. $66\n\nReasoning: All solvers agree on the arithmetic: 25% off $80 reduces the price to $60, and then 10% tax on $60 adds $6, yielding a final price of $66. The only variation is formatting, with some solvers wrapping the same content in JSON-like output; the underlying answer is unchanged.\n\nReview verdict: pass",
+          "executionId": "1a088c52-07e6-4245-998a-bb0bbca0fbc9",
+          "inputTokens": 2490,
+          "outputTokens": 885,
+          "totalTokens": 3375,
+          "estimatedCost": 0.00585,
+          "durationMs": 17899,
+          "measuredNodeDurationMs": 8540,
+          "modelCalls": 7,
+          "validationVerdict": "pass",
+          "validationPassed": true,
+          "revisionRounds": 0,
+          "nodeCallCounts": {
+            "Start": 1,
+            "Problem Normalizer": 1,
+            "Direct Solver": 1,
+            "Stepwise Solver": 1,
+            "Verification Solver": 1,
+            "Skeptical Solver": 1,
+            "Consensus Aggregator": 1,
+            "Critical Reviewer": 1,
+            "Final Response": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "Iterative",
+      "flowId": "b8dae061-5643-4c3d-85b2-140ad626dbc7",
+      "summary": {
+        "requestedRuns": 1,
+        "completedRuns": 1,
+        "failedRuns": 0,
+        "scoredRuns": 1,
+        "answerExtractionRate": 1,
+        "accuracy": 1,
+        "validationPassRate": 1,
+        "revisionRate": 0,
+        "averageRevisionRounds": 0,
+        "averageInputTokens": 2606,
+        "averageOutputTokens": 971,
+        "averageTotalTokens": 3577,
+        "totalTokens": 3577,
+        "averageCost": 0.006324000000000001,
+        "totalCost": 0.006324000000000001,
+        "averageDurationMs": 22098,
+        "averageModelCalls": 7,
+        "qualityPer1kTokens": 0.2795638803466592
+      },
+      "results": [
+        {
+          "workflow": "Iterative",
+          "flowId": "b8dae061-5643-4c3d-85b2-140ad626dbc7",
+          "taskId": "math_001",
+          "difficulty": "easy",
+          "repetition": 1,
+          "sessionId": "workflow-benchmark-2026-08-14T15-33-36-190Z-Iterative-math_001-r1",
+          "predictedAnswer": "B",
+          "referenceAnswer": "B",
+          "correct": true,
+          "answerText": "Final answer: B. $66\n\nReasoning: All solvers agree on the same arithmetic result: an 80-dollar item discounted by 25% becomes $60, and adding 10% tax to $60 yields $66. The direct, stepwise, and skeptical solvers explicitly compute 80 - 20 = 60 and 60 + 6 = 66. The verification solver also preserves this same computation, though it frames the task as reformatting. The shared conclusion is unambiguous.\n\nReview verdict: pass",
+          "executionId": "4f09a597-c723-4c07-855d-77355a50a3c6",
+          "inputTokens": 2606,
+          "outputTokens": 971,
+          "totalTokens": 3577,
+          "estimatedCost": 0.006324000000000001,
+          "durationMs": 22098,
+          "measuredNodeDurationMs": 8358,
+          "modelCalls": 7,
+          "validationVerdict": "pass",
+          "validationPassed": true,
+          "revisionRounds": 0,
+          "nodeCallCounts": {
+            "Start": 1,
+            "Problem Normalizer": 1,
+            "Direct Solver": 1,
+            "Stepwise Solver": 1,
+            "Verification Solver": 1,
+            "Skeptical Solver": 1,
+            "Consensus Aggregator": 1,
+            "Critical Reviewer": 1,
+            "Quality Gate: Pass?": 1,
+            "Final Response": 1
+          }
+        }
+      ]
+    }
+  ]
+}

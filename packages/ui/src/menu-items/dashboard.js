@@ -70,7 +70,7 @@ const dashboard = {
             children: [
                 {
                     id: 'meta-agent',
-                    title: 'Meta-Agent Studio',
+                    title: 'Workflow Autopilot',
                     type: 'item',
                     url: '/meta-agent',
                     icon: icons.IconSparkles,

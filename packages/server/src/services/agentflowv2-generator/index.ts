@@ -10,6 +10,17 @@ import { sysPrompt } from './prompt'
 import { databaseEntities } from '../../utils'
 import logger from '../../utils/logger'
 import { MODE } from '../../Interface'
+import {
+    applyStudioOperator,
+    compileStudioWorkflow,
+    designStudioWorkflow,
+    diagnoseStudioRun,
+    evaluateStudioOutput,
+    proposeStudioCandidates,
+    purgeStudioTools,
+    regenerateStudioCrew,
+    regenerateStudioScenarios
+} from './studioService'
 
 // Define the Zod schema for Agentflowv2 data structure
 const NodeType = z.object({
@@ -228,6 +239,7 @@ const generateAgentflowv2 = async (question: string, selectedChatModel: Record<s
             }
             // If response is already an object
             else if (typeof response === 'object') {
+                if (response && 'error' in response) return response as any
                 const validatedResponse = AgentFlowV2Type.parse(response)
                 return validatedResponse
             }
@@ -248,66 +260,15 @@ const generateAgentflowv2 = async (question: string, selectedChatModel: Record<s
     }
 }
 
-type IntentDraft = {
-    task: string
-    inputs?: string
-    outputs?: string
-    constraints?: string
-    tools?: string
-    humanCheckpoints?: string
-    successCriteria?: string
-}
-
-const splitItems = (value = '') =>
-    value
-        .split(/[,;\n]/)
-        .map((item) => item.trim())
-        .filter(Boolean)
-
-/**
- * Converts the thesis UI's elicitation form into an auditable compiler contract.
- * This step is deterministic on purpose: users can inspect and edit the contract
- * before a model is allowed to generate executable nodes and edges.
- */
-const analyzeIntent = (draft: IntentDraft) => {
-    if (!draft?.task?.trim()) {
-        throw new InternalFlowiseError(StatusCodes.BAD_REQUEST, 'A primary task is required')
-    }
-
-    const tools = splitItems(draft.tools)
-    const roles = ['Orchestrator', ...tools.map((tool) => `${tool} specialist`), 'Output validator']
-    const prompt = [
-        'Build a production-oriented multi-agent Agentflow V2 for the following task.',
-        '',
-        `Primary task: ${draft.task.trim()}`,
-        `Expected inputs: ${draft.inputs?.trim() || 'Natural-language user request'}`,
-        `Required outputs: ${draft.outputs?.trim() || 'A validated final answer'}`,
-        `Constraints: ${draft.constraints?.trim() || 'Prefer deterministic, observable execution'}`,
-        `Available or preferred tools: ${draft.tools?.trim() || 'Choose only tools required by the task'}`,
-        `Human checkpoints: ${draft.humanCheckpoints?.trim() || 'Ask for approval before risky or irreversible actions'}`,
-        `Success criteria: ${draft.successCriteria?.trim() || 'The requested output is complete and schema-valid'}`,
-        '',
-        'Architecture requirements:',
-        '- Use a supervisor/orchestrator when more than one specialist is required.',
-        '- Give every specialist a narrow role and explicit responsibility.',
-        '- Add validation before the final response.',
-        '- Add Human Input nodes at the requested checkpoints.',
-        '- Prefer parallel branches when tasks have no data dependency.',
-        '- Keep shared state explicit and pass only the data each node needs.',
-        '- Produce a minimal graph that is easy to debug in the sandbox.'
-    ].join('\n')
-
-    return {
-        version: 1,
-        prompt,
-        roles,
-        requiredHumanCheckpoints: splitItems(draft.humanCheckpoints),
-        successCriteria: splitItems(draft.successCriteria),
-        compiledAt: new Date().toISOString()
-    }
-}
-
 export default {
     generateAgentflowv2,
-    analyzeIntent
+    designStudioWorkflow,
+    regenerateStudioScenarios,
+    regenerateStudioCrew,
+    compileStudioWorkflow,
+    evaluateStudioOutput,
+    diagnoseStudioRun,
+    proposeStudioCandidates,
+    applyStudioOperator,
+    purgeStudioTools
 }

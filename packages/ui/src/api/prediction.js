@@ -1,6 +1,6 @@
 import client from './client'
 
-const sendMessageAndGetPrediction = (id, input) => client.post(`/internal-prediction/${id}`, input)
+const sendMessageAndGetPrediction = (id, input, config) => client.post(`/internal-prediction/${id}`, input, config)
 const sendMessageAndStreamPrediction = (id, input) => client.post(`/internal-prediction/stream/${id}`, input)
 const sendMessageAndGetPredictionPublic = (id, input) => client.post(`/prediction/${id}`, input)
 

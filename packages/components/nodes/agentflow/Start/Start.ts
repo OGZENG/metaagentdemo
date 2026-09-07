@@ -48,7 +48,7 @@ class Start_Agentflow implements INode {
     constructor() {
         this.label = 'Start'
         this.name = 'startAgentflow'
-        this.version = 1.4
+        this.version = 1.5
         this.type = 'Start'
         this.category = 'Agent Flows'
         this.description = 'Starting point of the agentflow'
@@ -729,6 +729,15 @@ class Start_Agentflow implements INode {
                 name: 'startEphemeralMemory',
                 type: 'boolean',
                 description: 'Start fresh for every execution without past chat history',
+                optional: true
+            },
+            {
+                label: 'Max Parallel Nodes',
+                name: 'startMaxConcurrency',
+                type: 'number',
+                default: 1,
+                description:
+                    'Maximum number of safe, dependency-ready sibling Agent/LLM nodes to run concurrently. Use 1 for legacy serial execution; 4 is recommended for parallel solver layers.',
                 optional: true
             },
             {

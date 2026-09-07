@@ -1063,6 +1063,11 @@ class Agent_Agentflow implements INode {
                     })
                 }
             }
+            // Preserve the original runtime request for downstream generated
+            // Agents even when prior nodes have already populated chat history.
+            if (!userMessage && input && typeof input === 'string' && !messages.some((msg: any) => msg.role === 'user')) {
+                messages.push({ role: 'user', content: input })
+            }
             delete nodeData.inputs?.agentMessages
 
             // Initialize response and determine if streaming is possible
@@ -1285,6 +1290,7 @@ class Agent_Agentflow implements INode {
 
             // Prepare final response and output object
             let finalResponse = ''
+            let structuredOutputValue: any
             if (response.content && Array.isArray(response.content)) {
                 // Process items and concatenate consecutive text items
                 const processedParts: string[] = []
@@ -1386,15 +1392,32 @@ class Agent_Agentflow implements INode {
 
             // If is structured output, then invoke LLM again with structured output at the very end after all tool calls
             if (isStructuredOutput) {
-                const structuredllmNodeInstance = configureStructuredOutput(llmWithoutToolsBind, _agentStructuredOutput)
+                // Preserve the raw AIMessage: the parsed object alone does not contain
+                // usage_metadata, which is required by execution analytics.
+                const structuredllmNodeInstance = configureStructuredOutput(llmWithoutToolsBind, _agentStructuredOutput, true)
                 const prompt = 'Convert the following response to the structured output format: ' + finalResponse
-                response = await structuredllmNodeInstance.invoke(prompt, { signal: abortController?.signal })
+                const structuredResponse = (await structuredllmNodeInstance.invoke(prompt, { signal: abortController?.signal })) as any
+                const rawResponse = structuredResponse?.raw ?? structuredResponse
+                const parsedCandidate =
+                    structuredResponse?.parsed ??
+                    rawResponse?.tool_calls?.[0]?.args ??
+                    rawResponse?.additional_kwargs?.tool_calls?.[0]?.function?.arguments
+                const parsedResponse =
+                    typeof parsedCandidate === 'string' ? JSON.parse(parsedCandidate) : parsedCandidate ?? structuredResponse
+                structuredOutputValue = parsedResponse
+
+                if (rawResponse?.usage_metadata || rawResponse?.response_metadata) {
+                    response = rawResponse
+                    Object.assign(response, parsedResponse)
+                } else {
+                    response = parsedResponse
+                }
 
                 // Prefix the response with ```json and suffix with ``` to render as a code block
-                if (typeof response === 'object') {
-                    finalResponse = '```json\n' + JSON.stringify(response, null, 2) + '\n```'
+                if (typeof parsedResponse === 'object') {
+                    finalResponse = '```json\n' + JSON.stringify(parsedResponse, null, 2) + '\n```'
                 } else {
-                    finalResponse = response
+                    finalResponse = parsedResponse
                 }
 
                 if (isLastNode && sseStreamer) {
@@ -1454,7 +1477,9 @@ class Agent_Agentflow implements INode {
 
             // Process template variables in state
             const outputForStateProcessing =
-                isStructuredOutput && typeof response === 'object' ? JSON.stringify(response, null, 2) : finalResponse
+                isStructuredOutput && structuredOutputValue !== undefined
+                    ? JSON.stringify(structuredOutputValue, null, 2)
+                    : finalResponse
             newState = processTemplateVariables(newState, outputForStateProcessing)
 
             /**

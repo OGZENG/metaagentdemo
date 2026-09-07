@@ -2120,7 +2120,11 @@ export async function parseWithTypeConversion<T extends z.ZodTypeAny>(schema: T,
  * @param {any[]} structuredOutput - Array of structured output schema definitions
  * @returns {BaseChatModel} - The configured LLM instance
  */
-export const configureStructuredOutput = (llmNodeInstance: BaseChatModel, structuredOutput: any[]): BaseChatModel => {
+export const configureStructuredOutput = (
+    llmNodeInstance: BaseChatModel,
+    structuredOutput: any[],
+    includeRaw = false
+): BaseChatModel => {
     try {
         const zodObj: ICommonObject = {}
         for (const sch of structuredOutput) {
@@ -2161,6 +2165,16 @@ export const configureStructuredOutput = (llmNodeInstance: BaseChatModel, struct
             }
         }
         const structuredOutputSchema = z.object(zodObj)
+
+        // LangChain uses separate overloads for parsed-only and raw+parsed results,
+        // so keep the literal `true` visible to TypeScript here.
+        if (includeRaw) {
+            // @ts-ignore
+            return llmNodeInstance.withStructuredOutput(structuredOutputSchema, {
+                method: 'functionCalling',
+                includeRaw: true
+            })
+        }
 
         // @ts-ignore
         return llmNodeInstance.withStructuredOutput(structuredOutputSchema, {

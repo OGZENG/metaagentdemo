@@ -248,11 +248,6 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
             setGeneratedInstruction('')
             setProgress(0)
         } else {
-            const compilerPrompt = localStorage.getItem('metaAgentCompilerPrompt')
-            if (compilerPrompt) {
-                setCustomAssistantInstruction(compilerPrompt)
-                localStorage.removeItem('metaAgentCompilerPrompt')
-            }
             getChatModelsApi.request()
         }
 

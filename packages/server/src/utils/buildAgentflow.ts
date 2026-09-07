@@ -63,6 +63,7 @@ import { UsageCacheManager } from '../UsageCacheManager'
 import { generateTTSForResponseStream, shouldAutoPlayTTS } from './buildChatflow'
 import { InternalFlowiseError } from '../errors/internalFlowiseError'
 import { StatusCodes } from 'http-status-codes'
+import { getParallelExecutionBatch, mergeParallelStates } from './agentflowParallelScheduler'
 
 interface IWaitingNode {
     nodeId: string
@@ -1910,6 +1911,12 @@ export const executeAgentFlow = async ({
     })
 
     const maxIterations = process.env.MAX_ITERATIONS ? parseInt(process.env.MAX_ITERATIONS) : 1000
+    const configuredMaxConcurrency = Number(
+        overrideConfig.agentflowMaxConcurrency ?? startNode?.data.inputs?.startMaxConcurrency ?? process.env.AGENTFLOW_MAX_CONCURRENCY ?? 1
+    )
+    const maxNodeConcurrency = Number.isFinite(configuredMaxConcurrency)
+        ? Math.min(16, Math.max(1, Math.floor(configuredMaxConcurrency)))
+        : 1
 
     // Get chat history from ChatMessage table
     const pastChatHistory = (await appDataSource
@@ -2023,6 +2030,185 @@ export const executeAgentFlow = async ({
 
         if (iterations === 0 && !isRecursive) {
             sseStreamer?.streamAgentFlowEvent(chatId, 'INPROGRESS')
+        }
+
+        const parallelBatch = getParallelExecutionBatch(nodeExecutionQueue, nodes, edges, maxNodeConcurrency)
+        if (parallelBatch.length > 1) {
+            if (iterations + parallelBatch.length > maxIterations) {
+                throw new Error('Maximum iteration limit reached')
+            }
+
+            nodeExecutionQueue.splice(0, parallelBatch.length)
+            iterations += parallelBatch.length
+
+            const baseRuntime = cloneDeep(agentflowRuntime)
+            const baseExecutedData = [...agentFlowExecutedData]
+
+            logger.debug(
+                `   Executing ${parallelBatch.length} dependency-ready nodes concurrently: [${parallelBatch
+                    .map((node) => node.nodeId)
+                    .join(', ')}]`
+            )
+
+            const parallelResults = await Promise.allSettled(
+                parallelBatch.map(async (queuedNode) => {
+                    if (abortController?.signal?.aborted) throw new Error('Aborted')
+
+                    const reactFlowNode = nodes.find((node) => node.id === queuedNode.nodeId)
+                    if (!reactFlowNode) throw new Error(`Node ${queuedNode.nodeId} not found`)
+
+                    const executionResult = await executeNode({
+                        nodeId: queuedNode.nodeId,
+                        reactFlowNode,
+                        nodes,
+                        edges,
+                        graph,
+                        reversedGraph,
+                        incomingInput,
+                        chatflow,
+                        chatId,
+                        sessionId,
+                        apiMessageId,
+                        evaluationRunId,
+                        parentExecutionId,
+                        isInternal,
+                        pastChatHistory,
+                        prependedChatHistory,
+                        appDataSource,
+                        usageCacheManager,
+                        telemetry,
+                        componentNodes,
+                        cachePool,
+                        sseStreamer,
+                        baseURL,
+                        overrideConfig,
+                        apiOverrideStatus,
+                        nodeOverrides,
+                        variableOverrides,
+                        uploadedFilesContent,
+                        fileUploads,
+                        humanInput: currentHumanInput,
+                        agentFlowExecutedData: [...baseExecutedData],
+                        agentflowRuntime: cloneDeep(baseRuntime),
+                        abortController,
+                        parentTraceIds,
+                        analyticHandlers,
+                        isRecursive,
+                        iterationContext,
+                        loopCounts,
+                        orgId,
+                        workspaceId,
+                        subscriptionId,
+                        productId
+                    })
+
+                    return { queuedNode, reactFlowNode, executionResult }
+                })
+            )
+
+            const failedIndex = parallelResults.findIndex((result) => result.status === 'rejected')
+            if (failedIndex >= 0) {
+                const failedNode = parallelBatch[failedIndex]
+                const failedReactFlowNode = nodes.find((node) => node.id === failedNode.nodeId)
+                const failure = parallelResults[failedIndex] as PromiseRejectedResult
+                const isAborted = getErrorMessage(failure.reason).includes('Aborted')
+                const errorStatus: ExecutionState = isAborted ? 'TERMINATED' : 'ERROR'
+                const errorMessage = isAborted ? 'Flow execution was cancelled' : getErrorMessage(failure.reason)
+
+                status = errorStatus
+                agentFlowExecutedData.push({
+                    nodeId: failedNode.nodeId,
+                    nodeLabel: failedReactFlowNode?.data.label ?? failedNode.nodeId,
+                    previousNodeIds: reversedGraph[failedNode.nodeId] || [],
+                    data: {
+                        id: failedNode.nodeId,
+                        name: failedReactFlowNode?.data.name ?? 'unknown',
+                        error: errorMessage
+                    },
+                    status: errorStatus
+                })
+
+                sseStreamer?.streamNextAgentFlowEvent(chatId, {
+                    nodeId: failedNode.nodeId,
+                    nodeLabel: failedReactFlowNode?.data.label ?? failedNode.nodeId,
+                    status: errorStatus,
+                    error: isAborted ? undefined : errorMessage
+                })
+
+                if (!isRecursive) {
+                    sseStreamer?.streamAgentFlowExecutedDataEvent(chatId, agentFlowExecutedData)
+                    await updateExecution(appDataSource, newExecution.id, workspaceId, {
+                        executionData: JSON.stringify(agentFlowExecutedData),
+                        state: errorStatus
+                    })
+                    sseStreamer?.streamAgentFlowEvent(chatId, errorStatus)
+                }
+
+                if (parentTraceIds && analyticHandlers) {
+                    await analyticHandlers.onChainError(parentTraceIds, errorMessage, true)
+                }
+
+                throw new Error(errorMessage)
+            }
+
+            const completedResults = parallelResults.map((result) => {
+                if (result.status !== 'fulfilled') throw result.reason
+                return result.value
+            })
+
+            agentflowRuntime.state = mergeParallelStates(
+                baseRuntime.state ?? {},
+                completedResults.map(({ executionResult }) => executionResult.result?.state ?? baseRuntime.state ?? {})
+            )
+
+            for (const { queuedNode, reactFlowNode, executionResult } of completedResults) {
+                if (executionResult.humanInput !== currentHumanInput) currentHumanInput = executionResult.humanInput
+                if (executionResult.shouldStop) status = 'STOPPED'
+
+                const nodeResult = executionResult.result
+                agentFlowExecutedData.push({
+                    nodeId: queuedNode.nodeId,
+                    nodeLabel: reactFlowNode.data.label,
+                    data: nodeResult,
+                    previousNodeIds: reversedGraph[queuedNode.nodeId],
+                    status: executionResult.shouldStop ? 'STOPPED' : 'FINISHED'
+                })
+
+                sseStreamer?.streamNextAgentFlowEvent(chatId, {
+                    nodeId: queuedNode.nodeId,
+                    nodeLabel: reactFlowNode.data.label,
+                    status: executionResult.shouldStop ? 'STOPPED' : 'FINISHED'
+                })
+
+                if (nodeResult?.chatHistory) {
+                    agentflowRuntime.chatHistory = [...(agentflowRuntime.chatHistory ?? []), ...nodeResult.chatHistory]
+                }
+                if (nodeResult?.output?.form) agentflowRuntime.form = nodeResult.output.form
+                if (nodeResult?.output?.ephemeralMemory) pastChatHistory.length = 0
+
+                if (!executionResult.shouldStop) {
+                    const processResult = await processNodeOutputs({
+                        nodeId: queuedNode.nodeId,
+                        nodeName: reactFlowNode.data.name,
+                        result: nodeResult,
+                        humanInput: currentHumanInput,
+                        graph,
+                        nodes,
+                        edges,
+                        nodeExecutionQueue,
+                        waitingNodes,
+                        loopCounts,
+                        sseStreamer,
+                        chatId
+                    })
+                    if (processResult.humanInput !== currentHumanInput) currentHumanInput = processResult.humanInput
+                }
+
+                if (!isRecursive) sseStreamer?.streamAgentFlowExecutedDataEvent(chatId, agentFlowExecutedData)
+            }
+
+            logger.debug(`/////////////////////////////////////////////////////////////////////////////`)
+            continue
         }
 
         if (iterations++ > maxIterations) {

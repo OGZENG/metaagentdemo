@@ -443,6 +443,13 @@ class LLM_Agentflow implements INode {
                     })
                 }
             }
+            // A generated workflow must never lose the current request merely
+            // because an earlier node populated runtimeChatHistory. Explicit
+            // user messages take precedence; otherwise the engine input is the
+            // deterministic fallback for every LLM node.
+            if (!userMessage && input && typeof input === 'string' && !messages.some((msg: any) => msg.role === 'user')) {
+                messages.push({ role: 'user', content: input })
+            }
             delete nodeData.inputs?.llmMessages
 
             /**
@@ -454,7 +461,9 @@ class LLM_Agentflow implements INode {
             // Configure structured output if specified
             const isStructuredOutput = _llmStructuredOutput && Array.isArray(_llmStructuredOutput) && _llmStructuredOutput.length > 0
             if (isStructuredOutput) {
-                llmNodeInstance = configureStructuredOutput(llmNodeInstance, _llmStructuredOutput)
+                // Keep the raw AIMessage so token usage and response metadata are not
+                // discarded by LangChain's structured-output parser.
+                llmNodeInstance = configureStructuredOutput(llmNodeInstance, _llmStructuredOutput, true)
             }
 
             // Initialize response and determine if streaming is possible
@@ -492,6 +501,22 @@ class LLM_Agentflow implements INode {
                 )
             } else {
                 response = await llmNodeInstance.invoke(messages, { signal: abortController?.signal })
+
+                if (isStructuredOutput) {
+                    const structuredResponse = response as any
+                    const raw = structuredResponse?.raw ?? structuredResponse
+                    const parsed =
+                        structuredResponse?.parsed ??
+                        raw?.tool_calls?.[0]?.args ??
+                        raw?.additional_kwargs?.tool_calls?.[0]?.function?.arguments
+
+                    if (parsed !== undefined && parsed !== null) {
+                        const parsedValue = typeof parsed === 'string' ? JSON.parse(parsed) : parsed
+                        response = raw
+                        response.content = JSON.stringify(parsedValue, null, 2)
+                        Object.assign(response, parsedValue)
+                    }
+                }
 
                 // Stream whole response back to UI if this is the last node
                 if (isLastNode && options.sseStreamer) {

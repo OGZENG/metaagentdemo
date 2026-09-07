@@ -1,0 +1,303 @@
+{"kind":"deck","id":"pr/7iixki","name":"Deck"}
+{"kind":"layout","layoutId":"959bf6cc-858c-4884-b8c8-ffa8e0187ed5","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"fe7692d7-a367-485f-bbc0-115e0e7180d5","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/x5tmfr","slide":1,"title":"THESIS IMPLEMENTATION","textShapes":11}
+{"kind":"textbox","id":"sh/mtwjy983","slide":1,"name":"text","text":"THESIS IMPLEMENTATION","textPreview":"THESIS IMPLEMENTATION","textChars":21,"textLines":1,"bbox":[42,40,300,24]}
+{"kind":"textbox","id":"sh/9w7i94re","slide":1,"name":"text","text":"Workflow\nAutopilot","textPreview":"Workflow | Autopilot","textChars":18,"textLines":2,"bbox":[42,124,560,170]}
+{"kind":"textbox","id":"sh/8vy10zq9","slide":1,"name":"text","text":"从自然语言目标到可验证、\n可优化的 AgentFlow","textPreview":"从自然语言目标到可验证、 | 可优化的 AgentFlow","textChars":27,"textLines":2,"bbox":[42,318,560,100]}
+{"kind":"textbox","id":"sh/zq503u9c","slide":1,"name":"text","text":"基于 Flowise 的 CrewIR 编译、模拟环境、\n自动评测与结构化搜索闭环","textPreview":"基于 Flowise 的 CrewIR 编译、模拟环境、 | 自动评测与结构化搜索闭环","textChars":41,"textLines":2,"bbox":[42,444,540,74]}
+{"kind":"shape","id":"sh/ypwjup8r","slide":1,"bbox":[42,560,150,0]}
+{"kind":"textbox","id":"sh/lsni54ri","slide":1,"name":"text","text":"导师汇报 · Implementation Review","textPreview":"导师汇报 · Implementation Review","textChars":28,"textLines":1,"bbox":[42,590,420,32]}
+{"kind":"shape","id":"sh/0re1wzqx","slide":1,"name":"cover-visual-field","bbox":[650,42,588,588]}
+{"kind":"shape","id":"sh/jm9kfe9w","slide":1,"name":"goal","bbox":[700,104,180,72]}
+{"kind":"textbox","id":"sh/il0j6t8b","slide":1,"name":"text","text":"自然语言目标","textPreview":"自然语言目标","textChars":6,"textLines":1,"bbox":[718,124,144,30]}
+{"kind":"shape","id":"sh/8byxwr2t","slide":1,"name":"contract","bbox":[946,104,210,72]}
+{"kind":"textbox","id":"sh/9c7ypw3e","slide":1,"name":"text","text":"Contract + Fixtures","textPreview":"Contract + Fixtures","textChars":19,"textLines":1,"bbox":[962,124,178,30]}
+{"kind":"shape","id":"sh/m9gfu1kn","slide":1,"name":"crewir","bbox":[700,276,180,72]}
+{"kind":"textbox","id":"sh/napgnml8","slide":1,"name":"text","text":"CrewIR","textPreview":"CrewIR","textChars":6,"textLines":1,"bbox":[718,296,144,30]}
+{"kind":"shape","id":"sh/0nyxsr2x","slide":1,"name":"agentflow","bbox":[946,276,210,72]}
+{"kind":"textbox","id":"sh/lo7ylw32","slide":1,"name":"text","text":"AgentFlow V2","textPreview":"AgentFlow V2","textChars":12,"textLines":1,"bbox":[962,296,178,30]}
+{"kind":"shape","id":"sh/ylwfqhkr","slide":1,"name":"evaluation","bbox":[700,448,180,72]}
+{"kind":"textbox","id":"sh/zm5wjmlc","slide":1,"name":"text","text":"执行 + 评测","textPreview":"执行 + 评测","textChars":7,"textLines":1,"bbox":[718,468,144,30]}
+{"kind":"shape","id":"sh/cjexo72l","slide":1,"name":"search","bbox":[946,448,210,72]}
+{"kind":"textbox","id":"sh/dknehc36","slide":1,"name":"text","text":"Operator Search","textPreview":"Operator Search","textChars":15,"textLines":1,"bbox":[962,468,178,30]}
+{"kind":"shape","id":"sh/t4vm54ry","slide":1,"bbox":[0,0,0,0]}
+{"kind":"shape","id":"sh/s3mlwjad","slide":1,"bbox":[0,0,0,0]}
+{"kind":"shape","id":"sh/72d43e9s","slide":1,"bbox":[0,0,0,0]}
+{"kind":"shape","id":"sh/6143u9s7","slide":1,"bbox":[0,0,0,0]}
+{"kind":"shape","id":"sh/50vm14rm","slide":1,"bbox":[0,0,0,0]}
+{"kind":"shape","id":"sh/kzmlsza1","slide":1,"bbox":[0,0,0,0]}
+{"kind":"notes","id":"nt/x5tmfr","slide":1,"text":"开场先定性：这不是一个画图功能，而是一个从规格、编译、执行到搜索的闭环系统。\n\n[Sources]\n- THESIS_MVP.md\n- packages/ui/src/views/metaagent/useAutopilotRun.js\n[/Sources]"}
+{"kind":"slide","id":"sl/pge6on","slide":2,"title":"WORKFLOW AUTOPILOT","textShapes":9}
+{"kind":"textbox","id":"sh/bexsbit8","slide":2,"name":"eyebrow","text":"WORKFLOW AUTOPILOT","textPreview":"WORKFLOW AUTOPILOT","textChars":18,"textLines":1,"bbox":[42,28,360,22]}
+{"kind":"textbox","id":"sh/wf69knut","slide":2,"name":"slide-title","text":"一次性生成解决不了“可靠性”和“可比较性”","textPreview":"一次性生成解决不了“可靠性”和“可比较性”","textChars":21,"textLines":1,"bbox":[42,56,1160,72]}
+{"kind":"shape","id":"sh/xgfadsbe","slide":2,"bbox":[42,142,1196,0]}
+{"kind":"textbox","id":"sh/mp4redcr","slide":2,"name":"page","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"textbox","id":"sh/nqds7itc","slide":2,"name":"text","text":"原始范式","textPreview":"原始范式","textChars":4,"textLines":1,"bbox":[42,180,220,28]}
+{"kind":"textbox","id":"sh/obm9gnux","slide":2,"name":"text","text":"Goal → LLM → nodes / edges","textPreview":"Goal → LLM → nodes / edges","textChars":26,"textLines":1,"bbox":[42,220,540,50]}
+{"kind":"textbox","id":"sh/9cva9sbi","slide":2,"name":"text","text":"• 模型同时承担业务理解与 Flowise 图格式细节\n• 一个 handle、变量路径或模型绑定错误即可导致运行失败\n• 生成后没有确定性测试世界，也没有统一质量门槛\n• 每次重生成都是新的猜测，难以复现、比较和消融","textPreview":"• 模型同时承担业务理解与 Flowise 图格式细节 | • 一个 handle、变量路径或模型绑定错误即可导致运行失败 | • 生成后没有确定性测试世界，也没有统一质量门槛 | • 每次重生成都是新的猜测，难以复现、比较和消融","textChars":109,"textLines":4,"bbox":[42,300,540,260]}
+{"kind":"shape","id":"sh/elkratcv","slide":2,"name":"closed-loop-field","bbox":[640,174,598,420]}
+{"kind":"textbox","id":"sh/zmds3yt0","slide":2,"name":"text","text":"重写后的范式","textPreview":"重写后的范式","textChars":6,"textLines":1,"bbox":[674,206,220,28]}
+{"kind":"textbox","id":"sh/b2xgby94","slide":2,"name":"text","text":"Specification → Compile → Measure → Search","textPreview":"Specification → Compile → Measure → Search","textChars":42,"textLines":1,"bbox":[674,246,520,82]}
+{"kind":"textbox","id":"sh/a14f2t8j","slide":2,"name":"text","text":"• LLM 负责语义设计，程序负责结构合法性与执行格式\n• 每个候选都在同一组 fixtures 和验收用例上运行\n• 优化单位是 typed operator，而不是整图重新生成\n• 输出是证据：轨迹、工具调用、得分、成本与延迟","textPreview":"• LLM 负责语义设计，程序负责结构合法性与执行格式 | • 每个候选都在同一组 fixtures 和验收用例上运行 | • 优化单位是 typed operator，而不是整图重新生成 | • 输出是证据：轨迹、工具调用、得分、成本与延迟","textChars":115,"textLines":4,"bbox":[674,344,520,210]}
+{"kind":"notes","id":"nt/pge6on","slide":2,"text":"用左右对照解释为什么要引入 IR、模拟环境和搜索，而不是继续修补 one-shot generator。\n\n[Sources]\n- packages/components/src/agentflowv2Generator.ts\n- packages/server/src/services/agentflowv2-generator/studioService.ts\n[/Sources]"}
+{"kind":"slide","id":"sl/x6ffdm","slide":3,"title":"WORKFLOW AUTOPILOT","textShapes":12}
+{"kind":"textbox","id":"sh/x4byd4ze","slide":3,"name":"eyebrow","text":"WORKFLOW AUTOPILOT","textPreview":"WORKFLOW AUTOPILOT","textChars":18,"textLines":1,"bbox":[42,28,360,22]}
+{"kind":"shape","id":"sh/a10zipg3","slide":3,"name":"slide-title","bbox":[42,56,1160,72]}
+{"kind":"shape","id":"sh/b29gbuho","slide":3,"bbox":[42,142,1196,0]}
+{"kind":"textbox","id":"sh/ozihgfyx","slide":3,"name":"page","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"textbox","id":"sh/p0ry9kzi","slide":3,"name":"slide-title","text":"系统的三个支柱","textPreview":"系统的三个支柱","textChars":7,"textLines":1,"bbox":[42,72,1160,54]}
+{"kind":"textbox","id":"sh/2x0zepgr","slide":3,"name":"text","text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[42,190,110,54]}
+{"kind":"shape","id":"sh/ny9g7uhc","slide":3,"bbox":[42,256,330,0]}
+{"kind":"textbox","id":"sh/0vihcfy1","slide":3,"name":"text","text":"确定性模拟环境","textPreview":"确定性模拟环境","textChars":7,"textLines":1,"bbox":[42,282,334,54]}
+{"kind":"textbox","id":"sh/1wry5kzm","slide":3,"name":"text","text":"工具规范被编译为纯 fixture lookup。\n无真实业务凭据、无真实副作用；已知事实、故障和 not-found 都可重复回放。","textPreview":"工具规范被编译为纯 fixture lookup。 | 无真实业务凭据、无真实副作用；已知事实、故障和 not-found 都可重复回放。","textChars":67,"textLines":2,"bbox":[42,360,334,186]}
+{"kind":"textbox","id":"sh/twj65onq","slide":3,"name":"text","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[452,190,110,54]}
+{"kind":"shape","id":"sh/8bqpcjm5","slide":3,"bbox":[452,256,330,0]}
+{"kind":"textbox","id":"sh/7aho3e5k","slide":3,"name":"text","text":"双层自动评测","textPreview":"双层自动评测","textChars":6,"textLines":1,"bbox":[452,282,334,54]}
+{"kind":"textbox","id":"sh/6987a94z","slide":3,"name":"text","text":"程序断言检查工具调用与事实依据；\nLLM rubric 只评估完整性、正确性、\n安全性与可用性。","textPreview":"程序断言检查工具调用与事实依据； | LLM rubric 只评估完整性、正确性、 | 安全性与可用性。","textChars":48,"textLines":3,"bbox":[452,360,334,186]}
+{"kind":"textbox","id":"sh/l8z614ne","slide":3,"name":"text","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[862,190,110,54]}
+{"kind":"shape","id":"sh/k7qp8zmt","slide":3,"bbox":[862,256,330,0]}
+{"kind":"textbox","id":"sh/j6hozu5o","slide":3,"name":"text","text":"CrewIR + Operator Search","textPreview":"CrewIR + Operator Search","textChars":24,"textLines":1,"bbox":[862,282,334,54]}
+{"kind":"textbox","id":"sh/y5876p43","slide":3,"name":"text","text":"模型只输出 Agents、Tasks 与依赖；\n编译器生成 Flowise 图，搜索对 IR 施加合法、可复现的结构化变换。","textPreview":"模型只输出 Agents、Tasks 与依赖； | 编译器生成 Flowise 图，搜索对 IR 施加合法、可复现的结构化变换。","textChars":62,"textLines":2,"bbox":[862,360,334,186]}
+{"kind":"notes","id":"nt/x6ffdm","slide":3,"text":"这三项分别对应实验环境、评价函数和搜索空间；缺一项都不能形成可靠的自动优化闭环。\n\n[Sources]\n- THESIS_MVP.md\n- packages/server/src/services/agentflowv2-generator/mockToolCompiler.ts\n- packages/server/src/services/agentflowv2-generator/assertions.ts\n- packages/server/src/services/agentflowv2-generator/crewIR.ts\n[/Sources]"}
+{"kind":"slide","id":"sl/2ee0v9","slide":4,"title":"WORKFLOW AUTOPILOT","textShapes":35}
+{"kind":"textbox","id":"sh/pc7mtsni","slide":4,"name":"eyebrow","text":"WORKFLOW AUTOPILOT","textPreview":"WORKFLOW AUTOPILOT","textChars":18,"textLines":1,"bbox":[42,28,360,22]}
+{"kind":"textbox","id":"sh/29g3id4r","slide":4,"name":"slide-title","text":"端到端管线把设计问题转化为可执行实验","textPreview":"端到端管线把设计问题转化为可执行实验","textChars":18,"textLines":1,"bbox":[42,56,1160,72]}
+{"kind":"shape","id":"sh/3ap4ri5c","slide":4,"bbox":[42,142,1196,0]}
+{"kind":"textbox","id":"sh/czilo7m9","slide":4,"name":"page","text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"shape","id":"sh/d0rmxcne","slide":4,"name":"stage-1","bbox":[42,200,194,126]}
+{"kind":"textbox","id":"sh/qd03mx43","slide":4,"name":"text","text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[56,212,40,26]}
+{"kind":"textbox","id":"sh/be94v25o","slide":4,"name":"text","text":"Describe","textPreview":"Describe","textChars":8,"textLines":1,"bbox":[56,243,164,30]}
+{"kind":"textbox","id":"sh/s3elc3mp","slide":4,"name":"text","text":"业务目标","textPreview":"业务目标","textChars":4,"textLines":1,"bbox":[56,282,164,26]}
+{"kind":"shape","id":"sh/t4nml8na","slide":4,"name":"stage-2","bbox":[281,200,194,126]}
+{"kind":"textbox","id":"sh/tofi1sny","slide":4,"name":"text","text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[295,212,40,26]}
+{"kind":"textbox","id":"sh/s361snmd","slide":4,"name":"text","text":"Contract","textPreview":"Contract","textChars":8,"textLines":1,"bbox":[295,243,164,30]}
+{"kind":"textbox","id":"sh/72x0zi5s","slide":4,"name":"text","text":"成功条件与约束","textPreview":"成功条件与约束","textChars":7,"textLines":1,"bbox":[295,282,164,26]}
+{"kind":"shape","id":"sh/61ozqd47","slide":4,"name":"stage-3","bbox":[520,200,194,126]}
+{"kind":"textbox","id":"sh/hszi5snu","slide":4,"name":"text","text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[534,212,40,26]}
+{"kind":"textbox","id":"sh/grq1w7m9","slide":4,"name":"text","text":"World","textPreview":"World","textChars":5,"textLines":1,"bbox":[534,243,164,30]}
+{"kind":"textbox","id":"sh/fqh0325o","slide":4,"name":"text","text":"Fixtures + Cases","textPreview":"Fixtures + Cases","textChars":16,"textLines":1,"bbox":[534,282,164,26]}
+{"kind":"shape","id":"sh/upojux4j","slide":4,"name":"stage-4","bbox":[759,200,194,126]}
+{"kind":"textbox","id":"sh/pwzi9c36","slide":4,"name":"text","text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[773,212,40,26]}
+{"kind":"textbox","id":"sh/4vq107ml","slide":4,"name":"text","text":"CrewIR","textPreview":"CrewIR","textChars":6,"textLines":1,"bbox":[773,243,164,30]}
+{"kind":"textbox","id":"sh/ozylwbuh","slide":4,"name":"text","text":"Agents + Tasks","textPreview":"Agents + Tasks","textChars":14,"textLines":1,"bbox":[773,282,164,26]}
+{"kind":"shape","id":"sh/90725gb2","slide":4,"name":"stage-5","bbox":[998,200,194,126]}
+{"kind":"textbox","id":"sh/mxg3ulcr","slide":4,"name":"text","text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[1012,212,40,26]}
+{"kind":"textbox","id":"sh/nypk36tc","slide":4,"name":"text","text":"Compile","textPreview":"Compile","textChars":7,"textLines":1,"bbox":[1012,243,164,30]}
+{"kind":"textbox","id":"sh/w3il0vut","slide":4,"name":"text","text":"AgentFlow V2","textPreview":"AgentFlow V2","textChars":12,"textLines":1,"bbox":[1012,282,164,26]}
+{"kind":"shape","id":"sh/x4r290be","slide":4,"name":"stage-6","bbox":[42,426,194,126]}
+{"kind":"textbox","id":"sh/a103ylcn","slide":4,"name":"text","text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[56,438,40,26]}
+{"kind":"textbox","id":"sh/b29k7qt8","slide":4,"name":"text","text":"Preflight","textPreview":"Preflight","textChars":9,"textLines":1,"bbox":[56,469,164,30]}
+{"kind":"textbox","id":"sh/s7e1oru9","slide":4,"name":"text","text":"执行就绪检查","textPreview":"执行就绪检查","textChars":6,"textLines":1,"bbox":[56,508,164,26]}
+{"kind":"shape","id":"sh/d8n2xwbu","slide":4,"name":"stage-7","bbox":[281,426,194,126]}
+{"kind":"textbox","id":"sh/fyxwjyho","slide":4,"name":"text","text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[295,438,40,26]}
+{"kind":"textbox","id":"sh/ux4fqt03","slide":4,"name":"text","text":"Dev Run","textPreview":"Dev Run","textChars":7,"textLines":1,"bbox":[295,469,164,30]}
+{"kind":"textbox","id":"sh/h0fel8zu","slide":4,"name":"text","text":"轨迹与工具调用","textPreview":"轨迹与工具调用","textChars":7,"textLines":1,"bbox":[295,508,164,26]}
+{"kind":"shape","id":"sh/gz6xs3i9","slide":4,"name":"stage-8","bbox":[520,426,194,126]}
+{"kind":"textbox","id":"sh/7adwfehs","slide":4,"name":"text","text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[534,438,40,26]}
+{"kind":"textbox","id":"sh/694fmt07","slide":4,"name":"text","text":"Evaluate","textPreview":"Evaluate","textChars":8,"textLines":1,"bbox":[534,469,164,30]}
+{"kind":"textbox","id":"sh/twvehozi","slide":4,"name":"text","text":"断言 + Rubric","textPreview":"断言 + Rubric","textChars":11,"textLines":1,"bbox":[534,508,164,26]}
+{"kind":"shape","id":"sh/sbmxojid","slide":4,"name":"stage-9","bbox":[759,426,194,126]}
+{"kind":"textbox","id":"sh/j6dwbehg","slide":4,"name":"text","text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[773,438,40,26]}
+{"kind":"textbox","id":"sh/i5kvi90v","slide":4,"name":"text","text":"Search","textPreview":"Search","textChars":6,"textLines":1,"bbox":[773,469,164,30]}
+{"kind":"textbox","id":"sh/ydojmhwv","slide":4,"name":"text","text":"Operator 候选","textPreview":"Operator 候选","textChars":11,"textLines":1,"bbox":[773,508,164,26]}
+{"kind":"shape","id":"sh/zex0vmd0","slide":4,"name":"stage-10","bbox":[998,426,194,126]}
+{"kind":"textbox","id":"sh/kf61o7el","slide":4,"name":"text","text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1012,438,40,26]}
+{"kind":"textbox","id":"sh/lgfixcv6","slide":4,"name":"text","text":"Results","textPreview":"Results","textChars":7,"textLines":1,"bbox":[1012,469,164,30]}
+{"kind":"textbox","id":"sh/q94zixwj","slide":4,"name":"text","text":"Pareto + Held-out","textPreview":"Pareto + Held-out","textChars":17,"textLines":1,"bbox":[1012,508,164,26]}
+{"kind":"shape","id":"sh/bad0r2d4","slide":4,"bbox":[236,263,45,0]}
+{"kind":"shape","id":"sh/cbmhk7ep","slide":4,"bbox":[475,263,45,0]}
+{"kind":"shape","id":"sh/dcfitcva","slide":4,"bbox":[714,263,45,0]}
+{"kind":"shape","id":"sh/2l4zexwn","slide":4,"bbox":[953,263,45,0]}
+{"kind":"shape","id":"sh/3md0n2x8","slide":4,"bbox":[139,326,956,100]}
+{"kind":"shape","id":"sh/50jmt0fq","slide":4,"bbox":[236,489,45,0]}
+{"kind":"shape","id":"sh/4zalkvy5","slide":4,"bbox":[475,489,45,0]}
+{"kind":"shape","id":"sh/jy1krqxk","slide":4,"bbox":[714,489,45,0]}
+{"kind":"shape","id":"sh/ids3ilgz","slide":4,"bbox":[953,489,45,0]}
+{"kind":"textbox","id":"sh/hcj2pgfe","slide":4,"name":"text","text":"设计阶段","textPreview":"设计阶段","textChars":4,"textLines":1,"bbox":[42,166,180,24]}
+{"kind":"textbox","id":"sh/wbalgbyt","slide":4,"name":"text","text":"实验与优化阶段","textPreview":"实验与优化阶段","textChars":7,"textLines":1,"bbox":[42,392,220,24]}
+{"kind":"notes","id":"nt/2ee0v9","slide":4,"text":"按实际前端控制器的顺序讲解。强调用户在 Contract 和 Crew 阶段可以编辑，搜索只在 dev split 上进行。\n\n[Sources]\n- packages/ui/src/views/metaagent/useAutopilotRun.js\n- packages/server/src/controllers/agentflowv2-generator/index.ts\n[/Sources]"}
+{"kind":"slide","id":"sl/77heyz","slide":5,"title":"WORKFLOW AUTOPILOT","textShapes":19}
+{"kind":"textbox","id":"sh/sf2dszu9","slide":5,"name":"eyebrow","text":"WORKFLOW AUTOPILOT","textPreview":"WORKFLOW AUTOPILOT","textChars":18,"textLines":1,"bbox":[42,28,360,22]}
+{"kind":"textbox","id":"sh/retcjudo","slide":5,"name":"slide-title","text":"Fixtures 把外部世界变成可重复的实验条件","textPreview":"Fixtures 把外部世界变成可重复的实验条件","textChars":24,"textLines":1,"bbox":[42,56,1160,72]}
+{"kind":"shape","id":"sh/6d0vqpc3","slide":5,"bbox":[42,142,1196,0]}
+{"kind":"textbox","id":"sh/5cruhkvi","slide":5,"name":"page","text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"textbox","id":"sh/kridofud","slide":5,"name":"text","text":"声明式工具规范","textPreview":"声明式工具规范","textChars":7,"textLines":1,"bbox":[42,176,220,28]}
+{"kind":"shape","id":"sh/jq9cfads","slide":5,"name":"fixture-code","bbox":[42,214,520,352]}
+{"kind":"textbox","id":"sh/ip0vm5c7","slide":5,"name":"text","text":"check_order(order_id)\n\nmatch: { order_id: \"A-1187\" }\nresult: { status: \"shipped\", carrier: \"DHL\" }\n\nmatch: { order_id: \"B-2000\" }\nerror: \"Order service timed out\"\n\nfallback: { status: \"not_found\" }","textPreview":"check_order(order_id) |  | match: { order_id: \"A-1187\" } | result: { status: \"shipped\", carrier: \"DHL\" } |  | match: { order_id: \"B-2000\"...","textChars":197,"textLines":9,"bbox":[70,242,464,298]}
+{"kind":"textbox","id":"sh/p8vet4b2","slide":5,"name":"text","text":"运行时匹配优先级","textPreview":"运行时匹配优先级","textChars":8,"textLines":1,"bbox":[630,176,220,28]}
+{"kind":"textbox","id":"sh/onmd0juh","slide":5,"name":"text","text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[630,220,36,32]}
+{"kind":"textbox","id":"sh/2l8n2pkz","slide":5,"name":"text","text":"Exact match","textPreview":"Exact match","textChars":11,"textLines":1,"bbox":[686,220,180,30]}
+{"kind":"textbox","id":"sh/3mhovulk","slide":5,"name":"text","text":"标识符完全相等","textPreview":"标识符完全相等","textChars":7,"textLines":1,"bbox":[884,220,330,30]}
+{"kind":"shape","id":"sh/47a54z25","slide":5,"bbox":[630,268,584,0]}
+{"kind":"textbox","id":"sh/p8j6x43q","slide":5,"name":"text","text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[630,300,36,32]}
+{"kind":"textbox","id":"sh/uh8nypk3","slide":5,"name":"text","text":"Containment","textPreview":"Containment","textChars":11,"textLines":1,"bbox":[686,300,180,30]}
+{"kind":"textbox","id":"sh/fih4ralo","slide":5,"name":"text","text":"自由文本包含短关键词","textPreview":"自由文本包含短关键词","textChars":10,"textLines":1,"bbox":[884,300,330,30]}
+{"kind":"shape","id":"sh/gjq50f29","slide":5,"bbox":[630,348,584,0]}
+{"kind":"textbox","id":"sh/hkz6tk3e","slide":5,"name":"text","text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[630,380,36,32]}
+{"kind":"textbox","id":"sh/edsna9k7","slide":5,"name":"text","text":"Catch-all","textPreview":"Catch-all","textChars":9,"textLines":1,"bbox":[686,380,180,30]}
+{"kind":"textbox","id":"sh/ze1o3els","slide":5,"name":"text","text":"空 match 处理动作型工具","textPreview":"空 match 处理动作型工具","textChars":15,"textLines":1,"bbox":[884,380,330,30]}
+{"kind":"shape","id":"sh/vidkv614","slide":5,"bbox":[630,428,584,0]}
+{"kind":"textbox","id":"sh/ah4321kj","slide":5,"name":"text","text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[630,460,36,32]}
+{"kind":"textbox","id":"sh/xkv2xgja","slide":5,"name":"text","text":"Fallback","textPreview":"Fallback","textChars":8,"textLines":1,"bbox":[686,460,180,30]}
+{"kind":"textbox","id":"sh/wjml4bip","slide":5,"name":"text","text":"返回 not_found 或 error","textPreview":"返回 not_found 或 error","textChars":20,"textLines":1,"bbox":[884,460,330,30]}
+{"kind":"shape","id":"sh/jmdkzq1g","slide":5,"name":"fixture-takeaway","bbox":[630,554,584,64]}
+{"kind":"textbox","id":"sh/il436l0v","slide":5,"name":"text","text":"同一输入 → 同一工具结果；因此 tool_called 与 grounded 可以客观判定。","textPreview":"同一输入 → 同一工具结果；因此 tool_called 与 grounded 可以客观判定。","textChars":47,"textLines":1,"bbox":[650,572,544,28]}
+{"kind":"notes","id":"nt/77heyz","slide":5,"text":"Fixtures 只确定化业务工具世界；模型调用仍访问模型供应商，整个 Agent 输出不保证完全确定。\n\n[Sources]\n- packages/server/src/services/agentflowv2-generator/mockToolCompiler.ts\n- packages/server/src/services/agentflowv2-generator/mockToolStore.ts\n- packages/server/src/services/agentflowv2-generator/studioSchemas.ts\n[/Sources]"}
+{"kind":"slide","id":"sl/jbpb7a","slide":6,"title":"WORKFLOW AUTOPILOT","textShapes":12}
+{"kind":"textbox","id":"sh/obu54nu5","slide":6,"name":"eyebrow","text":"WORKFLOW AUTOPILOT","textPreview":"WORKFLOW AUTOPILOT","textChars":18,"textLines":1,"bbox":[42,28,360,22]}
+{"kind":"textbox","id":"sh/nalobid0","slide":6,"name":"slide-title","text":"CrewIR：语义设计到 Flowise 执行图","textPreview":"CrewIR：语义设计到 Flowise 执行图","textChars":24,"textLines":1,"bbox":[42,56,1160,72]}
+{"kind":"shape","id":"sh/29cn2xcf","slide":6,"bbox":[42,142,1196,0]}
+{"kind":"textbox","id":"sh/18369svu","slide":6,"name":"page","text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"shape","id":"sh/07u50nu9","slide":6,"name":"ir-definition","bbox":[42,190,414,420]}
+{"kind":"textbox","id":"sh/f6l47ido","slide":6,"name":"text","text":"CrewIR","textPreview":"CrewIR","textChars":6,"textLines":1,"bbox":[68,218,220,28]}
+{"kind":"textbox","id":"sh/e5snydc3","slide":6,"name":"text","text":"process: parallel\n\nagents:\n  order_agent → check_order\n  reply_agent → no tools\n\ntasks:\n  lookup_order\n  write_reply dependsOn lookup_order\n\nfinalTaskId: write_reply","textPreview":"process: parallel |  | agents: |   order_agent → check_order |   reply_agent → no tools |  | tasks: |   lookup_order |   write_reply depe...","textChars":165,"textLines":11,"bbox":[68,266,360,308]}
+{"kind":"textbox","id":"sh/l4n6lcby","slide":6,"name":"text","text":"确定性\n编译器","textPreview":"确定性 | 编译器","textChars":7,"textLines":2,"bbox":[510,332,150,72]}
+{"kind":"shape","id":"sh/k3e5c7ud","slide":6,"bbox":[486,426,184,0]}
+{"kind":"shape","id":"sh/alwjy507","slide":6,"name":"flow-start","bbox":[744,194,148,58]}
+{"kind":"textbox","id":"sh/bm507ahs","slide":6,"name":"text","text":"Start","textPreview":"Start","textChars":5,"textLines":1,"bbox":[770,208,96,30]}
+{"kind":"shape","id":"sh/wne10fid","slide":6,"name":"flow-order","bbox":[704,330,228,70]}
+{"kind":"textbox","id":"sh/xoni90zy","slide":6,"name":"text","text":"Agent · 查询订单","textPreview":"Agent · 查询订单","textChars":12,"textLines":1,"bbox":[724,350,188,30]}
+{"kind":"shape","id":"sh/mhcjul0b","slide":6,"name":"flow-reply","bbox":[988,330,210,70]}
+{"kind":"textbox","id":"sh/ni503qhw","slide":6,"name":"text","text":"LLM · 生成回复","textPreview":"LLM · 生成回复","textChars":10,"textLines":1,"bbox":[1008,350,170,30]}
+{"kind":"shape","id":"sh/oje1wvi1","slide":6,"name":"flow-direct","bbox":[988,500,210,58]}
+{"kind":"textbox","id":"sh/9kni50zm","slide":6,"name":"text","text":"Direct Reply","textPreview":"Direct Reply","textChars":12,"textLines":1,"bbox":[1008,514,170,30]}
+{"kind":"shape","id":"sh/6dgj6pgf","slide":6,"bbox":[818,252,0,78]}
+{"kind":"shape","id":"sh/7epkfuh0","slide":6,"bbox":[932,365,56,0]}
+{"kind":"shape","id":"sh/3yhgrmxc","slide":6,"bbox":[1093,400,0,100]}
+{"kind":"textbox","id":"sh/2x8fyhgr","slide":6,"name":"text","text":"LLM 负责“谁做什么”","textPreview":"LLM 负责“谁做什么”","textChars":12,"textLines":1,"bbox":[708,586,220,24]}
+{"kind":"textbox","id":"sh/p0jytwfi","slide":6,"name":"text","text":"编译器负责 nodes / edges / handles","textPreview":"编译器负责 nodes / edges / handles","textChars":29,"textLines":1,"bbox":[952,586,280,24]}
+{"kind":"notes","id":"nt/jbpb7a","slide":6,"text":"IR 的价值是隔离不稳定的语言生成与严格的运行时格式。CrewIR 本身可编辑、可 hash、可 diff、可施加 operator。\n\n[Sources]\n- packages/server/src/services/agentflowv2-generator/studioSchemas.ts\n- packages/server/src/services/agentflowv2-generator/crewIR.ts\n[/Sources]"}
+{"kind":"slide","id":"sl/b6ct8j","slide":7,"title":"WORKFLOW AUTOPILOT","textShapes":10}
+{"kind":"textbox","id":"sh/dgn25w3y","slide":7,"name":"eyebrow","text":"WORKFLOW AUTOPILOT","textPreview":"WORKFLOW AUTOPILOT","textChars":18,"textLines":1,"bbox":[42,28,360,22]}
+{"kind":"textbox","id":"sh/qtcjah47","slide":7,"name":"slide-title","text":"编译器把模型常见错误提前修复，而不是留到运行时失败","textPreview":"编译器把模型常见错误提前修复，而不是留到运行时失败","textChars":25,"textLines":1,"bbox":[42,56,1160,72]}
+{"kind":"shape","id":"sh/bulk3mls","slide":7,"bbox":[42,142,1196,0]}
+{"kind":"textbox","id":"sh/0je1grm9","slide":7,"name":"page","text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"shape","id":"sh/lkn29w3u","slide":7,"bbox":[92,342,1034,0]}
+{"kind":"shape","id":"sh/yhwjeh4j","slide":7,"name":"dot-0","bbox":[86,334,18,18]}
+{"kind":"textbox","id":"sh/zi5k7ml4","slide":7,"name":"text","text":"01 · Normalize","textPreview":"01 · Normalize","textChars":14,"textLines":1,"bbox":[92,242,286,46]}
+{"kind":"textbox","id":"sh/8nelkbml","slide":7,"name":"text","text":"删除悬空依赖与不存在的工具\n重命名重复 outputKey\n修复 routed 分支入口和孤立终点","textPreview":"删除悬空依赖与不存在的工具 | 重命名重复 outputKey | 修复 routed 分支入口和孤立终点","textChars":49,"textLines":3,"bbox":[92,390,310,150]}
+{"kind":"shape","id":"sh/9o72dg36","slide":7,"name":"dot-1","bbox":[500,334,18,18]}
+{"kind":"textbox","id":"sh/hwfe5wva","slide":7,"name":"text","text":"02 · Compile","textPreview":"02 · Compile","textChars":12,"textLines":1,"bbox":[506,242,286,46]}
+{"kind":"textbox","id":"sh/gv6dcru5","slide":7,"name":"text","text":"工具任务 → Agent 节点\n纯推理任务 → LLM 节点\n依赖 → edges；final → Direct Reply","textPreview":"工具任务 → Agent 节点 | 纯推理任务 → LLM 节点 | 依赖 → edges；final → Direct Reply","textChars":62,"textLines":3,"bbox":[506,390,310,150]}
+{"kind":"shape","id":"sh/vuxw3mdk","slide":7,"name":"dot-2","bbox":[914,334,18,18]}
+{"kind":"textbox","id":"sh/ut4vahcz","slide":7,"name":"text","text":"03 · Assert","textPreview":"03 · Assert","textChars":11,"textLines":1,"bbox":[920,242,286,46]}
+{"kind":"textbox","id":"sh/5kfe9wvm","slide":7,"name":"text","text":"恰好一个 Start / Direct Reply\n所有模型已绑定\nDAG 无环且所有路径汇聚","textPreview":"恰好一个 Start / Direct Reply | 所有模型已绑定 | DAG 无环且所有路径汇聚","textChars":47,"textLines":3,"bbox":[920,390,310,150]}
+{"kind":"shape","id":"sh/4z6dgru1","slide":7,"name":"compiler-takeaway","bbox":[42,580,1196,48]}
+{"kind":"textbox","id":"sh/3yxw76dg","slide":7,"name":"text","text":"不可安全修复的错误（如循环依赖）才会阻止编译；图级不变量在执行前完成证明。","textPreview":"不可安全修复的错误（如循环依赖）才会阻止编译；图级不变量在执行前完成证明。","textChars":37,"textLines":1,"bbox":[62,592,1156,26]}
+{"kind":"notes","id":"nt/b6ct8j","slide":7,"text":"这一页强调 deterministic compiler 是核心工程贡献：同一个 normalized CrewIR 总会生成同一张 AgentFlow 图。\n\n[Sources]\n- packages/server/src/services/agentflowv2-generator/crewIR.ts\n[/Sources]"}
+{"kind":"slide","id":"sl/7a1a33","slide":8,"title":"WORKFLOW AUTOPILOT","textShapes":11}
+{"kind":"textbox","id":"sh/al8n6h8v","slide":8,"name":"eyebrow","text":"WORKFLOW AUTOPILOT","textPreview":"WORKFLOW AUTOPILOT","textChars":18,"textLines":1,"bbox":[42,28,360,22]}
+{"kind":"textbox","id":"sh/x8jm1wr6","slide":8,"name":"slide-title","text":"双层评测：语言合理不代表行为正确","textPreview":"双层评测：语言合理不代表行为正确","textChars":16,"textLines":1,"bbox":[42,56,1160,72]}
+{"kind":"shape","id":"sh/w7q58rql","slide":8,"bbox":[42,142,1196,0]}
+{"kind":"textbox","id":"sh/ja1o369c","slide":8,"name":"page","text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"textbox","id":"sh/i9sna18r","slide":8,"name":"text","text":"Final score","textPreview":"Final score","textChars":11,"textLines":1,"bbox":[42,190,200,34]}
+{"kind":"textbox","id":"sh/5cj65wri","slide":8,"name":"text","text":"0.6 × Assertions  +  0.4 × Rubric","textPreview":"0.6 × Assertions  +  0.4 × Rubric","textChars":33,"textLines":1,"bbox":[42,232,820,72]}
+{"kind":"shape","id":"sh/kba5cbqx","slide":8,"name":"hard-eval","bbox":[42,340,550,216]}
+{"kind":"textbox","id":"sh/7e1o7698","slide":8,"name":"text","text":"确定性硬断言","textPreview":"确定性硬断言","textChars":6,"textLines":1,"bbox":[66,364,220,28]}
+{"kind":"textbox","id":"sh/6dsne183","slide":8,"name":"text","text":"• tool_called / tool_not_called\n• tool_succeeded / output_matches\n• grounded：工具无数据时禁止事实性声明\n• Critical 失败 → 用例直接失败","textPreview":"• tool_called / tool_not_called | • tool_succeeded / output_matches | • grounded：工具无数据时禁止事实性声明 | • Critical 失败 → 用例直接失败","textChars":113,"textLines":4,"bbox":[66,410,500,124]}
+{"kind":"shape","id":"sh/ozexov6p","slide":8,"name":"soft-eval","bbox":[630,340,584,216]}
+{"kind":"textbox","id":"sh/pknex0na","slide":8,"name":"text","text":"LLM Rubric","textPreview":"LLM Rubric","textChars":10,"textLines":1,"bbox":[654,364,220,28]}
+{"kind":"textbox","id":"sh/2xwfmloj","slide":8,"name":"text","text":"• 完整性 30%\n• 正确性 30%\n• 安全性 25%\n• 可用性 15%","textPreview":"• 完整性 30% | • 正确性 30% | • 安全性 25% | • 可用性 15%","textChars":39,"textLines":4,"bbox":[654,410,250,124]}
+{"kind":"textbox","id":"sh/3y5wvq54","slide":8,"name":"text","text":"只评估需要语义判断的部分；\n不重复判断已经被程序证明的工具行为。","textPreview":"只评估需要语义判断的部分； | 不重复判断已经被程序证明的工具行为。","textChars":32,"textLines":2,"bbox":[930,410,250,110]}
+{"kind":"shape","id":"sh/cnyxsv61","slide":8,"name":"hallucination-example","bbox":[42,586,1172,48]}
+{"kind":"textbox","id":"sh/do7y10n6","slide":8,"name":"text","text":"例：没有调用 check_order 却回答“订单已发货” → critical grounded violation，即使语言很流畅也不能通过。","textPreview":"例：没有调用 check_order 却回答“订单已发货” → critical grounded violation，即使语言很流畅也不能通过。","textChars":73,"textLines":1,"bbox":[62,598,1132,26]}
+{"kind":"notes","id":"nt/7a1a33","slide":8,"text":"举订单例子说明 rubric-only evaluator 的盲点：它看不到真实工具轨迹。\n\n[Sources]\n- packages/server/src/services/agentflowv2-generator/assertions.ts\n- packages/server/src/services/agentflowv2-generator/studioService.ts\n[/Sources]"}
+{"kind":"slide","id":"sl/c9unoy","slide":9,"title":"WORKFLOW AUTOPILOT","textShapes":16}
+{"kind":"textbox","id":"sh/72xszi9w","slide":9,"name":"eyebrow","text":"WORKFLOW AUTOPILOT","textPreview":"WORKFLOW AUTOPILOT","textChars":18,"textLines":1,"bbox":[42,28,360,22]}
+{"kind":"textbox","id":"sh/836tsnah","slide":9,"name":"slide-title","text":"合法 CrewIR 邻域搜索","textPreview":"合法 CrewIR 邻域搜索","textChars":14,"textLines":1,"bbox":[42,56,1160,72]}
+{"kind":"shape","id":"sh/t4fa18rm","slide":9,"bbox":[42,142,1196,0]}
+{"kind":"textbox","id":"sh/u5obuds7","slide":9,"name":"page","text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"textbox","id":"sh/v6xs3i9s","slide":9,"name":"text","text":"每一轮","textPreview":"每一轮","textChars":3,"textLines":1,"bbox":[42,180,220,28]}
+{"kind":"shape","id":"sh/grqtwnad","slide":9,"name":"search-parent","bbox":[42,226,210,82]}
+{"kind":"textbox","id":"sh/hsza5sry","slide":9,"name":"text","text":"当前最健康 Crew","textPreview":"当前最健康 Crew","textChars":10,"textLines":1,"bbox":[58,250,178,30]}
+{"kind":"shape","id":"sh/2t8byxsj","slide":9,"name":"search-evidence","bbox":[330,226,210,82]}
+{"kind":"textbox","id":"sh/3uhc7294","slide":9,"name":"text","text":"Observed Evidence","textPreview":"Observed Evidence","textChars":17,"textLines":1,"bbox":[346,250,178,30]}
+{"kind":"shape","id":"sh/jy50zex0","slide":9,"name":"search-ops","bbox":[618,226,210,82]}
+{"kind":"textbox","id":"sh/yxwz69wf","slide":9,"name":"text","text":"Legal Operators","textPreview":"Legal Operators","textChars":15,"textLines":1,"bbox":[634,250,178,30]}
+{"kind":"shape","id":"sh/l0ni1of6","slide":9,"name":"search-trials","bbox":[906,226,250,82]}
+{"kind":"textbox","id":"sh/kzeh8jel","slide":9,"name":"text","text":"Compile → Run → Score","textPreview":"Compile → Run → Score","textChars":21,"textLines":1,"bbox":[922,250,218,30]}
+{"kind":"shape","id":"sh/bulgvex4","slide":9,"bbox":[252,267,78,0]}
+{"kind":"shape","id":"sh/a9cz29wj","slide":9,"bbox":[540,267,78,0]}
+{"kind":"shape","id":"sh/xwnyxofu","slide":9,"bbox":[828,267,78,0]}
+{"kind":"shape","id":"sh/wveh4jep","slide":9,"bbox":[147,308,884,0]}
+{"kind":"textbox","id":"sh/vqp07yd8","slide":9,"name":"text","text":"三种可比较策略","textPreview":"三种可比较策略","textChars":7,"textLines":1,"bbox":[42,372,220,28]}
+{"kind":"textbox","id":"sh/u5gzetwn","slide":9,"name":"text","text":"Random","textPreview":"Random","textChars":6,"textLines":1,"bbox":[42,414,150,30]}
+{"kind":"textbox","id":"sh/ql0j6xgv","slide":9,"name":"text","text":"固定 seed，从同一合法邻域均匀抽样","textPreview":"固定 seed，从同一合法邻域均匀抽样","textChars":19,"textLines":1,"bbox":[42,452,330,52]}
+{"kind":"textbox","id":"sh/rmtkz2xg","slide":9,"name":"text","text":"Greedy","textPreview":"Greedy","textChars":6,"textLines":1,"bbox":[430,414,150,30]}
+{"kind":"textbox","id":"sh/cn2l87y1","slide":9,"name":"text","text":"静态先验：失败时买质量，健康后买效率","textPreview":"静态先验：失败时买质量，健康后买效率","textChars":18,"textLines":1,"bbox":[430,452,330,52]}
+{"kind":"textbox","id":"sh/dob21cfm","slide":9,"name":"text","text":"Evidence-guided","textPreview":"Evidence-guided","textChars":15,"textLines":1,"bbox":[818,414,220,30]}
+{"kind":"textbox","id":"sh/epk3ahg7","slide":9,"name":"text","text":"LLM 只能从合法 operator 列表中选择，并可生成 prompt patch","textPreview":"LLM 只能从合法 operator 列表中选择，并可生成 prompt patch","textChars":42,"textLines":1,"bbox":[818,452,370,62]}
+{"kind":"shape","id":"sh/zqtk3mxs","slide":9,"bbox":[42,542,1172,0]}
+{"kind":"textbox","id":"sh/0r2lcryx","slide":9,"name":"text","text":"最终选择：先通过 feasibility gate，再保留 Quality↑ / Cost↓ / Latency↓ 的 Pareto 前沿。","textPreview":"最终选择：先通过 feasibility gate，再保留 Quality↑ / Cost↓ / Latency↓ 的 Pareto 前沿。","textChars":70,"textLines":1,"bbox":[42,572,1172,44]}
+{"kind":"notes","id":"nt/c9unoy","slide":9,"text":"搜索证据全部来自实际运行：pass rate、失败断言、未调用工具、执行错误、成本和延迟。\n\n[Sources]\n- packages/server/src/services/agentflowv2-generator/crewOperators.ts\n- packages/server/src/services/agentflowv2-generator/crewSearch.ts\n- packages/ui/src/views/metaagent/studioUtils.js\n[/Sources]"}
+{"kind":"slide","id":"sl/kc8lvi","slide":10,"title":"WORKFLOW AUTOPILOT","textShapes":15}
+{"kind":"textbox","id":"sh/3ihsb2lo","slide":10,"name":"eyebrow","text":"WORKFLOW AUTOPILOT","textPreview":"WORKFLOW AUTOPILOT","textChars":18,"textLines":1,"bbox":[42,28,360,22]}
+{"kind":"textbox","id":"sh/4jqt472t","slide":10,"name":"slide-title","text":"底层运行时增强保证实验可信","textPreview":"底层运行时增强保证实验可信","textChars":13,"textLines":1,"bbox":[42,56,1160,72]}
+{"kind":"shape","id":"sh/5kzudc3e","slide":10,"bbox":[42,142,1196,0]}
+{"kind":"textbox","id":"sh/ql8b6hkz","slide":10,"name":"page","text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"textbox","id":"sh/r61cfmlk","slide":10,"name":"text","text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[42,186,50,34]}
+{"kind":"textbox","id":"sh/s7at8725","slide":10,"name":"text","text":"输入传播","textPreview":"输入传播","textChars":4,"textLines":1,"bbox":[118,186,230,34]}
+{"kind":"textbox","id":"sh/d8juhc3q","slide":10,"name":"text","text":"下游 Agent / LLM 若没有 user message，使用当前 runtime input 兜底，避免只收到 system prompt。","textPreview":"下游 Agent / LLM 若没有 user message，使用当前 runtime input 兜底，避免只收到 system prompt。","textChars":74,"textLines":1,"bbox":[378,186,820,62]}
+{"kind":"shape","id":"sh/e9sbahkb","slide":10,"bbox":[42,266,1172,0]}
+{"kind":"textbox","id":"sh/fa1cjmlg","slide":10,"name":"text","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[42,294,50,34]}
+{"kind":"textbox","id":"sh/ra94j25c","slide":10,"name":"text","text":"Telemetry 保留","textPreview":"Telemetry 保留","textChars":12,"textLines":1,"bbox":[118,294,230,34]}
+{"kind":"textbox","id":"sh/q903qx4r","slide":10,"name":"text","text":"Structured output 使用 includeRaw，保留 usage metadata、response metadata 与 parsed result。","textPreview":"Structured output 使用 includeRaw，保留 usage metadata、response metadata 与 parsed result。","textChars":84,"textLines":1,"bbox":[378,294,820,62]}
+{"kind":"shape","id":"sh/dcrmlsni","slide":10,"bbox":[42,374,1172,0]}
+{"kind":"textbox","id":"sh/sbils7mx","slide":10,"name":"text","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[42,402,50,34]}
+{"kind":"textbox","id":"sh/36p4vi5g","slide":10,"name":"text","text":"安全并行","textPreview":"安全并行","textChars":4,"textLines":1,"bbox":[118,402,230,34]}
+{"kind":"textbox","id":"sh/i5g3md4v","slide":10,"name":"text","text":"仅并行无 memory、无工具副作用、同依赖前沿且 state writes 不冲突的兄弟节点。","textPreview":"仅并行无 memory、无工具副作用、同依赖前沿且 state writes 不冲突的兄弟节点。","textChars":48,"textLines":1,"bbox":[378,402,820,62]}
+{"kind":"shape","id":"sh/58rmhsn6","slide":10,"bbox":[42,482,1172,0]}
+{"kind":"textbox","id":"sh/47ilonml","slide":10,"name":"text","text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[42,510,50,34]}
+{"kind":"textbox","id":"sh/n2t4rm5k","slide":10,"name":"text","text":"停止与超时","textPreview":"停止与超时","textChars":5,"textLines":1,"bbox":[118,510,230,34]}
+{"kind":"textbox","id":"sh/m1knyh4z","slide":10,"name":"text","text":"跟踪每个 runId，Stop 会请求服务端 abort；生成、评测和执行都有明确 timeout。","textPreview":"跟踪每个 runId，Stop 会请求服务端 abort；生成、评测和执行都有明确 timeout。","textChars":50,"textLines":1,"bbox":[378,510,820,62]}
+{"kind":"notes","id":"nt/kc8lvi","slide":10,"text":"并行状态合并采用 base snapshot + delta merge；同一 key 出现不同写入时显式报冲突，而不是静默 last-writer-wins。\n\n[Sources]\n- packages/components/nodes/agentflow/Agent/Agent.ts\n- packages/components/nodes/agentflow/LLM/LLM.ts\n- packages/components/src/utils.ts\n- packages/server/src/utils/agentflowParallelScheduler.ts\n- packages/ui/src/views/metaagent/useAutopilotRun.js\n[/Sources]"}
+{"kind":"slide","id":"sl/423j3x","slide":11,"title":"WORKFLOW AUTOPILOT","textShapes":16}
+{"kind":"textbox","id":"sh/at0nudgf","slide":11,"name":"eyebrow","text":"WORKFLOW AUTOPILOT","textPreview":"WORKFLOW AUTOPILOT","textChars":18,"textLines":1,"bbox":[42,28,360,22]}
+{"kind":"textbox","id":"sh/xwbmp8z6","slide":11,"name":"slide-title","text":"验证覆盖从纯函数单测延伸到真实 Flowise 组件池与沙箱","textPreview":"验证覆盖从纯函数单测延伸到真实 Flowise 组件池与沙箱","textChars":30,"textLines":1,"bbox":[42,56,1160,72]}
+{"kind":"shape","id":"sh/wv25wnyl","slide":11,"bbox":[42,142,1196,0]}
+{"kind":"textbox","id":"sh/jyt4rihc","slide":11,"name":"page","text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"textbox","id":"sh/yxknydgr","slide":11,"name":"text","text":"本地验证结果 · 2026-08-26","textPreview":"本地验证结果 · 2026-08-26","textChars":19,"textLines":1,"bbox":[42,174,460,30]}
+{"kind":"shape","id":"sh/50b6tsz2","slide":11,"name":"metric-0","bbox":[42,242,374,250]}
+{"kind":"textbox","id":"sh/kz250nyh","slide":11,"name":"text","text":"150","textPreview":"150","textChars":3,"textLines":1,"bbox":[70,280,318,96]}
+{"kind":"textbox","id":"sh/z2p4fyhs","slide":11,"name":"text","text":"总检查通过","textPreview":"总检查通过","textChars":5,"textLines":1,"bbox":[70,392,318,34]}
+{"kind":"textbox","id":"sh/e1gnmt07","slide":11,"name":"text","text":"0 failed","textPreview":"0 failed","textChars":8,"textLines":1,"bbox":[70,440,318,28]}
+{"kind":"shape","id":"sh/4jmxwve5","slide":11,"name":"metric-1","bbox":[453,242,374,250]}
+{"kind":"textbox","id":"sh/pkvy50fq","slide":11,"name":"text","text":"113","textPreview":"113","textChars":3,"textLines":1,"bbox":[481,280,318,96]}
+{"kind":"textbox","id":"sh/2h4fulwf","slide":11,"name":"text","text":"单元测试","textPreview":"单元测试","textChars":4,"textLines":1,"bbox":[481,392,318,34]}
+{"kind":"textbox","id":"sh/3idg3qx0","slide":11,"name":"text","text":"96 server + 17 UI","textPreview":"96 server + 17 UI","textChars":17,"textLines":1,"bbox":[481,440,318,28]}
+{"kind":"shape","id":"sh/cn6x0veh","slide":11,"name":"metric-2","bbox":[864,242,374,250]}
+{"kind":"textbox","id":"sh/dofy90f2","slide":11,"name":"text","text":"37","textPreview":"37","textChars":2,"textLines":1,"bbox":[892,280,318,96]}
+{"kind":"textbox","id":"sh/qlofy5wb","slide":11,"name":"text","text":"真实集成检查","textPreview":"真实集成检查","textChars":6,"textLines":1,"bbox":[892,392,318,34]}
+{"kind":"textbox","id":"sh/rmxg7qxw","slide":11,"name":"text","text":"component pool + sandbox","textPreview":"component pool + sandbox","textChars":24,"textLines":1,"bbox":[892,440,318,28]}
+{"kind":"textbox","id":"sh/sr2xobyx","slide":11,"name":"text","text":"300 Flowise components loaded","textPreview":"300 Flowise components loaded","textChars":29,"textLines":1,"bbox":[42,548,360,34]}
+{"kind":"textbox","id":"sh/tsbexgfi","slide":11,"name":"text","text":"14 legal operators compiled in integration harness","textPreview":"14 legal operators compiled in integration harness","textChars":50,"textLines":1,"bbox":[446,548,470,34]}
+{"kind":"textbox","id":"sh/983u1s7m","slide":11,"name":"text","text":"fixtures · grounded · graph invariants · parallel state merge","textPreview":"fixtures · grounded · graph invariants · parallel state merge","textChars":61,"textLines":1,"bbox":[42,598,900,26]}
+{"kind":"notes","id":"nt/423j3x","slide":11,"text":"这些数字来自本地刚刚运行的测试，不是预计值。说明集成脚本使用真实 NodesPool、真实 Custom Tool sandbox 和真实节点 input schema。\n\n[Sources]\n- packages/server/src/services/agentflowv2-generator/*.test.ts\n- packages/server/src/utils/agentflowParallelScheduler.test.ts\n- packages/ui/src/views/metaagent/studioUtils.test.js\n- packages/server/scripts/verify-autopilot-pipeline.js\n[/Sources]"}
+{"kind":"slide","id":"sl/363ehn","slide":12,"title":"WORKFLOW AUTOPILOT","textShapes":8}
+{"kind":"textbox","id":"sh/vitwjytw","slide":12,"name":"eyebrow","text":"WORKFLOW AUTOPILOT","textPreview":"WORKFLOW AUTOPILOT","textChars":18,"textLines":1,"bbox":[42,28,360,22]}
+{"kind":"textbox","id":"sh/wj2xc3uh","slide":12,"name":"slide-title","text":"当前限制明确了下一阶段最有价值的实验","textPreview":"当前限制明确了下一阶段最有价值的实验","textChars":18,"textLines":1,"bbox":[42,56,1160,72]}
+{"kind":"shape","id":"sh/xkbel8b2","slide":12,"bbox":[42,142,1196,0]}
+{"kind":"textbox","id":"sh/mt0f6tcf","slide":12,"name":"page","text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"textbox","id":"sh/nu9wfyd0","slide":12,"name":"text","text":"当前实现","textPreview":"当前实现","textChars":4,"textLines":1,"bbox":[42,180,260,28]}
+{"kind":"textbox","id":"sh/8vix83ul","slide":12,"name":"text","text":"下一步验证","textPreview":"下一步验证","textChars":5,"textLines":1,"bbox":[656,180,260,28]}
+{"kind":"textbox","id":"sh/9greh8b6","slide":12,"name":"text","text":"• 生成图未主动设置 startMaxConcurrency，默认仍为 1\n• 带工具 Agent 被安全调度器保留在串行路径\n• 部分已实现 operator 尚未进入自动枚举\n• Held-out 只用于报告，不影响推荐选择\n• 未配置 cheap model 时 downgrade 会回退默认模型\n• Session 清理不删除候选 Flow 与模拟工具记录","textPreview":"• 生成图未主动设置 startMaxConcurrency，默认仍为 1 | • 带工具 Agent 被安全调度器保留在串行路径 | • 部分已实现 operator 尚未进入自动枚举 | • Held-out 只用于报告，不影响推荐选择 | • 未配置 cheap mo...","textChars":183,"textLines":6,"bbox":[42,226,548,360]}
+{"kind":"textbox","id":"sh/6p4fidcz","slide":12,"name":"text","text":"• 比较串行与受控并行的端到端延迟收益\n• 为只读工具建立 side-effect taxonomy 与并发许可\n• 补全 operator 枚举并做逐算子 ablation\n• 加入 held-out-aware selection 或稳定性门槛\n• 将模型可用性纳入合法邻域生成\n• 增加实验生命周期与自动清理机制","textPreview":"• 比较串行与受控并行的端到端延迟收益 | • 为只读工具建立 side-effect taxonomy 与并发许可 | • 补全 operator 枚举并做逐算子 ablation | • 加入 held-out-aware selection 或稳定性门槛 | • 将模...","textChars":159,"textLines":6,"bbox":[656,226,558,360]}
+{"kind":"shape","id":"sh/7qdgrit4","slide":12,"bbox":[620,194,0,418]}
+{"kind":"shape","id":"sh/zel8byh4","slide":12,"name":"limitations-takeaway","bbox":[42,600,1172,38]}
+{"kind":"textbox","id":"sh/ydc72tgj","slide":12,"name":"text","text":"研究价值：这些限制都可以转化为可测量的消融或对照实验，而不是只做工程修补。","textPreview":"研究价值：这些限制都可以转化为可测量的消融或对照实验，而不是只做工程修补。","textChars":37,"textLines":1,"bbox":[62,607,1132,24]}
+{"kind":"notes","id":"nt/363ehn","slide":12,"text":"主动报告限制可以让导师看到研究边界和下一阶段实验设计。\n\n[Sources]\n- packages/server/src/services/agentflowv2-generator/crewOperators.ts\n- packages/server/src/services/agentflowv2-generator/crewSearch.ts\n- packages/server/src/services/agentflowv2-generator/crewIR.ts\n- packages/server/src/utils/buildAgentflow.ts\n- packages/ui/src/views/metaagent/useAutopilotRun.js\n[/Sources]"}
+{"kind":"slide","id":"sl/jc0cxn","slide":13,"title":"CONCLUSION","textShapes":10}
+{"kind":"textbox","id":"sh/u98jixkz","slide":13,"name":"text","text":"CONCLUSION","textPreview":"CONCLUSION","textChars":10,"textLines":1,"bbox":[42,40,240,24]}
+{"kind":"textbox","id":"sh/hcjidc3q","slide":13,"name":"text","text":"核心贡献不是自动画图，\n而是把工作流设计变成可执行实验。","textPreview":"核心贡献不是自动画图， | 而是把工作流设计变成可执行实验。","textChars":28,"textLines":2,"bbox":[42,122,820,150]}
+{"kind":"shape","id":"sh/gba1k725","slide":13,"bbox":[42,306,1196,0]}
+{"kind":"textbox","id":"sh/3y10f2lw","slide":13,"name":"text","text":"可编译","textPreview":"可编译","textChars":3,"textLines":1,"bbox":[42,366,320,44]}
+{"kind":"textbox","id":"sh/idsjmxkb","slide":13,"name":"text","text":"CrewIR 隔离语义设计与 Flowise 执行格式","textPreview":"CrewIR 隔离语义设计与 Flowise 执行格式","textChars":27,"textLines":1,"bbox":[42,430,330,92]}
+{"kind":"textbox","id":"sh/50jihcjm","slide":13,"name":"text","text":"可验证","textPreview":"可验证","textChars":3,"textLines":1,"bbox":[452,366,320,44]}
+{"kind":"textbox","id":"sh/4za1o721","slide":13,"name":"text","text":"Fixtures + Assertions 提供可重复的行为证据","textPreview":"Fixtures + Assertions 提供可重复的行为证据","textChars":32,"textLines":1,"bbox":[452,430,330,92]}
+{"kind":"textbox","id":"sh/r210jm1s","slide":13,"name":"text","text":"可优化","textPreview":"可优化","textChars":3,"textLines":1,"bbox":[862,366,320,44]}
+{"kind":"textbox","id":"sh/q1sjqhk7","slide":13,"name":"text","text":"Typed Operators + Pareto 把结构、质量和效率放进同一搜索空间","textPreview":"Typed Operators + Pareto 把结构、质量和效率放进同一搜索空间","textChars":42,"textLines":1,"bbox":[862,430,330,92]}
+{"kind":"shape","id":"sh/wva583ql","slide":13,"name":"final-claim","bbox":[42,574,1196,60]}
+{"kind":"textbox","id":"sh/xw361876","slide":13,"name":"text","text":"Workflow Autopilot = Agent Workflow Compiler + Test Harness + Search Controller","textPreview":"Workflow Autopilot = Agent Workflow Compiler + Test Harness + Search Controller","textChars":79,"textLines":1,"bbox":[62,590,1156,30]}
+{"kind":"textbox","id":"sh/atsn6t8f","slide":13,"name":"text","text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[1160,672,78,22]}
+{"kind":"notes","id":"nt/jc0cxn","slide":13,"text":"收束到论文式主张：系统贡献是一个可编译、可验证、可优化的 Agent workflow lifecycle。\n\n[Sources]\n- THESIS_MVP.md\n[/Sources]"}

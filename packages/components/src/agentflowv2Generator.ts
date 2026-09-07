@@ -7,6 +7,54 @@ import { extractResponseContent } from './utils'
 
 const ToolType = z.array(z.string()).describe('List of tools')
 
+export const extractAgentflowGeneratorJSON = (content: string): unknown => {
+    const trimmed = String(content || '').trim()
+    const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i)
+    const source = (fenced?.[1] || trimmed).trim()
+
+    try {
+        return JSON.parse(source)
+    } catch (_) {
+        // Models sometimes wrap the JSON in a short explanation. Fall through
+        // to a balanced scanner that supports both arrays and nested objects.
+    }
+
+    for (let start = 0; start < source.length; start += 1) {
+        const opener = source[start]
+        if (opener !== '{' && opener !== '[') continue
+        const stack: string[] = []
+        let inString = false
+        let escaped = false
+
+        for (let index = start; index < source.length; index += 1) {
+            const character = source[index]
+            if (inString) {
+                if (escaped) escaped = false
+                else if (character === '\\') escaped = true
+                else if (character === '"') inString = false
+                continue
+            }
+            if (character === '"') {
+                inString = true
+                continue
+            }
+            if (character === '{' || character === '[') stack.push(character)
+            else if (character === '}' || character === ']') {
+                const expected = character === '}' ? '{' : '['
+                if (stack.pop() !== expected) break
+                if (!stack.length) {
+                    try {
+                        return JSON.parse(source.slice(start, index + 1))
+                    } catch (_) {
+                        break
+                    }
+                }
+            }
+        }
+    }
+    throw new Error('No valid JSON object or array found in model response')
+}
+
 // Define a more specific NodePosition schema
 const NodePositionType = z.object({
     x: z.number().describe('X coordinate of the node position'),
@@ -24,7 +72,6 @@ const NodeDataType = z
         label: z.string().optional().describe('Label for the node'),
         name: z.string().optional().describe('Name of the node')
     })
-    .optional()
 
 const NodeType = z.object({
     id: z.string().describe('Unique identifier for the node'),
@@ -151,8 +198,11 @@ interface OutputAnchor {
 export const generateAgentflowv2 = async (config: Record<string, any>, question: string, options: ICommonObject) => {
     try {
         const result = await generateNodesEdges(config, question, options)
+        if ('error' in result) return result
 
-        const { nodes, edges } = generateNodesData(result, config)
+        const generatedData = generateNodesData(result, config)
+        if ('error' in generatedData) return generatedData
+        const { nodes, edges } = generatedData
 
         const updatedNodes = await generateSelectedTools(nodes, config, question, options)
 
@@ -329,23 +379,13 @@ const _generateSelectedTools = async (config: Record<string, any>, question: str
         // Standard completion without structured output
         const response = await model.invoke(messages)
 
-        // Try to extract JSON from the response
+        // Parse either the array required by ToolType or a fenced/wrapped response.
         const responseContent = extractResponseContent(response)
-        const jsonMatch = responseContent.match(/```json\n([\s\S]*?)\n```/) || responseContent.match(/{[\s\S]*?}/)
-
-        if (jsonMatch) {
-            const jsonStr = jsonMatch[1] || jsonMatch[0]
-            try {
-                const parsedJSON = JSON.parse(jsonStr)
-                // Validate with our schema
-                return ToolType.parse(parsedJSON)
-            } catch (parseError) {
-                console.error('Error parsing JSON from response:', parseError)
-                return { error: 'Failed to parse JSON from response', content: responseContent }
-            }
-        } else {
-            console.error('No JSON found in response:', responseContent)
-            return { error: 'No JSON found in response', content: responseContent }
+        try {
+            return ToolType.parse(extractAgentflowGeneratorJSON(responseContent))
+        } catch (parseError) {
+            console.error('Error parsing JSON from response:', parseError)
+            return { error: 'Failed to parse JSON from response', content: responseContent }
         }
     } catch (error) {
         console.error('Error generating AgentflowV2:', error)
@@ -385,23 +425,14 @@ const generateNodesEdges = async (config: Record<string, any>, question: string,
         // Standard completion without structured output
         const response = await model.invoke(messages)
 
-        // Try to extract JSON from the response
+        // Parse the full nested graph object instead of stopping at its first
+        // inner closing brace.
         const responseContent = extractResponseContent(response)
-        const jsonMatch = responseContent.match(/```json\n([\s\S]*?)\n```/) || responseContent.match(/{[\s\S]*?}/)
-
-        if (jsonMatch) {
-            const jsonStr = jsonMatch[1] || jsonMatch[0]
-            try {
-                const parsedJSON = JSON.parse(jsonStr)
-                // Validate with our schema
-                return NodesEdgesType.parse(parsedJSON)
-            } catch (parseError) {
-                console.error('Error parsing JSON from response:', parseError)
-                return { error: 'Failed to parse JSON from response', content: responseContent }
-            }
-        } else {
-            console.error('No JSON found in response:', responseContent)
-            return { error: 'No JSON found in response', content: responseContent }
+        try {
+            return NodesEdgesType.parse(extractAgentflowGeneratorJSON(responseContent))
+        } catch (parseError) {
+            console.error('Error parsing JSON from response:', parseError)
+            return { error: 'Failed to parse JSON from response', content: responseContent }
         }
     } catch (error) {
         console.error('Error generating AgentflowV2:', error)
@@ -419,7 +450,7 @@ const generateNodesData = (result: Record<string, any>, config: Record<string, a
 
         for (let i = 0; i < nodes.length; i += 1) {
             const node = nodes[i]
-            let nodeName = node.data.name
+            let nodeName = node.data?.name
 
             // If nodeName is not found in data.name, try extracting from node.id
             if (!nodeName || !config.componentNodes[nodeName]) {
@@ -428,7 +459,7 @@ const generateNodesData = (result: Record<string, any>, config: Record<string, a
 
             const componentNode = config.componentNodes[nodeName]
             if (!componentNode) {
-                continue
+                throw new Error(`Generated node ${node.id} does not identify a supported Agentflow component.`)
             }
 
             const initializedNodeData = initNode(cloneDeep(componentNode), node.id)
@@ -453,7 +484,7 @@ const generateNodesData = (result: Record<string, any>, config: Record<string, a
     }
 }
 
-const initNode = (nodeData: Record<string, any>, newNodeId: string): NodeData => {
+export const initNode = (nodeData: Record<string, any>, newNodeId: string): Record<string, any> => {
     const inputParams = []
     const incoming = nodeData.inputs ? nodeData.inputs.length : 0
 
