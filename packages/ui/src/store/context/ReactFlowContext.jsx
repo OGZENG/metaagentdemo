@@ -21,6 +21,9 @@ export const ReactFlowContext = ({ children }) => {
     const [reactFlowInstance, setReactFlowInstance] = useState(null)
 
     const onAgentflowNodeStatusUpdate = ({ nodeId, status, error }) => {
+        // The chat also runs outside a canvas (the Autopilot playground), where
+        // there are no nodes to colour.
+        if (!reactFlowInstance) return
         reactFlowInstance.setNodes((nds) =>
             nds.map((node) => {
                 if (node.id === nodeId) {
@@ -36,6 +39,7 @@ export const ReactFlowContext = ({ children }) => {
     }
 
     const clearAgentflowNodeStatus = () => {
+        if (!reactFlowInstance) return
         reactFlowInstance.setNodes((nds) =>
             nds.map((node) => {
                 node.data = {

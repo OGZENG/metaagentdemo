@@ -1,4 +1,10 @@
 import {
+    buildConversationTurns,
+    buildImprovementSuite,
+    compareToLab,
+    summarizeExecutedData,
+    summarizeResultSubset,
+    summarizeTurns,
     buildRunEvidence,
     buildSearchTree,
     extractStudioToolCalls,
@@ -224,5 +230,76 @@ describe('selection', () => {
         expect(tree).toHaveLength(1)
         expect(tree[0].children[0].id).toBe('c1')
         expect(tree[0].children[0].children[0].id).toBe('c2')
+    })
+})
+
+describe('deployed crew telemetry', () => {
+    const executed = (label, usage, tools = [], status = 'FINISHED') => ({
+        nodeId: label,
+        nodeLabel: label,
+        status,
+        data: { output: { usageMetadata: usage, usedTools: tools } }
+    })
+
+    it('breaks usage down per agent and counts tool calls', () => {
+        const summary = summarizeExecutedData([
+            executed('Router', { input_tokens: 10, output_tokens: 5 }),
+            executed('Support', { total_tokens: 100, total_cost: 0.01 }, [{ tool: 'lookup_order' }]),
+            executed('Support', { input_tokens: 20, output_tokens: 20 }),
+            { nodeId: 'start', data: { output: {} } }
+        ])
+        expect(summary.totalTokens).toBe(155)
+        expect(summary.modelCalls).toBe(3)
+        expect(summary.toolCalls).toBe(1)
+        expect(summary.agents.map((agent) => [agent.name, agent.calls, agent.totalTokens])).toEqual([
+            ['Support', 2, 140],
+            ['Router', 1, 15]
+        ])
+    })
+
+    it('pairs questions with replies and leaves a streaming reply incomplete', () => {
+        const messages = [
+            { type: 'apiMessage', message: 'Hi there! How can I help?' },
+            { type: 'userMessage', message: 'Where is A1?' },
+            { type: 'apiMessage', id: 'm1', message: 'Shipped', agentFlowExecutedData: [executed('Support', { total_tokens: 50 })] },
+            { type: 'userMessage', message: 'And A2?' },
+            { type: 'apiMessage', message: 'Look' }
+        ]
+        const turns = buildConversationTurns(messages, true)
+        expect(turns.map((turn) => [turn.key, turn.question, turn.complete])).toEqual([
+            ['m1', 'Where is A1?', true],
+            ['turn-1', 'And A2?', false]
+        ])
+        expect(summarizeTurns(turns)).toMatchObject({ turns: 1, totalTokens: 50, averageTokens: 50 })
+    })
+
+    it('flags live usage that drifts far above the measured crew', () => {
+        const rows = compareToLab({ averageTokens: 3000, averageCost: 0 }, { averageTokens: 1000, averageCost: 0.01 })
+        expect(rows.find((row) => row.key === 'averageTokens')).toMatchObject({ ratio: 3, drift: true })
+        expect(rows.find((row) => row.key === 'averageCost')).toMatchObject({ ratio: null, drift: false })
+    })
+
+    it('adds accepted online cases to the development split only', () => {
+        const suite = buildImprovementSuite(
+            {
+                scenarios: [
+                    { id: 'a', split: 'dev' },
+                    { id: 'b', split: 'test' }
+                ]
+            },
+            [
+                { id: 'online_1', status: 'accepted', instruction: 'Quote the order id', scenario: { id: 'x', split: 'test' } },
+                { id: 'online_2', status: 'accepted', instruction: 'Quote the order id', scenario: null },
+                { id: 'online_3', status: 'pending', scenario: { id: 'y' } }
+            ]
+        )
+        expect(suite.dev.map((scenario) => [scenario.id, scenario.split])).toEqual([
+            ['a', 'dev'],
+            ['online_1', 'dev']
+        ])
+        expect(suite.test.map((scenario) => scenario.id)).toEqual(['b'])
+        expect(suite.caseIds).toEqual(['online_1', 'online_2'])
+        expect(suite.instructions).toEqual(['Quote the order id'])
+        expect(summarizeResultSubset([{ scenarioId: 'a' }], new Set(['online_1']))).toBeNull()
     })
 })

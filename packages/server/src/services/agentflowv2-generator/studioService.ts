@@ -19,7 +19,7 @@ import {
 } from './studioSchemas'
 import { assertCompiledGraph, compileCrewIRFlow, normalizeCrewIR, summarizeCrewIR } from './crewIR'
 import { describeToolEnvironment } from './mockToolCompiler'
-import { provisionMockTools, purgeMockTools } from './mockToolStore'
+import { provisionMockTools, purgeMockTools, resolveToolBindings } from './mockToolStore'
 import { combineScores, evaluateAssertions, rubricScore, summarizeAssertions, type RecordedToolCall } from './assertions'
 import {
     OperatorSelectionType,
@@ -513,7 +513,8 @@ export const compileStudioWorkflow = async (
     selectedChatModel: Record<string, any>,
     cheapChatModel: Record<string, any> | undefined,
     workspaceId: string,
-    orgId: string
+    orgId: string,
+    toolBindings: Record<string, string> = {}
 ) => {
     const design = StudioDesignType.parse(designInput)
     const { ir, validation } = normalizeCrewIR(
@@ -522,7 +523,15 @@ export const compileStudioWorkflow = async (
     )
     if (!validation.valid) throw new Error(`The crew definition is invalid: ${validation.errors.join(' ')}`)
 
-    const provisioning = await provisionMockTools(design.tools, workspaceId, orgId)
+    // A tool bound to a real Flowise tool is not simulated at all, so a deployed
+    // crew never depends on fixture rows that a purge could remove.
+    const realTools = await resolveToolBindings(toolBindings, workspaceId)
+    const simulated = await provisionMockTools(
+        design.tools.filter((tool) => !realTools[tool.name]),
+        workspaceId,
+        orgId
+    )
+    const provisioning = { ...simulated, toolIdByName: { ...simulated.toolIdByName, ...realTools }, bound: Object.keys(realTools) }
     const graph = assertCompiledGraph(
         compileCrewIRFlow(ir, {
             componentNodes: getRunningExpressApp().nodesPool.componentNodes,
@@ -548,7 +557,7 @@ export const compileStudioWorkflow = async (
     }
 }
 
-export const purgeStudioTools = async (workspaceId: string) => purgeMockTools(workspaceId)
+export const purgeStudioTools = async (workspaceId: string, keepToolIds?: Set<string>) => purgeMockTools(workspaceId, keepToolIds)
 
 /* ------------------------------------------------------------------ *
  * Stage 3 — two-layer evaluation
@@ -671,6 +680,7 @@ const SELECTION_PROMPT = [
     'Prefer the smallest change that addresses the strongest evidence. Do not trade quality for cost while cases still fail.',
     'You may additionally author promptPatches: for a named agent, a sharper goal and up to six guardrails derived from concrete observed failures. Guardrails must be specific rules, not restatements of the objective.',
     'If no operator in the list would plausibly help, return an empty selections array rather than picking one to fill the quota. A round spent on a change you do not believe in is worse than no round.',
+    'evidence.userInstructions are rules the people operating a deployed crew accepted from real conversations. While a rule is not yet reflected in the crew, prefer a promptPatch that encodes it as a guardrail on the agent responsible.',
     'Return: selections (index plus rationale) and promptPatches.'
 ].join('\n')
 

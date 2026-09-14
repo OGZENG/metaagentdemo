@@ -185,7 +185,7 @@ CardWithDeleteOverlay.propTypes = {
     onDelete: PropTypes.func
 }
 
-const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setPreviews }) => {
+const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setPreviews, onMessagesChange, loadHistory = true }) => {
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
 
@@ -1520,6 +1520,13 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
         }
     }, [isChatFlowAvailableForRAGFileUploads, fullFileUpload])
 
+    // Lets a host page — the Autopilot playground — observe the conversation
+    // for monitoring and review without taking over the chat state.
+    useEffect(() => {
+        if (onMessagesChange) onMessagesChange({ messages, chatId, loading })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [messages, chatId, loading])
+
     // Auto scroll chat to bottom (but not during TTS actions)
     useEffect(() => {
         if (!isTTSActionRef.current) {
@@ -1538,7 +1545,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
     useEffect(() => {
         if (open && chatflowid) {
             // API request
-            getChatmessageApi.request(chatflowid)
+            if (loadHistory) getChatmessageApi.request(chatflowid)
             getIsChatflowStreamingApi.request(chatflowid)
             getAllowChatFlowUploads.request(chatflowid)
             getChatflowConfig.request(chatflowid)
@@ -3239,7 +3246,9 @@ ChatMessage.propTypes = {
     isAgentCanvas: PropTypes.bool,
     isDialog: PropTypes.bool,
     previews: PropTypes.array,
-    setPreviews: PropTypes.func
+    setPreviews: PropTypes.func,
+    onMessagesChange: PropTypes.func,
+    loadHistory: PropTypes.bool
 }
 
 export default memo(ChatMessage)

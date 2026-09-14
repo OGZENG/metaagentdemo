@@ -13,6 +13,8 @@ const Chatflows = Loadable(lazy(() => import('@/views/chatflows')))
 // agents routing
 const Agentflows = Loadable(lazy(() => import('@/views/agentflows')))
 const MetaAgentStudio = Loadable(lazy(() => import('@/views/metaagent')))
+const AutopilotDeployments = Loadable(lazy(() => import('@/views/metaagent/deployments')))
+const AutopilotPlayground = Loadable(lazy(() => import('@/views/metaagent/deployments/Playground')))
 
 // marketplaces routing
 const Marketplaces = Loadable(lazy(() => import('@/views/marketplaces')))
@@ -103,6 +105,22 @@ const MainRoutes = {
             element: (
                 <RequireAuth permission={'agentflows:view'}>
                     <MetaAgentStudio />
+                </RequireAuth>
+            )
+        },
+        {
+            path: '/meta-agent/deployments',
+            element: (
+                <RequireAuth permission={'agentflows:view'}>
+                    <AutopilotDeployments />
+                </RequireAuth>
+            )
+        },
+        {
+            path: '/meta-agent/deployments/:id',
+            element: (
+                <RequireAuth permission={'agentflows:view'}>
+                    <AutopilotPlayground />
                 </RequireAuth>
             )
         },

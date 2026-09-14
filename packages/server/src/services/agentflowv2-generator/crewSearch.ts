@@ -39,6 +39,8 @@ export const RunEvidenceType = z.object({
     unusedTools: z.array(z.string()).default([]),
     errorMessages: z.array(z.string()).default([]),
     evaluatorIssues: z.array(z.string()).default([]),
+    /** rules accepted from live conversations on a deployed crew */
+    userInstructions: z.array(z.string()).default([]),
     /** operator signatures already measured in this search, never re-proposed */
     triedOperators: z.array(z.string()).default([])
 })

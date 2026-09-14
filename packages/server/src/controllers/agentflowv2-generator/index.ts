@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import agentflowv2Service from '../../services/agentflowv2-generator'
+import { referencedToolIdsForWorkspace } from '../../services/agentflowv2-generator/deploymentService'
 
 const requireWorkspace = (req: Request) => {
     const workspaceId = req.user?.activeWorkspaceId
@@ -56,11 +57,20 @@ const regenerateStudioCrew = async (req: Request, res: Response, next: NextFunct
 
 const compileStudioWorkflow = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { goal, design, crew, selectedChatModel, cheapChatModel } = req.body
+        const { goal, design, crew, selectedChatModel, cheapChatModel, toolBindings } = req.body
         if (!goal || !design || !selectedChatModel) throw new Error('Goal, design and selectedChatModel are required')
         const { workspaceId, orgId } = requireWorkspace(req)
         return res.json(
-            await agentflowv2Service.compileStudioWorkflow(goal, design, crew, selectedChatModel, cheapChatModel, workspaceId, orgId)
+            await agentflowv2Service.compileStudioWorkflow(
+                goal,
+                design,
+                crew,
+                selectedChatModel,
+                cheapChatModel,
+                workspaceId,
+                orgId,
+                toolBindings || {}
+            )
         )
     } catch (error) {
         next(error)
@@ -125,7 +135,7 @@ const applyStudioOperator = async (req: Request, res: Response, next: NextFuncti
 const purgeStudioTools = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { workspaceId } = requireWorkspace(req)
-        return res.json(await agentflowv2Service.purgeStudioTools(workspaceId))
+        return res.json(await agentflowv2Service.purgeStudioTools(workspaceId, await referencedToolIdsForWorkspace(workspaceId)))
     } catch (error) {
         next(error)
     }

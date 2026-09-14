@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
     Alert,
     Box,
@@ -17,7 +18,7 @@ import {
     Typography
 } from '@mui/material'
 import { alpha, useTheme } from '@mui/material/styles'
-import { IconPlayerPlay, IconRefresh, IconSparkles, IconSquare, IconTrash, IconWand } from '@tabler/icons-react'
+import { IconMessageChatbot, IconPlayerPlay, IconRefresh, IconSparkles, IconSquare, IconTrash, IconWand } from '@tabler/icons-react'
 
 import ViewHeader from '@/layout/MainLayout/ViewHeader'
 import MainCard from '@/ui-component/cards/MainCard'
@@ -32,6 +33,7 @@ import CrewGraph from './components/CrewGraph'
 import ScenarioPanel from './components/ScenarioPanel'
 import ToolEnvironmentPanel from './components/ToolEnvironmentPanel'
 import TrialsPanel from './components/TrialsPanel'
+import DeployDialog from './components/DeployDialog'
 import useAutopilotRun from './useAutopilotRun'
 import { SEARCH_STRATEGIES, splitScenarios } from './studioUtils'
 
@@ -130,7 +132,9 @@ const WorkflowAutopilot = () => {
         clearSession
     } = autopilot
 
+    const navigate = useNavigate()
     const [stage, setStage] = useState(0)
+    const [deployTrial, setDeployTrial] = useState(null)
 
     useEffect(() => {
         if (!goal) setGoal(EXAMPLE_GOAL)
@@ -267,6 +271,13 @@ const WorkflowAutopilot = () => {
                 description='Design, compile and improve an agent workflow through a guided, measurable process.'
             >
                 <Stack direction='row' spacing={1}>
+                    <Button
+                        variant='outlined'
+                        startIcon={<IconMessageChatbot size={16} />}
+                        onClick={() => navigate('/meta-agent/deployments')}
+                    >
+                        Deployed crews
+                    </Button>
                     {busy && (
                         <Button variant='outlined' color='error' startIcon={<IconSquare size={16} />} onClick={requestStop}>
                             Stop
@@ -807,6 +818,8 @@ const WorkflowAutopilot = () => {
                                 recommendations={shownRun.recommendations}
                                 onRecommendationStatus={setRecommendationStatus}
                                 onApplyRecommendations={applyRecommendations}
+                                // A snapshot was measured against a suite that no longer exists.
+                                onDeploy={showingArchive ? undefined : setDeployTrial}
                                 busy={busy}
                             />
                         </Box>
@@ -829,6 +842,18 @@ const WorkflowAutopilot = () => {
                     </Box>
                 )}
             </Box>
+            <DeployDialog
+                open={Boolean(deployTrial)}
+                trial={deployTrial}
+                session={session}
+                selectedChatModel={selectedChatModel}
+                cheapChatModel={configuredCheapModel}
+                onClose={() => setDeployTrial(null)}
+                onDeployed={(deployment) => {
+                    setDeployTrial(null)
+                    navigate(`/meta-agent/deployments/${deployment.id}`)
+                }}
+            />
             <ConfirmDialog />
         </MainCard>
     )

@@ -17,7 +17,7 @@ import {
     TableRow,
     Typography
 } from '@mui/material'
-import { IconCheck, IconChevronDown, IconExternalLink, IconX } from '@tabler/icons-react'
+import { IconCheck, IconChevronDown, IconExternalLink, IconRocket, IconX } from '@tabler/icons-react'
 
 import CrewGraph from './CrewGraph'
 import { buildSearchTree } from '../studioUtils'
@@ -139,6 +139,7 @@ const TrialsPanel = ({
     recommendations,
     onRecommendationStatus,
     onApplyRecommendations,
+    onDeploy,
     busy
 }) => {
     const baseline = trials[0]
@@ -216,7 +217,19 @@ const TrialsPanel = ({
                                 <TableCell align='right'>{trial.summary ? trial.summary.averageModelCalls.toFixed(1) : '—'}</TableCell>
                                 <TableCell align='right'>{trial.summary ? formatCost(trial.summary.averageCost) : '—'}</TableCell>
                                 <TableCell align='right'>{trial.summary ? formatLatency(trial.summary.averageDurationMs) : '—'}</TableCell>
-                                <TableCell align='right'>
+                                <TableCell align='right' sx={{ whiteSpace: 'nowrap' }}>
+                                    {onDeploy && trial.summary && trial.crew && trial.status !== 'rejected' && (
+                                        <Button
+                                            size='small'
+                                            variant={trial.id === selectedTrialId ? 'contained' : 'outlined'}
+                                            startIcon={<IconRocket size={14} />}
+                                            disabled={busy}
+                                            onClick={() => onDeploy(trial)}
+                                            sx={{ mr: 0.5 }}
+                                        >
+                                            Deploy
+                                        </Button>
+                                    )}
                                     {trial.flowId && (
                                         <Button
                                             size='small'
@@ -360,6 +373,7 @@ TrialsPanel.propTypes = {
     recommendations: PropTypes.array,
     onRecommendationStatus: PropTypes.func.isRequired,
     onApplyRecommendations: PropTypes.func.isRequired,
+    onDeploy: PropTypes.func,
     busy: PropTypes.bool
 }
 

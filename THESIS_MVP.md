@@ -97,6 +97,50 @@ quoting; the dev column is what the search was allowed to tune against.
 5. **Results** — search tree, Pareto frontier, held-out evaluation, and a diagnosis
    that separates workflow issues from coverage gaps, contract ambiguity and gaps
    in the simulated environment itself.
+6. **Deploy and use** — promote a measured crew into a deployment, chat with it,
+   monitor it against what it was measured at, and improve it from real replies.
+
+## Deployment and the online improvement loop
+
+**Deploy.** Any measured crew on the Results step can be deployed. The server stores
+the contract, the simulated world, the acceptance suite, the models and the CrewIR in
+an `autopilot_deployment` row, and compiles an AgentFlow for it. Each declared tool
+either stays simulated or is bound to a real Flowise tool; a bound tool is not
+simulated at all, and a purge of simulated tools keeps every row a deployment still
+calls. Every later version is recompiled on the server from its stored CrewIR, so a
+published version or a rollback is exactly the crew that was measured.
+
+**Playground** (`/meta-agent/deployments/:id`). A normal Flowise chat beside three panels:
+
+- *Monitor* — the latest reply's tokens, cost, model and tool calls per agent; this
+  session against the metrics the version was published at (drift is flagged at
+  ×1.5); session and 30-day totals from Token Analytics, now filterable by `sessionId`.
+- *Improve* — collected cases and the improvement run.
+- *Versions* — every published crew with its evidence, and rollback.
+
+**Online improvement is proposed automatically but applied only through a gate.**
+Letting a model or a user edit the live workflow directly has no ground truth, invites
+regressions and turns user text into a prompt-injection path. Instead:
+
+1. *Signal.* A user flags a reply, or the reviewer model reviews one (on demand or
+   automatically). The reviewer treats the conversation as untrusted data and returns
+   issues, at most one rule consistent with the contract, and — when the fixtures
+   allow — a regression scenario whose assertions would fail on the observed reply.
+   The result is filed as a **pending** case; nothing changes yet.
+2. *Human decision.* A person accepts or rejects each case.
+3. *Regression run.* The live version and evidence-guided candidates (the same legal
+   operator set, with accepted rules passed as `userInstructions`) are compiled into
+   throwaway flows and measured on the original development cases plus accepted
+   online cases; held-out cases only for contenders. The live flow's history and
+   analytics contain only real use.
+4. *Gate.* The server re-judges every recorded run
+   (`deploymentModel.ts › gateImprovementCandidate`): no regression in pass rate,
+   execution failures, critical violations, online cases or held-out pass rate, and a
+   measurable improvement in online pass rate, pass rate, quality or ≥10 % tokens/cost.
+   A client-supplied eligibility verdict is ignored.
+5. *Publish.* Only an eligible candidate of a run measured against the live version
+   can be published. It becomes a new version, its cases are marked incorporated, and
+   rollback stays available.
 
 ## API
 
@@ -105,12 +149,19 @@ quoting; the dev column is what the search was allowed to tune against.
 | `POST /api/v1/agentflowv2-generator/studio/design` | contract + environment + crew |
 | `POST …/studio/scenarios/regenerate` | regenerate environment and suite |
 | `POST …/studio/crew/regenerate` | redesign the crew from the contract |
-| `POST …/studio/compile` | provision tools, compile CrewIR into a graph |
+| `POST …/studio/compile` | provision tools (or real bindings), compile CrewIR into a graph |
 | `POST …/studio/evaluate` | assertions + rubric for one case |
 | `POST …/studio/candidates` | propose operator-mutated crews |
 | `POST …/studio/operator/apply` | apply one operator to a crew |
 | `POST …/studio/diagnose` | post-run diagnosis |
-| `POST …/studio/tools/purge` | remove simulated tools from the workspace |
+| `POST …/studio/tools/purge` | remove simulated tools not used by a deployment |
+| `GET/POST …/studio/deployments` | list / deploy a measured crew |
+| `GET/PATCH/DELETE …/studio/deployments/:id` | read, rename, delete (with its flow) |
+| `POST …/studio/deployments/:id/assess` | review one live turn, file a pending case |
+| `PATCH/DELETE …/studio/deployments/:id/cases/:caseId` | accept, reject, delete a case |
+| `POST …/studio/deployments/:id/improvement-runs` | record a regression run; server applies the gate |
+| `POST …/studio/deployments/:id/publish` | publish an eligible candidate as a new version |
+| `POST …/studio/deployments/:id/rollback` | make an earlier version live again |
 
 ## Thesis-owned code
 
@@ -122,8 +173,11 @@ quoting; the dev column is what the search was allowed to tune against.
 - `packages/server/src/services/agentflowv2-generator/assertions.ts`
 - `packages/server/src/services/agentflowv2-generator/mockToolCompiler.ts`
 - `packages/server/src/services/agentflowv2-generator/mockToolStore.ts`
+- `packages/server/src/services/agentflowv2-generator/deploymentModel.ts`
+- `packages/server/src/services/agentflowv2-generator/deploymentService.ts`
+- `packages/server/src/database/entities/AutopilotDeployment.ts` and its migrations
 - `packages/ui/src/views/metaagent/**`
-- Autopilot routes, controller and navigation entry
+- Autopilot routes, controllers and navigation entries
 
 The graph generator, visual canvas, execution engine and execution history remain
 upstream Flowise components under their original license.

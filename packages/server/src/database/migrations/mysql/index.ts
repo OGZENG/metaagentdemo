@@ -60,6 +60,7 @@ import { AddSSOColumns1730519457880 } from '../../../enterprise/database/migrati
 import { AddPersonalWorkspace1734074497540 } from '../../../enterprise/database/migrations/mysql/1734074497540-AddPersonalWorkspace'
 import { RefactorEnterpriseDatabase1737076223692 } from '../../../enterprise/database/migrations/mysql/1737076223692-RefactorEnterpriseDatabase'
 import { ExecutionLinkWorkspaceId1746862866554 } from '../../../enterprise/database/migrations/mysql/1746862866554-ExecutionLinkWorkspaceId'
+import { AddAutopilotDeployment1790000000000 } from './1790000000000-AddAutopilotDeployment'
 
 export const mysqlMigrations = [
     Init1693840429259,
@@ -122,5 +123,6 @@ export const mysqlMigrations = [
     AddWebhookSecretToChatFlow1776240000002,
     AddCustomMcpServer1766000000000,
     AddMcpServerConfigToChatFlow1767000000000,
-    AddScheduleEntities1772000000000
+    AddScheduleEntities1772000000000,
+    AddAutopilotDeployment1790000000000
 ]

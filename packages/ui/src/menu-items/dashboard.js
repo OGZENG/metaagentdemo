@@ -24,7 +24,8 @@ import {
     IconFileDatabase,
     IconShieldLock,
     IconListCheck,
-    IconSparkles
+    IconSparkles,
+    IconMessageChatbot
 } from '@tabler/icons-react'
 
 // constant
@@ -53,7 +54,8 @@ const icons = {
     IconFileDatabase,
     IconShieldLock,
     IconListCheck,
-    IconSparkles
+    IconSparkles,
+    IconMessageChatbot
 }
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
@@ -74,6 +76,15 @@ const dashboard = {
                     type: 'item',
                     url: '/meta-agent',
                     icon: icons.IconSparkles,
+                    breadcrumbs: true,
+                    permission: 'agentflows:view'
+                },
+                {
+                    id: 'meta-agent-deployments',
+                    title: 'Deployed Crews',
+                    type: 'item',
+                    url: '/meta-agent/deployments',
+                    icon: icons.IconMessageChatbot,
                     breadcrumbs: true,
                     permission: 'agentflows:view'
                 },

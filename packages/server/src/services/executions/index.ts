@@ -23,6 +23,7 @@ export interface ExecutionFilters {
 
 export interface AnalyticsFilters {
     agentflowId?: string
+    sessionId?: string
     startDate?: Date
     endDate?: Date
     workspaceId?: string
@@ -38,7 +39,7 @@ const numberValue = (...values: any[]): number => {
 const getExecutionAnalytics = async (filters: AnalyticsFilters = {}) => {
     try {
         const appServer = getRunningExpressApp()
-        const { agentflowId, startDate, endDate, workspaceId, limit = 1000 } = filters
+        const { agentflowId, sessionId, startDate, endDate, workspaceId, limit = 1000 } = filters
         const queryBuilder = appServer.AppDataSource.getRepository(Execution)
             .createQueryBuilder('execution')
             .leftJoinAndSelect('execution.agentflow', 'agentflow')
@@ -47,6 +48,7 @@ const getExecutionAnalytics = async (filters: AnalyticsFilters = {}) => {
 
         if (workspaceId) queryBuilder.andWhere('execution.workspaceId = :workspaceId', { workspaceId })
         if (agentflowId) queryBuilder.andWhere('execution.agentflowId = :agentflowId', { agentflowId })
+        if (sessionId) queryBuilder.andWhere('execution.sessionId = :sessionId', { sessionId })
         if (startDate) queryBuilder.andWhere('execution.createdDate >= :startDate', { startDate })
         if (endDate) queryBuilder.andWhere('execution.createdDate <= :endDate', { endDate })
 

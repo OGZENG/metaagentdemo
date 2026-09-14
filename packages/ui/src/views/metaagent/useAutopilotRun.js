@@ -2,30 +2,17 @@ import { useCallback, useSyncExternalStore } from 'react'
 
 import chatflowsApi from '@/api/chatflows'
 import chatmessageApi from '@/api/chatmessage'
-import predictionApi from '@/api/prediction'
 
+import { errorMessage, preflightFlow, runScenariosOnFlow } from './studioRunner'
 import {
     DEFAULT_ACCEPTANCE_SCORE_THRESHOLD,
     buildRunEvidence,
-    extractStudioOutput,
-    extractStudioToolCalls,
-    extractStudioTrace,
     getParetoTrialIds,
     selectNextTrial,
-    selectPreflightScenarios,
     selectSearchParent,
     splitScenarios,
-    summarizePrediction,
-    summarizeStudioResults,
-    validateStudioOutput
+    summarizeStudioResults
 } from './studioUtils'
-
-/**
- * A crew execution is several chained model calls, so it is legitimately slow —
- * but never unbounded. Without this a hung execution leaves the run spinning
- * with no error and no way out but a page reload.
- */
-const EXECUTION_TIMEOUT = 8 * 60 * 1000
 
 const SESSION_KEY = 'workflowAutopilotSessionV2'
 const SETTINGS_KEY = 'workflowAutopilotSettingsV2'
@@ -95,17 +82,6 @@ const archiveRun = (session) =>
               scenarioCount: (session.design?.scenarios || []).length
           }
         : session.archivedRun || null
-
-const errorMessage = (error) => {
-    // Axios reports a timeout as "timeout of 480000ms exceeded", which tells a
-    // user nothing about what to do next.
-    if (error?.code === 'ECONNABORTED') {
-        return `The request timed out after ${Math.round(
-            Number(error?.config?.timeout || 0) / 1000
-        )}s. The model or the workflow stalled; nothing is still running.`
-    }
-    return error?.response?.data?.message || error?.message || String(error)
-}
 
 /**
  * Autopilot state lives in a module-level store the hook subscribes to, not in
@@ -493,119 +469,31 @@ export const useAutopilotRun = () => {
      * -------------------------------------------------------------- */
 
     const runScenarios = useCallback(
-        async (trial, scenarios, selectedChatModel, onProgress) => {
+        (trial, scenarios, selectedChatModel, onProgress) => {
             const current = currentSession()
-            const design = current.design
-            const results = new Array(scenarios.length)
-            let cursor = 0
-
-            const worker = async () => {
-                while (!shouldStop()) {
-                    const index = cursor
-                    cursor += 1
-                    if (index >= scenarios.length) return
-                    const scenario = scenarios[index]
-                    const startedAt = Date.now()
-                    setStatus(`${trial.name} · ${scenario.title}`)
-                    const runId = `${current.id || 'autopilot'}-${trial.id}-${scenario.id}`.replace(/[^a-zA-Z0-9_-]/g, '-')
-                    try {
-                        trackRun(trial.flowId, runId)
-                        const { data: prediction } = await predictionApi.sendMessageAndGetPrediction(
-                            trial.flowId,
-                            {
-                                question: scenario.input,
-                                streaming: false,
-                                chatId: runId,
-                                overrideConfig: { sessionId: runId }
-                            },
-                            { timeout: EXECUTION_TIMEOUT }
-                        )
-                        untrackRun(runId)
-                        // An aborted execution returns whatever it had reached;
-                        // recording that would poison the trial's metrics.
-                        if (shouldStop()) return
-                        const output = extractStudioOutput(prediction)
-                        const toolCalls = extractStudioToolCalls(prediction)
-                        const outputProblem = validateStudioOutput(output, scenario)
-                        if (outputProblem) throw new Error(`Workflow output validation failed: ${outputProblem}.`)
-                        const { data: evaluation } = await chatflowsApi.evaluateStudioOutput({
-                            goal: current.goal,
-                            scenario,
-                            output,
-                            toolCalls,
-                            successCriteria: design.successCriteria,
-                            constraints: design.constraints,
-                            acceptanceScoreThreshold: Number(settings.acceptanceScoreThreshold),
-                            selectedChatModel
-                        })
-                        results[index] = {
-                            scenarioId: scenario.id,
-                            title: scenario.title,
-                            split: scenario.split || 'dev',
-                            output,
-                            toolCalls,
-                            trace: extractStudioTrace(prediction),
-                            evaluation,
-                            ...summarizePrediction(prediction, Date.now() - startedAt)
-                        }
-                    } catch (caseError) {
-                        untrackRun(runId)
-                        if (shouldStop()) return
-                        results[index] = {
-                            scenarioId: scenario.id,
-                            title: scenario.title,
-                            split: scenario.split || 'dev',
-                            error: errorMessage(caseError)
-                        }
-                    }
-                    onProgress?.()
-                }
-            }
-
-            // A crew fans one case out to several model calls. Running large crews
-            // fully concurrently produces provider bursts that show up as random
-            // execution failures, which would be indistinguishable from a bad
-            // candidate — so serialize once the graph is large.
-            const modelNodes = (trial.flowData?.nodes || []).filter((node) =>
-                ['agentAgentflow', 'llmAgentflow', 'conditionAgentAgentflow'].includes(node?.data?.name)
-            ).length
-            const concurrency = modelNodes >= 6 ? 1 : Math.max(1, Math.min(Number(settings.concurrency), scenarios.length))
-            await Promise.all(Array.from({ length: concurrency }, () => worker()))
-            return results.filter(Boolean)
+            return runScenariosOnFlow({
+                trial,
+                scenarios,
+                goal: current.goal,
+                design: current.design,
+                selectedChatModel,
+                acceptanceScoreThreshold: Number(settings.acceptanceScoreThreshold),
+                concurrency: Number(settings.concurrency),
+                runPrefix: current.id || 'autopilot',
+                shouldStop,
+                onStatus: setStatus,
+                onProgress,
+                trackRun,
+                untrackRun
+            })
         },
         [settings.acceptanceScoreThreshold, settings.concurrency]
     )
 
-    const preflight = useCallback(async (trial, scenarios) => {
-        const smoke = selectPreflightScenarios(scenarios)
-        if (!smoke.length) return
-        setStatus(`${trial.name} · ${smoke.length} executable-readiness checks…`)
-        for (const scenario of smoke) {
-            if (shouldStop()) return
-            const runId = `${trial.id}-preflight-${scenario.id}`.replace(/[^a-zA-Z0-9_-]/g, '-')
-            let prediction
-            try {
-                trackRun(trial.flowId, runId)
-                const response = await predictionApi.sendMessageAndGetPrediction(
-                    trial.flowId,
-                    {
-                        question: scenario.input,
-                        streaming: false,
-                        chatId: runId,
-                        overrideConfig: { sessionId: runId }
-                    },
-                    { timeout: EXECUTION_TIMEOUT }
-                )
-                prediction = response.data
-            } finally {
-                untrackRun(runId)
-            }
-            if (shouldStop()) return
-            const problem = validateStudioOutput(extractStudioOutput(prediction), scenario)
-            if (problem) throw new Error(`preflight failed on "${scenario.title}": ${problem}`)
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    const preflight = useCallback(
+        (trial, scenarios) => preflightFlow({ trial, scenarios, shouldStop, onStatus: setStatus, trackRun, untrackRun }),
+        []
+    )
 
     /* -------------------------------------------------------------- *
      * The search loop

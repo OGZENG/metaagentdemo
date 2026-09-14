@@ -31,24 +31,67 @@ export const SEARCH_STRATEGIES = [
  * Execution telemetry
  * ------------------------------------------------------------------ */
 
-export const summarizePrediction = (prediction, durationMs) => {
-    const executionData = Array.isArray(prediction?.agentFlowExecutedData) ? prediction.agentFlowExecutedData : []
-    let totalTokens = 0
-    let estimatedCost = 0
-    let modelCalls = 0
+/**
+ * Token, cost and call totals for one execution trace, overall and per node.
+ * The experiment, the playground monitor and Token Analytics all read the same
+ * `usageMetadata`, so a turn in the playground is directly comparable with a
+ * case measured during the search.
+ */
+export const summarizeExecutedData = (executionData = []) => {
+    const nodes = Array.isArray(executionData) ? executionData : []
+    const totals = { inputTokens: 0, outputTokens: 0, totalTokens: 0, estimatedCost: 0, modelCalls: 0, toolCalls: 0 }
+    const agents = new Map()
 
-    for (const node of executionData) {
+    nodes.forEach((node, index) => {
         const output = node?.data?.output || {}
         const usage = output.usageMetadata || output.usage_metadata
-        if (!usage) continue
-        const inputTokens = numberValue(usage.input_tokens, usage.inputTokens, usage.prompt_tokens, usage.promptTokens)
-        const outputTokens = numberValue(usage.output_tokens, usage.outputTokens, usage.completion_tokens, usage.completionTokens)
-        totalTokens += numberValue(usage.total_tokens, usage.totalTokens, inputTokens + outputTokens)
-        estimatedCost += numberValue(usage.total_cost, usage.totalCost, usage.cost)
-        modelCalls += 1
-    }
+        const toolCalls = (output.usedTools || []).filter(Boolean).length
+        if (!usage && !toolCalls) return
+        const inputTokens = usage ? numberValue(usage.input_tokens, usage.inputTokens, usage.prompt_tokens, usage.promptTokens) : 0
+        const outputTokens = usage
+            ? numberValue(usage.output_tokens, usage.outputTokens, usage.completion_tokens, usage.completionTokens)
+            : 0
+        const totalTokens = usage ? numberValue(usage.total_tokens, usage.totalTokens, inputTokens + outputTokens) : 0
+        const estimatedCost = usage ? numberValue(usage.total_cost, usage.totalCost, usage.cost) : 0
+        const name = node?.nodeLabel || node?.data?.nodeLabel || node?.nodeId || `Node ${index + 1}`
+        const agent = agents.get(name) || {
+            name,
+            calls: 0,
+            inputTokens: 0,
+            outputTokens: 0,
+            totalTokens: 0,
+            estimatedCost: 0,
+            toolCalls: 0
+        }
+        if (usage) {
+            agent.calls += 1
+            totals.modelCalls += 1
+        }
+        agent.inputTokens += inputTokens
+        agent.outputTokens += outputTokens
+        agent.totalTokens += totalTokens
+        agent.estimatedCost += estimatedCost
+        agent.toolCalls += toolCalls
+        totals.inputTokens += inputTokens
+        totals.outputTokens += outputTokens
+        totals.totalTokens += totalTokens
+        totals.estimatedCost += estimatedCost
+        totals.toolCalls += toolCalls
+        agents.set(name, agent)
+    })
 
-    return { executionId: prediction?.executionId || null, totalTokens, estimatedCost, durationMs, modelCalls }
+    return { ...totals, agents: [...agents.values()].sort((left, right) => right.totalTokens - left.totalTokens) }
+}
+
+export const summarizePrediction = (prediction, durationMs) => {
+    const usage = summarizeExecutedData(prediction?.agentFlowExecutedData)
+    return {
+        executionId: prediction?.executionId || null,
+        totalTokens: usage.totalTokens,
+        estimatedCost: usage.estimatedCost,
+        durationMs,
+        modelCalls: usage.modelCalls
+    }
 }
 
 export const extractStudioOutput = (prediction = {}) => {
@@ -290,4 +333,99 @@ export const readFlowData = (flowData) => {
     } catch (_) {
         return { nodes: [], edges: [] }
     }
+}
+
+/* ------------------------------------------------------------------ *
+ * Deployed crews
+ * ------------------------------------------------------------------ */
+
+/**
+ * Pairs each user message with the reply that answered it. The last reply is
+ * incomplete while the chat is still streaming; nothing downstream (metrics,
+ * automatic review) may treat a half-written answer as the crew's output.
+ */
+export const buildConversationTurns = (messages = [], loading = false) => {
+    const list = Array.isArray(messages) ? messages : []
+    const turns = []
+    let question = null
+    list.forEach((message, position) => {
+        if (message?.type === 'userMessage') {
+            question = String(message.message ?? '')
+            return
+        }
+        if (message?.type !== 'apiMessage' || question === null) return
+        const executedData = Array.isArray(message.agentFlowExecutedData) ? message.agentFlowExecutedData : []
+        turns.push({
+            index: turns.length,
+            key: message.id || `turn-${turns.length}`,
+            messageId: message.id || '',
+            question,
+            answer: String(message.message ?? ''),
+            executedData,
+            toolCalls: extractStudioToolCalls({ agentFlowExecutedData: executedData }),
+            usage: summarizeExecutedData(executedData),
+            failed: executedData.some((node) => node?.status === 'ERROR'),
+            complete: !(loading && position === list.length - 1)
+        })
+        question = null
+    })
+    return turns
+}
+
+export const summarizeTurns = (turns = []) => {
+    const measured = (turns || []).filter((turn) => turn.complete && turn.executedData.length)
+    return {
+        turns: measured.length,
+        totalTokens: measured.reduce((sum, turn) => sum + turn.usage.totalTokens, 0),
+        estimatedCost: measured.reduce((sum, turn) => sum + turn.usage.estimatedCost, 0),
+        averageTokens: mean(measured.map((turn) => turn.usage.totalTokens)),
+        averageCost: mean(measured.map((turn) => turn.usage.estimatedCost)),
+        averageModelCalls: mean(measured.map((turn) => turn.usage.modelCalls))
+    }
+}
+
+/** A live average this many times the measured one is flagged as drift. */
+export const LAB_DRIFT_RATIO = 1.5
+
+const LAB_METRICS = [
+    ['averageTokens', 'Tokens / turn'],
+    ['averageCost', 'Cost / turn'],
+    ['averageModelCalls', 'Model calls / turn'],
+    ['averageDurationMs', 'Latency / turn']
+]
+
+/**
+ * Live usage against what the crew was measured at before it was deployed.
+ * Real traffic that costs far more than the acceptance suite predicted is itself
+ * evidence: either the suite under-represents real requests or the crew loops.
+ */
+export const compareToLab = (live = {}, lab = {}, driftRatio = LAB_DRIFT_RATIO) =>
+    LAB_METRICS.map(([key, label]) => {
+        const expected = Number(lab?.[key] || 0)
+        const observed = Number(live?.[key] || 0)
+        const ratio = expected > 0 && observed > 0 ? observed / expected : null
+        return { key, label, expected, observed, ratio, drift: ratio !== null && ratio >= driftRatio }
+    })
+
+/**
+ * The regression suite for an improvement run: the original development cases
+ * plus every accepted case collected from real conversations. Held-out cases
+ * stay held out, exactly as in the experiment.
+ */
+export const buildImprovementSuite = (design = {}, onlineCases = []) => {
+    const accepted = (onlineCases || []).filter((item) => item.status === 'accepted')
+    const online = accepted.filter((item) => item.scenario).map((item) => ({ ...item.scenario, id: item.id, split: 'dev' }))
+    const { dev, test } = splitScenarios(design?.scenarios || [])
+    return {
+        dev: [...dev, ...online],
+        test,
+        onlineIds: online.map((scenario) => scenario.id),
+        caseIds: accepted.map((item) => item.id),
+        instructions: [...new Set(accepted.map((item) => String(item.instruction || '').trim()).filter(Boolean))]
+    }
+}
+
+export const summarizeResultSubset = (results = [], ids = new Set()) => {
+    const subset = (results || []).filter((result) => ids.has(result.scenarioId))
+    return subset.length ? summarizeStudioResults(subset) : null
 }

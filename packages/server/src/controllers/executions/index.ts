@@ -88,6 +88,7 @@ const getExecutionAnalytics = async (req: Request, res: Response, next: NextFunc
     try {
         const filters: any = { workspaceId: req.user?.activeWorkspaceId }
         if (req.query.agentflowId) filters.agentflowId = req.query.agentflowId as string
+        if (req.query.sessionId) filters.sessionId = req.query.sessionId as string
         if (req.query.startDate) filters.startDate = new Date(req.query.startDate as string)
         if (req.query.endDate) filters.endDate = new Date(req.query.endDate as string)
         if (req.query.limit) filters.limit = parseInt(req.query.limit as string, 10)

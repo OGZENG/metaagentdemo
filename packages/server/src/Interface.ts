@@ -255,6 +255,16 @@ export interface ICustomMcpServerResponse extends Omit<ICustomMcpServer, 'authCo
     authConfig?: Record<string, any>
 }
 
+export interface IAutopilotDeployment {
+    id: string
+    name: string
+    flowId: string
+    data: string
+    createdDate: Date
+    updatedDate: Date
+    workspaceId: string
+}
+
 export interface IComponentNodes {
     [key: string]: INode
 }
