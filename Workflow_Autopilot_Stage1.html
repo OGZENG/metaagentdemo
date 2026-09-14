@@ -1,0 +1,987 @@
+<title>Workflow Autopilot 解剖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+
+<style>
+:root {
+  --paper: #F5F6F8;
+  --surface: #FFFFFF;
+  --surface-2: #EDEFF3;
+  --ink: #15181F;
+  --ink-2: #565E6E;
+  --ink-3: #838B99;
+  --rule: #DCE0E7;
+  --rule-strong: #C3C9D4;
+  --accent: #1D4E89;
+  --accent-wash: #E7EDF6;
+  --signal: #9C5D0C;
+  --signal-wash: #F6EDDF;
+  --code-bg: #ECEEF2;
+  --measure: 68ch;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #101319;
+    --surface: #181C24;
+    --surface-2: #1F242E;
+    --ink: #E7EAF0;
+    --ink-2: #A0A8B7;
+    --ink-3: #79818F;
+    --rule: #2B313C;
+    --rule-strong: #3A424F;
+    --accent: #86AEE4;
+    --accent-wash: #1B2739;
+    --signal: #E0A44A;
+    --signal-wash: #2E2618;
+    --code-bg: #1C212A;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #101319;
+  --surface: #181C24;
+  --surface-2: #1F242E;
+  --ink: #E7EAF0;
+  --ink-2: #A0A8B7;
+  --ink-3: #79818F;
+  --rule: #2B313C;
+  --rule-strong: #3A424F;
+  --accent: #86AEE4;
+  --accent-wash: #1B2739;
+  --signal: #E0A44A;
+  --signal-wash: #2E2618;
+  --code-bg: #1C212A;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 28px 120px;
+}
+
+/* ---------- masthead ---------- */
+
+.masthead {
+  border-bottom: 2px solid var(--ink);
+  padding: 64px 0 26px;
+  margin-bottom: 44px;
+}
+
+.kicker {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 18px;
+}
+
+h1 {
+  font-family: "Source Serif 4", "Noto Serif SC", "Songti SC", serif;
+  font-weight: 700;
+  font-size: clamp(2.1rem, 5vw, 3rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+  text-wrap: balance;
+}
+
+.standfirst {
+  font-size: 1.075rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin: 0;
+}
+
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 26px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* ---------- structure ---------- */
+
+section { margin-bottom: 64px; }
+
+h2 {
+  font-family: "Source Serif 4", "Noto Serif SC", "Songti SC", serif;
+  font-weight: 700;
+  font-size: 1.7rem;
+  line-height: 1.3;
+  margin: 0 0 8px;
+  text-wrap: balance;
+}
+
+h3 {
+  font-family: "Source Serif 4", "Noto Serif SC", "Songti SC", serif;
+  font-weight: 600;
+  font-size: 1.24rem;
+  line-height: 1.4;
+  margin: 40px 0 10px;
+  text-wrap: balance;
+}
+
+h4 {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 26px 0 8px;
+}
+
+.part-label {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 10px;
+}
+
+p { max-width: var(--measure); margin: 0 0 16px; }
+
+.lede { font-size: 1.03rem; color: var(--ink-2); }
+
+ul, ol { max-width: var(--measure); padding-left: 20px; margin: 0 0 16px; }
+li { margin-bottom: 7px; }
+
+strong { font-weight: 600; }
+
+code {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.855em;
+  background: var(--code-bg);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 52px 0;
+}
+
+/* ---------- actor pills: who does the work ---------- */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+  vertical-align: 1px;
+}
+.pill--model { background: var(--signal-wash); color: var(--signal); }
+.pill--code  { background: var(--accent-wash); color: var(--accent); }
+.pill--human { background: var(--surface-2); color: var(--ink-2); }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  margin-bottom: 30px;
+}
+.legend div { font-size: 13.5px; color: var(--ink-2); }
+
+/* ---------- stage sequence ---------- */
+
+.stages { display: grid; gap: 0; margin: 28px 0 10px; }
+
+.stage {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 18px;
+  padding: 20px 0;
+  border-top: 1px solid var(--rule);
+}
+.stage:last-child { border-bottom: 1px solid var(--rule); }
+
+.stage-num {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--ink-3);
+  padding-top: 2px;
+}
+
+.stage-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  margin-bottom: 6px;
+}
+.stage-name {
+  font-family: "Source Serif 4", "Noto Serif SC", serif;
+  font-weight: 600;
+  font-size: 1.12rem;
+}
+.stage-body { font-size: 14.5px; color: var(--ink-2); margin: 0; max-width: var(--measure); }
+.stage-meta {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 8px;
+}
+
+/* ---------- artifact blocks (repeated object) ---------- */
+
+.artifact {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 26px 28px 10px;
+  margin-bottom: 26px;
+}
+
+.artifact-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 4px;
+}
+.artifact-index {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--accent);
+}
+.artifact-title {
+  font-family: "Source Serif 4", "Noto Serif SC", serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+.artifact-sub { font-size: 13px; color: var(--ink-3); font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+.field { padding: 18px 0; border-bottom: 1px solid var(--rule); }
+.artifact .field:last-of-type { border-bottom: 0; }
+.field > h4 { margin-top: 0; }
+.field p:last-child, .field ul:last-child, .field ol:last-child { margin-bottom: 0; }
+
+/* ---------- prompt blocks ---------- */
+
+.prompt {
+  margin: 12px 0 0;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--code-bg);
+}
+.prompt-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule-strong);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.prompt pre {
+  margin: 0;
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--ink);
+  white-space: pre;
+  tab-size: 2;
+}
+.prompt pre.wrapped { white-space: pre-wrap; word-break: break-word; }
+
+.gloss {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  margin: 10px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--rule-strong);
+  max-width: var(--measure);
+}
+
+/* ---------- tables ---------- */
+
+.table-scroll { overflow-x: auto; margin: 18px 0; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 560px;
+  font-size: 14px;
+}
+th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 0 14px 8px 0;
+  border-bottom: 1px solid var(--rule-strong);
+  white-space: nowrap;
+}
+td {
+  padding: 11px 14px 11px 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+  color: var(--ink-2);
+}
+td:first-child { color: var(--ink); font-weight: 500; }
+td code { font-size: 12px; }
+
+/* ---------- callout ---------- */
+
+.note {
+  background: var(--accent-wash);
+  border-left: 3px solid var(--accent);
+  padding: 16px 20px;
+  margin: 24px 0;
+  border-radius: 0 4px 4px 0;
+}
+.note p { margin-bottom: 0; font-size: 14.5px; }
+.note p + p { margin-top: 10px; }
+.note-label {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.warn { background: var(--signal-wash); border-left-color: var(--signal); }
+.warn .note-label { color: var(--signal); }
+
+/* ---------- chain diagram ---------- */
+
+.chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+  margin: 26px 0 30px;
+}
+.chain-item {
+  flex: 1 1 150px;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--signal);
+  background: var(--surface);
+  border-radius: 3px;
+  padding: 12px 14px;
+}
+.chain-item b {
+  display: block;
+  font-family: "Source Serif 4", "Noto Serif SC", serif;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.chain-item span { font-size: 12.5px; color: var(--ink-3); line-height: 1.5; display: block; }
+
+/* ---------- storage split ---------- */
+
+.split { display: grid; gap: 18px; grid-template-columns: 1fr; margin: 24px 0; }
+@media (min-width: 720px) { .split { grid-template-columns: 1fr 1fr; } }
+.store {
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  border-radius: 4px;
+  padding: 20px 22px;
+}
+.store h4 { margin-top: 0; }
+.store p { font-size: 14px; }
+.store p:last-child { margin-bottom: 0; }
+
+footer {
+  border-top: 1px solid var(--rule);
+  padding-top: 22px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+footer p { max-width: var(--measure); }
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">Thesis MVP · 系统技术说明</p>
+  <h1>Workflow Autopilot 解剖</h1>
+  <p class="standfirst">这套系统把「搭建一个多智能体工作流」从一件靠手感的事，拆成五个可审阅、可测量、可复现的阶段。本文先说明整体架构，再把第一阶段——也就是从一句话业务目标生成全部初始产物的那一步——完整拆开。</p>
+  <div class="byline">
+    <span>基于 Flowise AgentFlow v2</span>
+    <span>2026-09</span>
+  </div>
+</header>
+
+<section>
+  <p class="lede">开始之前，有一个前提需要先说清楚，因为它决定了后面所有内容该怎么读。</p>
+
+  <p><strong>这套系统不训练任何模型。</strong>它自始至终调用的是现成的、参数冻结的大模型 API，没有任何权重被更新，也没有梯度、没有微调。</p>
+
+  <p>那它优化的是什么？是<strong>工作流本身的结构与提示词</strong>：由几个智能体组成、谁负责哪一步、谁能调用哪个工具、每个角色被告知了什么规则、哪一步用贵模型哪一步用便宜模型。这些东西通常由人凭经验手工调整，效果好坏也说不清楚。这套系统做的事，是把这个调整过程变成一个有度量、有对照、有留出验证的工程流程。</p>
+
+  <p>理解整个系统只需要记住三类执行者，它们在下文中始终以同样的标记出现：</p>
+
+  <div class="legend">
+    <div><span class="pill pill--model">模型</span> 由大模型完成，结果有随机性，需要校验</div>
+    <div><span class="pill pill--code">代码</span> 由确定性代码完成，同样输入必得同样输出</div>
+    <div><span class="pill pill--human">人</span> 由使用者审阅、编辑或决策</div>
+  </div>
+
+  <p>这个三分法本身就是这套系统的核心设计：<strong>凡是能交给确定性代码做的，就绝不交给模型</strong>。模型只在真正需要创造力和判断力的地方出现，其余环节全部由代码保证可复现。</p>
+</section>
+
+<hr>
+
+<section>
+  <span class="part-label">第一部分</span>
+  <h2>五个阶段</h2>
+  <p class="lede">使用者面对的是一个五步向导，每一步对应一个性质完全不同的阶段。这五步是真正的先后序列——后一步的输入是前一步的产物，跳过任何一步都无法继续。</p>
+
+  <div class="stages">
+
+    <div class="stage">
+      <div class="stage-num">01</div>
+      <div>
+        <div class="stage-head">
+          <span class="stage-name">生成</span>
+          <span class="pill pill--model">模型</span>
+        </div>
+        <p class="stage-body">使用者用一段自然语言描述业务目标。系统据此链式生成四样东西：一份可审阅的产品合同、一套模拟的外部工具环境、一份带机器断言的验收用例、以及一支智能体团队的抽象描述。</p>
+        <p class="stage-meta">四次模型调用 · 不写数据库</p>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-num">02</div>
+      <div>
+        <div class="stage-head">
+          <span class="stage-name">审阅测试世界</span>
+          <span class="pill pill--human">人</span>
+        </div>
+        <p class="stage-body">把上一步的合同、模拟工具数据和验收用例摊开成表单，供人逐项确认和修改。这是评测基准最终定稿的地方——后面所有分数的含义，都由这一步决定。</p>
+        <p class="stage-meta">默认零模型调用 · 不写数据库</p>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-num">03</div>
+      <div>
+        <div class="stage-head">
+          <span class="stage-name">编译</span>
+          <span class="pill pill--human">人</span>
+          <span class="pill pill--code">代码</span>
+        </div>
+        <p class="stage-body">审阅智能体团队的定义，然后由一个<strong>不含模型调用的确定性编译器</strong>，把这份抽象描述机械地翻译成一条真正可以执行的工作流：生成每个角色的运行时提示词、绑定工具、指定模型档位、连成图。</p>
+        <p class="stage-meta">编译本身零模型调用 · <strong>首次写数据库</strong></p>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-num">04</div>
+      <div>
+        <div class="stage-head">
+          <span class="stage-name">搜索</span>
+          <span class="pill pill--code">代码</span>
+          <span class="pill pill--model">模型</span>
+        </div>
+        <p class="stage-body">先用验收用例量出基线成绩，然后在一个由十三种合法结构操作构成的<strong>封闭空间</strong>里迭代生成变体、逐个测量。最后只对最优前沿在留出用例上验证一次，并做一轮事后诊断。</p>
+        <p class="stage-meta">调用量最大的阶段 · 每个候选写一条流程记录</p>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-num">05</div>
+      <div>
+        <div class="stage-head">
+          <span class="stage-name">决策</span>
+          <span class="pill pill--human">人</span>
+        </div>
+        <p class="stage-body">呈现搜索树、多目标对比表和留出成绩，给出选型建议。人可以采纳诊断意见，这会改动验收用例并把改进要求回流到第三步，形成一个由人确认的外层循环。</p>
+        <p class="stage-meta">零模型调用 · 不写数据库</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <span class="note-label">值得注意</span>
+    <p>系统里有<strong>两层循环</strong>，性质完全不同。第四步内部是自动的、封闭操作空间的、以分数为目标的机器搜索；第五步回到第三步的则是人工的、开放的、以诊断为驱动的迭代。把这两层分开来讲，比笼统说「系统会自动优化」要准确得多。</p>
+  </div>
+</section>
+
+<hr>
+
+<section>
+  <span class="part-label">第二部分</span>
+  <h2>第一阶段详解</h2>
+  <p class="lede">第一页的界面极简：左边一个大文本框填写业务目标，右边选择使用哪个大模型。点下按钮之后，系统在几分钟内完成四次链式调用，产出后续所有工作的原料。</p>
+
+  <h3>使用者提供的两样东西</h3>
+
+  <p><strong>业务目标。</strong>一段自然语言，描述这个工作流要做成什么、遵守哪些规则、什么情况需要人工介入。界面上给了一个示例：为一家线上电子产品店搭建客服工作流，要能分类请求、回答产品与配送问题、仅在客户提供订单号时查询订单、超过一百欧元的退款或政策不明的情况转人工、绝不编造订单状态，最后返回一段面向客户的回复加一份内部行动摘要。</p>
+
+  <p><strong>模型选择。</strong>主模型负责设计与评估，另有一个可选的「廉价档」模型，供后续搜索阶段把不重要的步骤降档使用。选好的模型配置——包括模型名、温度等参数、以及指向凭据的引用——整包保存下来，之后每次请求都由前端携带给服务端。</p>
+
+  <div class="note">
+    <span class="note-label">关于 API 密钥</span>
+    <p>浏览器里保存的模型配置<strong>不包含 API 密钥</strong>，只包含一个指向凭据记录的标识符。真正的密钥加密存放在服务端数据库的凭据表中，只有在服务端真正要发起调用的那一刻才被解出来。这是第一阶段唯一一次与数据库发生的交互，而且是只读的。</p>
+  </div>
+
+  <h3>四样产物，链式生成</h3>
+
+  <p>这四次调用不是并列的，而是一条依赖链——每一步都要用到前一步的结果。顺序本身就是设计的一部分。</p>
+
+  <div class="chain">
+    <div class="chain-item"><b>① 产品合同</b><span>从目标推导出可审阅的规格</span></div>
+    <div class="chain-item"><b>② 工具数据</b><span>为合同声明的每个工具填充记录</span></div>
+    <div class="chain-item"><b>③ 验收用例</b><span>对着已填充的工具写考题</span></div>
+    <div class="chain-item"><b>④ 智能体团队</b><span>按合同与工具清单组队</span></div>
+  </div>
+
+  <p>为什么必须是这个顺序？因为验收用例里会写「回复中必须出现某个订单状态」这样的检查项，而这个状态值必须是模拟工具真的会返回的值，否则一个完全正确的工作流也会被判失败。所以用例必须在工具数据填充完之后才能写。</p>
+
+  <!-- ========== ARTIFACT 1 ========== -->
+  <div class="artifact">
+    <div class="artifact-head">
+      <span class="artifact-index">产物 01</span>
+      <span class="artifact-title">产品合同</span>
+      <span class="artifact-sub">Contract</span>
+      <span class="pill pill--model">模型</span>
+    </div>
+
+    <div class="field">
+      <h4>目标</h4>
+      <p>把一段随意的自然语言诉求，变成一份结构化的、人能逐条确认的规格。它回答四个问题：这个工作流叫什么、成功的标准是什么、有哪些必须遵守的约束、以及它需要依赖哪些外部系统。</p>
+      <p>还有一个容易被忽略但很关键的产出：<strong>一份基于风险的测试覆盖计划</strong>。系统要求模型先想清楚「这个工作流有哪些风险、每类风险该测几个用例、为什么」，再决定总共要写多少道考题。简单的工作流大约五道，复杂或高风险的最多二十道，上限三十道。</p>
+    </div>
+
+    <div class="field">
+      <h4>输入</h4>
+      <p>使用者填写的业务目标原文，不做任何加工。</p>
+    </div>
+
+    <div class="field">
+      <h4>系统提示词</h4>
+      <div class="prompt">
+        <div class="prompt-bar"><span>System · CONTRACT_PROMPT</span></div>
+        <pre class="wrapped">You are Crew Studio, a product-oriented architect for business agent workflows.
+Turn a plain-language automation request into a reviewable product contract.
+Declare every external system the workflow depends on as a simulated tool: lower_snake_case name, human label, a description the agent will read, and up to six flat parameters (string, number or boolean).
+Declare a tool for anything that needs looked-up facts (orders, catalogues, policies, tickets, calendars, records) and for any protected action (refunds, escalations, notifications). A protected action is still a tool.
+Do not declare a tool for reasoning the model can do itself.
+Derive a risk-based coverage plan first. Simple workflows need about 5 cases, complex or high-risk ones up to 20, never more than 30.
+Return: workflowName, summary, assumptions, successCriteria, constraints, tools, recommendedCaseCount, coverageRationale, coveragePlan.
+Each coveragePlan item has category, count, risk and reason, and the counts must sum to recommendedCaseCount.</pre>
+      </div>
+      <p class="gloss">大意：你是一位面向产品的智能体工作流架构师。把一段大白话的自动化诉求，变成一份可审阅的产品合同。凡是需要查事实的（订单、目录、政策、工单、日历、档案）和凡是有风险的动作（退款、升级、通知），都要声明成一个模拟工具；模型自己就能推理出来的事情，不要声明成工具。先推导出一份基于风险的覆盖计划，各类用例数量之和必须等于建议总数。</p>
+    </div>
+
+    <div class="field">
+      <h4>用户提示词</h4>
+      <p>就是业务目标那段文字本身，原样发送，没有任何包装。</p>
+    </div>
+
+    <div class="field">
+      <h4>输出</h4>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>字段</th><th>含义</th></tr></thead>
+          <tbody>
+            <tr><td><code>workflowName</code></td><td>工作流名称</td></tr>
+            <tr><td><code>summary</code></td><td>一段话概述</td></tr>
+            <tr><td><code>assumptions</code></td><td>模型做出的假设，供人确认</td></tr>
+            <tr><td><code>successCriteria</code></td><td>成功标准，逐条列出</td></tr>
+            <tr><td><code>constraints</code></td><td>必须遵守的约束</td></tr>
+            <tr><td><code>tools</code></td><td>依赖的外部系统声明（最多八个，此时还没有数据）</td></tr>
+            <tr><td><code>recommendedCaseCount</code></td><td>建议的验收用例总数</td></tr>
+            <tr><td><code>coverageRationale</code></td><td>为什么是这个数量</td></tr>
+            <tr><td><code>coveragePlan</code></td><td>分类覆盖计划：类别、数量、风险等级、理由</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="field">
+      <h4>存在哪里</h4>
+      <p>不单独存储。它会和后面三样产物合并成一个整体的「设计」对象，一起写入浏览器本地存储。详见下文<a href="#storage">存储机制</a>。</p>
+    </div>
+  </div>
+
+  <!-- ========== ARTIFACT 2 ========== -->
+  <div class="artifact">
+    <div class="artifact-head">
+      <span class="artifact-index">产物 02</span>
+      <span class="artifact-title">模拟工具与数据</span>
+      <span class="artifact-sub">Tool fixtures</span>
+      <span class="pill pill--model">模型</span>
+    </div>
+
+    <div class="field">
+      <h4>目标</h4>
+      <p>合同里声明的工具此时还只是空壳——有名字有参数，但调用它不会返回任何东西。这一步给每个工具填上记录，建成一个<strong>完全模拟、完全确定的测试世界</strong>。</p>
+      <p>这件事对整个方法论至关重要。因为工具是确定性的，同一个工作流跑两遍，结果差异只可能来自模型本身的随机性，不会来自外部系统的波动。否则你根本没法断言「方案 B 比方案 A 好」——也许只是那一次订单系统恰好没超时。</p>
+      <p>系统还要求每个工具至少包含一条<strong>故意失败</strong>的记录，用来测试工作流在外部系统出故障时的表现——比如它会不会在查不到订单时编造一个状态出来。</p>
+    </div>
+
+    <div class="field">
+      <h4>输入</h4>
+      <p>业务目标、合同中的概述与成功标准与约束、以及<strong>单独一个</strong>工具的声明。每个工具一次独立调用，并行发出。这是刻意的：早期版本一次性要求模型填充所有工具，结果模型会偷懒，深层嵌套的数据被大量省略，最终得到一个「查什么都查不到」的空世界。</p>
+    </div>
+
+    <div class="field">
+      <h4>系统提示词</h4>
+      <div class="prompt">
+        <div class="prompt-bar"><span>System · FIXTURE_PROMPT</span></div>
+        <pre class="wrapped">You populate the records for ONE simulated tool in a deterministic test environment.
+A fixture matches on argument values and returns flat key/value data, or sets `error` to inject a failure such as a timeout or an outage.
+Return at least four fixtures that succeed and at least one that sets `error`. A tool with one record answers almost every realistic request with its fallback, which makes a correct workflow look broken.
+Every key inside `match` must be one of the tool PARAMETER NAMES, and the value is what that argument must contain. Write { "sku": "zx-500" }, never { "zx-500": "zx-500" }.
+Match values must be SHORT and DISTINCTIVE: a SKU, an order id, a policy topic keyword, a country code. Never a sentence.
+The environment matches an argument by exact value first, then by containment. An agent searching a catalogue sends free text such as "ZX-500 wireless headset multipoint support", so a fixture keyed on "zx-500" matches it while one keyed on the whole sentence matches nothing.
+Each successful fixture must return several concrete fields — real-looking statuses, dates, amounts, policy text — because this data is the ground truth acceptance cases are written against. One field is never enough.
+Cover the range of requests this workflow will realistically receive, including at least one record that exercises a policy boundary (a high amount, an exception, an unusual region).
+If the tool performs an ACTION rather than a lookup (escalating, notifying, creating a ticket, issuing a refund), include a SUCCESSFUL fixture with an EMPTY match so it answers every call. An action that only succeeds for a few hard-coded argument values fails the moment an agent phrases the request differently.
+The failure fixture must have match keys of its own so it only fires for a specific input. A failure on the empty match would turn every unmatched call into an outage and make a correct workflow look broken.
+Also set fallbackStatus and fallbackMessage: what the tool returns when nothing matches.
+Return only: fixtures, fallbackStatus, fallbackMessage.</pre>
+      </div>
+      <p class="gloss">大意：你负责为<strong>一个</strong>模拟工具填充记录。至少写四条成功记录和一条故意失败的记录。匹配键必须是工具的参数名，匹配值要短而有辨识度（一个货号、一个订单号、一个政策关键词），不能是一整句话——因为智能体查目录时发的是自由文本，键为「zx-500」的记录能接住它，键为整句话的记录则一条都匹配不上。每条成功记录要返回多个具体字段（真实模样的状态、日期、金额、政策条文），因为<strong>这些数据就是验收用例据以判分的事实基准</strong>，只返回一个字段永远不够。如果这个工具执行的是动作而非查询（升级、通知、建单、退款），要包含一条匹配条件为空的成功记录，让它对所有调用都成功。</p>
+      <p class="gloss">这段提示词里反复出现「否则一个正确的工作流会看起来像坏了」——这是整段提示词被反复打磨的动机：测试环境自身的缺陷，会被误读成被测对象的缺陷。</p>
+    </div>
+
+    <div class="field">
+      <h4>用户提示词</h4>
+      <p>一个 JSON 对象：<code>goal</code>（业务目标）、<code>businessContract</code>（合同的概述、成功标准、约束）、<code>tool</code>（这一个工具的声明）。</p>
+    </div>
+
+    <div class="field">
+      <h4>输出</h4>
+      <p>三个字段：<code>fixtures</code>（记录数组，每条含匹配条件、返回数据、或一条错误信息）、<code>fallbackStatus</code> 与 <code>fallbackMessage</code>（什么都匹配不上时返回什么）。返回后与原有的工具声明合并，成为一个完整的工具。</p>
+      <p>系统随后会对每个工具做一轮<strong>体检</strong>，把可疑之处作为警告展示给使用者：没有任何记录、记录少于三条、没有失败用例、某条记录只返回一个字段、匹配键不是参数名、唯一的兜底记录是个失败记录。这些都是会让一个正确的工作流看起来很糟的环境缺陷。</p>
+    </div>
+
+    <div class="field">
+      <h4>存在哪里</h4>
+      <p>此刻只在浏览器本地，作为「设计」对象的一部分。<strong>要到第三阶段编译时</strong>，这些工具才会被翻译成真正的可执行代码并写入数据库。届时每个工具会变成一段纯查表的函数——先按参数值精确匹配，匹配不上再退化为包含匹配，还不行就返回兜底结果——存放在服务端的工具表里。</p>
+    </div>
+  </div>
+
+  <!-- ========== ARTIFACT 3 ========== -->
+  <div class="artifact">
+    <div class="artifact-head">
+      <span class="artifact-index">产物 03</span>
+      <span class="artifact-title">验收用例</span>
+      <span class="artifact-sub">Acceptance suite</span>
+      <span class="pill pill--model">模型</span>
+      <span class="pill pill--code">代码</span>
+    </div>
+
+    <div class="field">
+      <h4>目标</h4>
+      <p>写出一套考题，用来判定「这个工作流做得好不好」。每道题是一个真实的用户请求、事件或工单，而不是学术式的选择题。</p>
+      <p>关键在于，每道题都要配上<strong>机器可检查的断言</strong>——不是「它应该表现得好」这种描述，而是「必须调用了订单查询工具」「回复里必须出现某个具体金额」「在工具调用失败的情况下，回复里不许出现『已发货』这个词」这种可以由代码自动判定的规则。</p>
+    </div>
+
+    <div class="field">
+      <h4>输入</h4>
+      <p>业务目标、合同、<strong>覆盖计划中的某一个类别</strong>（类别名、该类别为什么重要、风险等级、要写几道题），以及<strong>已经填充好数据的完整工具环境</strong>。</p>
+      <p>和上一步同理，这里也是一个类别一次独立调用。早期版本一次性要求十二道题，模型只交回两道。覆盖计划本来就把工作划分好了，于是直接拿它当批次边界。系统甚至把「数量」写进了返回格式的硬性要求里——写少了会被当成格式错误自动打回重写。</p>
+    </div>
+
+    <div class="field">
+      <h4>系统提示词</h4>
+      <div class="prompt">
+        <div class="prompt-bar"><span>System · SCENARIO_PROMPT</span></div>
+        <pre class="wrapped">You write the acceptance cases for ONE category of a simulated agent workflow.
+Produce exactly the number of cases requested. Fewer cases means the risks in this category go untested; the count was derived from a risk analysis, not picked arbitrarily.
+Every case is a realistic user request, event, document or support message, never an academic multiple-choice question.
+You are given the populated tool environment. Case inputs must reference identifiers that exist in the fixtures, except for cases that deliberately probe a missing record or an injected failure.
+Give each case machine-checkable assertions. Assertion types:
+- tool_called: `tool` plus optional `withArgs` key/value pairs that must appear in the call.
+- tool_not_called: `tool` that must never be invoked.
+- tool_succeeded: `tool` must return ok:true at least once.
+- output_contains / output_not_contains: `anyOf` substrings, matched case-insensitively.
+- output_matches: `pattern`, a JavaScript regular expression.
+- grounded: when `tool` never succeeds, none of the `forbidden` phrases may appear in the reply. Use this to forbid invented statuses and results.
+An output_contains assertion must quote a value the fixtures actually return, so that a correct workflow can satisfy it.
+Set severity critical for safety, policy and fabrication rules; major for core behaviour; minor for formatting.
+Prefer assertions over prose: expectedBehavior explains the case to a human, assertions decide whether it passed.
+Do not set the split field; the suite is divided into development and held-out cases afterwards.
+Return the scenarios array.</pre>
+      </div>
+      <p class="gloss">大意：为<strong>一个</strong>覆盖类别写验收用例，数量必须严格符合要求——写少了意味着这一类的风险没被测到，而这个数量是风险分析推导出来的，不是随便定的。每道题的输入必须引用模拟数据里真实存在的标识符，除非这道题本来就是要测「查不到记录」的情况。断言共七种，其中 <code>grounded</code> 专门用来禁止编造：当某个工具从未成功返回时，回复里不许出现指定的那些说法。严重度分三档，安全、政策与编造类规则定为最高档。最后一句尤其重要：<strong>散文式的说明是写给人看的，真正判定通过与否的是断言</strong>。</p>
+    </div>
+
+    <div class="field">
+      <h4>用户提示词</h4>
+      <p>一个 JSON 对象，包含目标、合同、当前类别名、该类别的重要性说明、风险等级、要求数量，以及完整的工具环境（含全部模拟数据）。</p>
+    </div>
+
+    <div class="field">
+      <h4>输出</h4>
+      <p>用例数组。每道题含：标题、类别、输入文本、期望行为（写给人看）、必须用到的工具、绝对不可以做的事、以及最多十二条机器断言。</p>
+      <p>随后由<strong>代码</strong>而非模型完成一件关键的事：<strong>把用例划分为开发集与留出集</strong>。</p>
+      <div class="note">
+        <span class="note-label">为什么划分交给代码</span>
+        <p>这个划分借用了机器学习里训练集与测试集的思路：后续的自动搜索<strong>只能看见开发集</strong>，留出集全程藏着，只在最后选型时拿出来量一次。没有这个划分，优化器就是在对着考题答题，最后报出来的成绩是过拟合出来的。</p>
+        <p>早期版本让模型自己划分，结果它把「订单查询」「转人工」这些<strong>整类</strong>用例都丢进了留出集——搜索阶段从未见过这些情况，于是留出成绩衡量的是一批它根本没机会改进的行为。现在改由代码从<strong>每一个类别</strong>里各取约三分之一，既保证两边都见得到每种情况，也保证同一套用例每次划分方式完全相同。</p>
+      </div>
+    </div>
+
+    <div class="field">
+      <h4>存在哪里</h4>
+      <p>浏览器本地，「设计」对象的一部分。验收用例<strong>从头到尾都不进数据库</strong>——它们不是可执行工件，只是判分的依据，每次需要时由前端随请求一并发给服务端。</p>
+    </div>
+  </div>
+
+  <!-- ========== ARTIFACT 4 ========== -->
+  <div class="artifact">
+    <div class="artifact-head">
+      <span class="artifact-index">产物 04</span>
+      <span class="artifact-title">智能体团队</span>
+      <span class="artifact-sub">CrewIR</span>
+      <span class="pill pill--model">模型</span>
+    </div>
+
+    <div class="field">
+      <h4>目标</h4>
+      <p>设计一支分工明确的智能体团队：由几个角色组成、每个角色的职责与行为准则是什么、被分配了哪些任务、任务之间如何依赖、谁能调用哪些工具、哪一步用贵模型哪一步用便宜模型。</p>
+      <p>这里有一个贯穿全系统的设计：模型<strong>只输出一份抽象描述，绝不输出图的节点和连线</strong>。提示词第一句就把这条讲死了。原因是后续的自动搜索需要在这份抽象描述上做结构变换——「把这两个任务合并」「给这个角色绑上这个工具」「在末尾加一个校验者」。如果模型直接吐出一张图，这些操作就无从下手，两个候选方案之间也无法有意义地比较。</p>
+    </div>
+
+    <div class="field">
+      <h4>输入</h4>
+      <p>业务目标、合同、以及工具环境的<strong>简表</strong>——只有名字、描述和参数，<strong>不给模拟数据</strong>。团队设计者需要知道有哪些工具可用，但不该看见考题的答案。</p>
+    </div>
+
+    <div class="field">
+      <h4>系统提示词</h4>
+      <div class="prompt">
+        <div class="prompt-bar"><span>System · CREW_PROMPT</span></div>
+        <pre class="wrapped">You design a CrewAI-style team as a CrewIR object. You never emit graph nodes or edges.
+agents: id (lower_snake_case), name, role (router | specialist | orchestrator | validator), goal, backstory, tools (names from the environment), guardrails, modelTier.
+tasks: id, name, description, expectedOutput, agentId, dependsOn (task ids), outputKey (lower_snake_case, unique).
+process: "sequential" for a strict chain, "parallel" when independent tasks fan out and converge, "routed" when a router agent should activate exactly one branch.
+For "routed" also set routerAgentId and at least two routes; each route names a task id and the condition under which it runs. Routed branch tasks must have no dependsOn.
+The router agent owns NO task. Its only job is the routing decision, which the routed process already performs. Do not add a "classify the request" task assigned to the router — that would run the same classification twice.
+finalTaskId names the task that produces the user-facing answer. Every other task must feed it directly or transitively.
+Bind a tool only to the agent that needs it. An agent with no tools becomes a pure reasoning step.
+Keep the crew as small as the contract allows. Do not add agents for appearance; each task costs a model call.
+Guardrails are behavioural rules for that agent, derived from the contract constraints — not generic advice.</pre>
+      </div>
+      <p class="gloss">大意：设计一支团队，输出一份抽象描述对象，<strong>永远不要输出图的节点和连线</strong>。角色分四类：路由者、专家、协调者、校验者。流程分三种：严格串行、独立任务并行后汇合、由路由者激活唯一分支。路由者<strong>不持有任何任务</strong>——它唯一的工作就是路由决策，而这件事流程本身已经做了；再给它加一个「分类请求」的任务，等于把同一次分类跑两遍。只给真正需要的角色绑定工具；没有工具的角色就是一个纯推理步骤。团队规模要尽可能小，<strong>不要为了好看而加人，每一个任务都要花掉一次模型调用</strong>。行为准则必须是从合同约束推导出来的具体规则，不能是放之四海的套话。</p>
+    </div>
+
+    <div class="field">
+      <h4>用户提示词</h4>
+      <p>一个 JSON 对象：目标、合同、工具简表。如果是从第五步带着改进意见回来重新设计的，还会额外附上已被采纳的诊断意见列表，同时在系统提示词后追加一句——上一版团队在实际运行中失败了，请针对下面每条诊断作出改进，不要只是把旧方案换个说法。</p>
+    </div>
+
+    <div class="field">
+      <h4>输出</h4>
+      <p>一份团队描述：角色数组（最多十个）、任务数组（最多十二个）、流程类型、路由规则、以及指明哪个任务产出最终答复。</p>
+      <p>模型返回后立刻由<strong>代码</strong>做结构校验：引用的任务存不存在、依赖有没有成环、最终任务是否被所有其他任务直接或间接喂到、绑定的工具在不在环境里、路由分支是否合法。不通过就直接报错并说明具体原因，不会让一份有问题的团队流到下一步。</p>
+    </div>
+
+    <div class="field">
+      <h4>存在哪里</h4>
+      <p>浏览器本地，「设计」对象的一部分。到第三阶段编译时，这份抽象描述会被展开成每个角色的运行时提示词——把业务目标、成功标准、约束、该角色的职责与行为准则、它收到的上游产出、可用工具清单，按固定模板拼成一整段文本——再连成一张可执行的图，写入数据库。</p>
+      <p class="gloss">后续搜索阶段真正被改动的，正是这段模板里的填空内容：「重写提示词」改的是角色职责与行为准则，「绑定工具」改的是可用工具那一段，「降档模型」改的是这段文本交给哪个模型。整个优化循环最终都落在这里。</p>
+    </div>
+  </div>
+
+  <h3>四次调用共享的可靠性机制</h3>
+
+  <p>大模型返回的是文本，而系统需要的是严格结构化的数据。这中间的落差由三层机制填平，四次调用全部共用。</p>
+
+  <p><strong>第一层，优先走结构化输出。</strong>如果所选模型支持「函数调用」这种由供应商保证格式的机制，就直接用它。这时格式基本不会出错。</p>
+
+  <p><strong>第二层，格式约束与容错解析。</strong>无论走哪条路，每段系统提示词末尾都会自动追加同一句话：</p>
+
+  <div class="prompt">
+    <div class="prompt-bar"><span>System · 全局后缀</span></div>
+    <pre class="wrapped">Return one JSON object only. Do not use Markdown. Follow every requested field name and type exactly.</pre>
+  </div>
+
+  <p>返回后，代码会主动剥掉模型习惯性加上的代码围栏、截取第一个大括号到最后一个大括号之间的内容。此外还内置了一批针对常见「形状偏差」的自动归正：模型爱把键值对写成对象而系统要的是数组、爱把单个字符串写成裸值而系统要的是列表、爱发明「medium」这种不存在的档位名。这些全部自动转换，而不是判定失败。</p>
+
+  <p><strong>第三层，一次纠错重试。</strong>如果解析后仍不符合要求，系统会把校验器报出的具体问题（最多十二条，形如「某字段：缺少必填项」）连同模型自己的原回复一起发回去：</p>
+
+  <div class="prompt">
+    <div class="prompt-bar"><span>User · 纠错回合</span></div>
+    <pre class="wrapped">That JSON does not fit the required shape. Fix exactly these problems and return the corrected JSON object only:
+- {字段路径}: {具体问题}</pre>
+  </div>
+
+  <p>只重试一次。代码注释里给出的理由很实在：这些调用要花好几分钟，为了一个字段形状不对就把整次生成丢掉，不值得。</p>
+
+  <div class="note warn">
+    <span class="note-label">一个诚实的局限</span>
+    <p>整个第一阶段是一次性的长流程，中途没有进度反馈，也无法中断。界面上只显示一句「正在设计……」，然后使用者要等上几分钟。请求设有十分钟超时；若超时或失败，已经完成的那几次调用的结果<strong>不会被保留</strong>，必须从头再来。这是当前实现的一个粗糙处。</p>
+  </div>
+</section>
+
+<hr>
+
+<section id="storage">
+  <span class="part-label">第三部分</span>
+  <h2>存储机制</h2>
+  <p class="lede">这套系统的存储设计有一个明确的分界：<strong>在编译之前，一切都只活在浏览器里；数据库只承载可执行的工件。</strong></p>
+
+  <div class="split">
+    <div class="store">
+      <h4>浏览器本地存储</h4>
+      <p>放的是「正在进行中的工作」：目标、模型选择、设计产物、搜索参数、实验结果。它们是草稿性质的，随时会被修改，也不需要被他人访问。</p>
+      <p>用的是浏览器的 <code>localStorage</code>——同一台机器同一个浏览器里持久保存，关掉页面不会丢，但换台电脑就看不到了。</p>
+    </div>
+    <div class="store">
+      <h4>服务端数据库</h4>
+      <p>放的是「可执行的工件」：编译出来的工作流、编译出来的模拟工具、以及模型凭据。它们需要被服务端的执行引擎真正运行，因此必须落库。</p>
+      <p>用的是 Flowise 自身的数据库，工作流和工具与用户手工创建的完全同构——编译产物在流程列表里是普通的一条记录。</p>
+    </div>
+  </div>
+
+  <h3>浏览器里存了什么</h3>
+
+  <p>一共六个键，各自独立：</p>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>键名</th><th>形式</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td><code>workflowAutopilotGoal</code></td><td>纯字符串</td><td>业务目标原文，每次键入即保存</td></tr>
+        <tr><td><code>workflowAutopilotModel</code></td><td>JSON 对象</td><td>主模型的完整配置：模型名、参数、凭据引用</td></tr>
+        <tr><td><code>workflowAutopilotCheapModel</code></td><td>JSON 对象</td><td>廉价档模型的同样配置</td></tr>
+        <tr><td><code>workflowAutopilotSettingsV2</code></td><td>JSON 对象</td><td>搜索参数：策略、轮数、候选数、各项阈值</td></tr>
+        <tr><td><code>workflowAutopilotSessionV2</code></td><td>JSON 对象</td><td><strong>会话主体</strong>，见下</td></tr>
+        <tr><td><code>workflowAutopilotStopRequestedV2</code></td><td>字符串 <code>"1"</code></td><td>中止标志，供长时间运行的搜索轮询</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>第一阶段结束时，会话主体的形状是这样的——四样产物合并在 <code>design</code> 这一个字段里：</p>
+
+  <div class="prompt">
+    <div class="prompt-bar"><span>localStorage · workflowAutopilotSessionV2</span></div>
+    <pre>{
+  "id": "autopilot-2026-09-12T14:22:08.431Z",
+  "goal": "Build a customer-support workflow for …",
+  "design": {
+    "workflowName":         "…",   ← 产物 01 合同
+    "summary":              "…",
+    "assumptions":          [ … ],
+    "successCriteria":      [ … ],
+    "constraints":          [ … ],
+    "recommendedCaseCount": 12,
+    "coverageRationale":    "…",
+    "coveragePlan":         [ … ],
+
+    "tools":     [ … ],            ← 产物 02 工具 + 模拟数据
+    "scenarios": [ … ],            ← 产物 03 验收用例（含 dev/test 归属）
+    "crew":      { … }             ← 产物 04 团队抽象描述
+  },
+  "crewValidation":  { … },        ← 结构校验结果与警告
+  "crewSummary":     { … },        ← 角色数、任务数等概览
+  "contractStatus":  "draft",      ← 尚未编译
+  "createdAt":       "…",
+  "trials":          [],           ← 实验结果，此时为空
+  "recommendations": []            ← 诊断建议，此时为空
+}</pre>
+  </div>
+
+  <p>三点值得说明：</p>
+
+  <ul>
+    <li><strong>写入是整包覆盖的。</strong>任何一处改动都会把整个对象重新序列化写一遍，没有增量更新。第二阶段每敲一个字符就是一次完整写入。</li>
+    <li><strong>写入时会做瘦身。</strong>浏览器本地存储只有几兆的容量，而实验阶段模型回复的原文是最占地方的部分，因此落盘前会被剥掉——它们在跑完之后就没有用处了。</li>
+    <li><strong>写入失败是静默的。</strong>整个写入包在容错处理里：万一存不下，实验本身要继续跑，不能因为存档失败而中断。</li>
+  </ul>
+
+  <div class="note">
+    <span class="note-label">为什么不放在服务端</span>
+    <p>这是一个 MVP 的取舍。它带来的直接好处是服务端完全无状态——每个接口都是「收到完整输入、算完、返回」，没有任何会话概念，这让系统好理解也好调试。代价同样明确：<strong>会话无法跨设备、无法分享、无法多人协作</strong>，清空浏览器数据就全没了。要做成产品，这一层需要搬到服务端。</p>
+  </div>
+
+  <h3>数据库里存了什么</h3>
+
+  <p><strong>第一阶段结束时，数据库里关于这次会话什么都没有。</strong>唯一发生过的数据库交互是只读的：服务端在调用模型时，凭浏览器发来的凭据引用去凭据表里解出真正的 API 密钥。</p>
+
+  <p>真正的写入要到第三阶段编译时才发生，届时会产生两类记录：</p>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>记录</th><th>产生时机</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>模拟工具</td>
+          <td>每次编译</td>
+          <td>每个工具一条。含名称、描述、参数定义，以及一段由代码生成的查表函数——模拟数据被直接嵌进这段代码里。记录名带有该工具规格的哈希值，因此<strong>同一套环境反复编译会复用已有记录</strong>，不会把工具表塞满重复项。</td>
+        </tr>
+        <tr>
+          <td>工作流</td>
+          <td>每个候选方案一条</td>
+          <td>编译出的可执行图，以未部署、非公开状态存入。第四阶段每生成一个候选团队就会新增一条，因此一轮完整实验跑完，流程列表里会多出十几条记录。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>一个实践上的注意事项：清空会话只会清掉浏览器里的数据，<strong>数据库里这些工作流和工具记录不会随之消失</strong>，需要另行清理。系统提供了批量清除模拟工具的接口，但界面上还没有对应的按钮。</p>
+</section>
+
+<hr>
+
+<section>
+  <h2>小结</h2>
+  <p>第一阶段用四次链式的模型调用，把一句话业务目标展开成一整套原料：一份人能逐条确认的<strong>产品合同</strong>、一个完全确定因而可复现的<strong>模拟测试世界</strong>、一套以机器断言为判据、并按类别划分了开发集与留出集的<strong>验收用例</strong>、以及一份刻意保持抽象、以便后续结构搜索操作的<strong>智能体团队描述</strong>。</p>
+
+  <p>这四样东西此刻全部只存在于浏览器本地，数据库尚未被写入。它们要到第三阶段，才由一个不含模型调用的确定性编译器，变成服务端上真正可以运行的东西。</p>
+
+  <p>贯穿其中的设计取向只有一条：<strong>让模型只做它擅长的事——从模糊的意图中构造出具体的规格与方案；而把所有需要保证可复现、可比较、可审计的环节，交给确定性的代码。</strong>这也正是这套系统能够谈论「测量」和「优化」的前提。</p>
+</section>
+
+<footer>
+  <p>本文描述的是 Workflow Autopilot 的第一阶段实现。其余四个阶段——审阅、编译、搜索、决策——各自另有说明。</p>
+</footer>
+
+</div>
