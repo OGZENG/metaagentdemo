@@ -42,6 +42,14 @@ import {
 } from '../../../src/utils'
 import { sanitizeFileName } from '../../../src/validator'
 import { getModelConfigByModelName, MODEL_TYPE } from '../../../src/modelLoader'
+import {
+    addModelCallUsage,
+    emptyTokenUsage,
+    mergeTokenUsage,
+    priceTokenUsage,
+    toUsageMetadata,
+    type AgentTokenUsage
+} from '../../../src/agentflowTokenUsage'
 
 interface ITool {
     agentSelectedTool: string
@@ -1091,7 +1099,7 @@ class Agent_Agentflow implements INode {
             let sourceDocuments: Array<any> = []
             let artifacts: any[] = []
             let fileAnnotations: any[] = []
-            let additionalTokens = 0
+            let tokenUsage = emptyTokenUsage()
             let isWaitingForHumanInput = false
             let reasonContent = ''
             let thinkingDuration: number | undefined
@@ -1143,7 +1151,7 @@ class Agent_Agentflow implements INode {
                 usedTools = result.usedTools
                 sourceDocuments = result.sourceDocuments
                 artifacts = result.artifacts
-                additionalTokens = result.totalTokens
+                tokenUsage = mergeTokenUsage(tokenUsage, result.tokenUsage)
                 isWaitingForHumanInput = result.isWaitingForHumanInput || false
                 if (result.accumulatedReasonContent !== undefined) {
                     reasonContent = result.accumulatedReasonContent
@@ -1183,6 +1191,7 @@ class Agent_Agentflow implements INode {
                 } else {
                     response = await llmNodeInstance.invoke(messages, { signal: abortController?.signal })
                 }
+                tokenUsage = addModelCallUsage(tokenUsage, response.usage_metadata)
             }
 
             // Capture reasoning and duration from first LLM response so they can be accumulated across tool-call turns
@@ -1219,7 +1228,7 @@ class Agent_Agentflow implements INode {
                 usedTools = result.usedTools
                 sourceDocuments = result.sourceDocuments
                 artifacts = result.artifacts
-                additionalTokens = result.totalTokens
+                tokenUsage = mergeTokenUsage(tokenUsage, result.tokenUsage)
                 isWaitingForHumanInput = result.isWaitingForHumanInput || false
                 if (result.accumulatedReasonContent !== undefined) {
                     reasonContent = result.accumulatedReasonContent
@@ -1398,6 +1407,8 @@ class Agent_Agentflow implements INode {
                 const prompt = 'Convert the following response to the structured output format: ' + finalResponse
                 const structuredResponse = (await structuredllmNodeInstance.invoke(prompt, { signal: abortController?.signal })) as any
                 const rawResponse = structuredResponse?.raw ?? structuredResponse
+                // The structured-output conversion is a model call of its own.
+                tokenUsage = addModelCallUsage(tokenUsage, rawResponse?.usage_metadata)
                 const parsedCandidate =
                     structuredResponse?.parsed ??
                     rawResponse?.tool_calls?.[0]?.args ??
@@ -1435,12 +1446,7 @@ class Agent_Agentflow implements INode {
             const reasonContentObj =
                 reasonContent !== undefined && reasonContent !== '' ? { thinking: reasonContent, thinkingDuration } : undefined
 
-            const costMetadata = await this.calculateUsageCost(
-                model,
-                modelConfig?.modelName as string | undefined,
-                response.usage_metadata,
-                additionalTokens
-            )
+            const costMetadata = await this.calculateUsageCost(model, modelConfig?.modelName as string | undefined, tokenUsage)
 
             const output = this.prepareOutputObject(
                 response,
@@ -1452,7 +1458,7 @@ class Agent_Agentflow implements INode {
                 usedTools,
                 sourceDocuments,
                 artifacts,
-                additionalTokens,
+                tokenUsage,
                 isWaitingForHumanInput,
                 fileAnnotations,
                 isStructuredOutput,
@@ -1467,7 +1473,7 @@ class Agent_Agentflow implements INode {
 
             // Send additional streaming events if needed
             if (isStreamable) {
-                this.sendStreamingEvents(options, chatId, response)
+                this.sendStreamingEvents(options, chatId, response, output.usageMetadata)
             }
 
             // Stream file annotations if any were extracted
@@ -1477,9 +1483,7 @@ class Agent_Agentflow implements INode {
 
             // Process template variables in state
             const outputForStateProcessing =
-                isStructuredOutput && structuredOutputValue !== undefined
-                    ? JSON.stringify(structuredOutputValue, null, 2)
-                    : finalResponse
+                isStructuredOutput && structuredOutputValue !== undefined ? JSON.stringify(structuredOutputValue, null, 2) : finalResponse
             newState = processTemplateVariables(newState, outputForStateProcessing)
 
             /**
@@ -1991,8 +1995,7 @@ class Agent_Agentflow implements INode {
     private async calculateUsageCost(
         provider: string | undefined,
         modelName: string | undefined,
-        usageMetadata: Record<string, any> | undefined,
-        additionalTokens: number = 0
+        tokenUsage: AgentTokenUsage
     ): Promise<
         | {
               input_cost: number
@@ -2004,16 +2007,12 @@ class Agent_Agentflow implements INode {
         | undefined
     > {
         if (!provider || !modelName) return undefined
-        const inputTokens = (usageMetadata?.input_tokens ?? 0) as number
-        const outputTokens = ((usageMetadata?.output_tokens ?? 0) as number) + additionalTokens
         try {
             const modelConfig = await getModelConfigByModelName(MODEL_TYPE.CHAT, provider, modelName)
             if (!modelConfig) return undefined
             const baseInputCost = Number(modelConfig.input_cost) || 0
             const baseOutputCost = Number(modelConfig.output_cost) || 0
-            const inputCost = inputTokens * baseInputCost
-            const outputCost = outputTokens * baseOutputCost
-            const totalCost = inputCost + outputCost
+            const { inputCost, outputCost, totalCost } = priceTokenUsage(tokenUsage, baseInputCost, baseOutputCost)
             if (inputCost === 0 && outputCost === 0) return undefined
             return {
                 input_cost: inputCost,
@@ -2040,7 +2039,7 @@ class Agent_Agentflow implements INode {
         usedTools: IUsedTool[],
         sourceDocuments: Array<any>,
         artifacts: any[],
-        additionalTokens: number = 0,
+        tokenUsage: AgentTokenUsage = emptyTokenUsage(),
         isWaitingForHumanInput: boolean = false,
         fileAnnotations: any[] = [],
         isStructuredOutput: boolean = false,
@@ -2066,20 +2065,10 @@ class Agent_Agentflow implements INode {
             output.calledTools = response.tool_calls
         }
 
-        // Include token usage metadata with accumulated tokens from tool calls
-        if (response.usage_metadata) {
-            const originalTokens = response.usage_metadata.total_tokens || 0
-            output.usageMetadata = {
-                ...response.usage_metadata,
-                total_tokens: originalTokens + additionalTokens,
-                tool_call_tokens: additionalTokens
-            }
-        } else if (additionalTokens > 0) {
-            // If no original usage metadata but we have tool tokens
-            output.usageMetadata = {
-                total_tokens: additionalTokens,
-                tool_call_tokens: additionalTokens
-            }
+        // Every model call of this turn, each counted once, input and output kept apart
+        const usageMetadata = toUsageMetadata(tokenUsage)
+        if (usageMetadata) {
+            output.usageMetadata = usageMetadata
         }
 
         if (costMetadata && output.usageMetadata) {
@@ -2138,7 +2127,12 @@ class Agent_Agentflow implements INode {
     /**
      * Sends additional streaming events for tool calls and metadata
      */
-    private sendStreamingEvents(options: ICommonObject, chatId: string, response: AIMessageChunk): void {
+    private sendStreamingEvents(
+        options: ICommonObject,
+        chatId: string,
+        response: AIMessageChunk,
+        usageMetadata?: Record<string, any>
+    ): void {
         const sseStreamer: IServerSideEventStreamer = options.sseStreamer as IServerSideEventStreamer
 
         if (response.tool_calls) {
@@ -2150,8 +2144,8 @@ class Agent_Agentflow implements INode {
             sseStreamer.streamCalledToolsEvent(chatId, flatten(formattedToolCalls))
         }
 
-        if (response.usage_metadata) {
-            sseStreamer.streamUsageMetadataEvent(chatId, response.usage_metadata)
+        if (usageMetadata) {
+            sseStreamer.streamUsageMetadataEvent(chatId, usageMetadata)
         }
 
         sseStreamer.streamEndEvent(chatId)
@@ -2197,13 +2191,13 @@ class Agent_Agentflow implements INode {
         usedTools: IUsedTool[]
         sourceDocuments: Array<any>
         artifacts: any[]
-        totalTokens: number
+        tokenUsage: AgentTokenUsage
         isWaitingForHumanInput?: boolean
         accumulatedReasonContent?: string
         accumulatedReasoningDuration?: number
     }> {
-        // Track total tokens used throughout this process
-        let totalTokens = response.usage_metadata?.total_tokens || 0
+        // Model calls made inside this handler. The call that produced `response` was counted by the caller.
+        let tokenUsage = emptyTokenUsage()
         const usedTools: IUsedTool[] = []
         let sourceDocuments: Array<any> = []
         let artifacts: any[] = []
@@ -2218,7 +2212,7 @@ class Agent_Agentflow implements INode {
                 usedTools: [],
                 sourceDocuments: [],
                 artifacts: [],
-                totalTokens,
+                tokenUsage,
                 accumulatedReasonContent: accumulatedReasonContent || undefined,
                 accumulatedReasoningDuration: accumulatedReasoningDuration || undefined
             }
@@ -2286,7 +2280,7 @@ class Agent_Agentflow implements INode {
                         usedTools,
                         sourceDocuments,
                         artifacts,
-                        totalTokens,
+                        tokenUsage,
                         isWaitingForHumanInput: true,
                         accumulatedReasonContent: accumulatedReasonContent || undefined,
                         accumulatedReasoningDuration: accumulatedReasoningDuration || undefined
@@ -2404,7 +2398,7 @@ class Agent_Agentflow implements INode {
                     usedTools,
                     sourceDocuments,
                     artifacts,
-                    totalTokens,
+                    tokenUsage,
                     accumulatedReasonContent: accumulatedReasonContent || undefined,
                     accumulatedReasoningDuration: accumulatedReasoningDuration || undefined
                 }
@@ -2418,7 +2412,7 @@ class Agent_Agentflow implements INode {
                 usedTools,
                 sourceDocuments,
                 artifacts,
-                totalTokens,
+                tokenUsage,
                 accumulatedReasonContent: accumulatedReasonContent || undefined,
                 accumulatedReasoningDuration: accumulatedReasoningDuration || undefined
             }
@@ -2447,9 +2441,7 @@ class Agent_Agentflow implements INode {
         }
 
         // Add tokens from this response
-        if (newResponse.usage_metadata?.total_tokens) {
-            totalTokens += newResponse.usage_metadata.total_tokens
-        }
+        tokenUsage = addModelCallUsage(tokenUsage, newResponse.usage_metadata)
 
         // Accumulate this turn's reasoning content and duration
         if (newResponse.additional_kwargs?.reasoning_content) {
@@ -2467,7 +2459,7 @@ class Agent_Agentflow implements INode {
                 usedTools: recursiveUsedTools,
                 sourceDocuments: recursiveSourceDocuments,
                 artifacts: recursiveArtifacts,
-                totalTokens: recursiveTokens,
+                tokenUsage: recursiveTokenUsage,
                 isWaitingForHumanInput: recursiveIsWaitingForHumanInput,
                 accumulatedReasonContent: recursiveAccumulatedReasonContent,
                 accumulatedReasoningDuration: recursiveAccumulatedReasoningDuration
@@ -2494,7 +2486,7 @@ class Agent_Agentflow implements INode {
             usedTools.push(...recursiveUsedTools)
             sourceDocuments = [...sourceDocuments, ...recursiveSourceDocuments]
             artifacts = [...artifacts, ...recursiveArtifacts]
-            totalTokens += recursiveTokens
+            tokenUsage = mergeTokenUsage(tokenUsage, recursiveTokenUsage)
             isWaitingForHumanInput = recursiveIsWaitingForHumanInput
             if (recursiveAccumulatedReasonContent !== undefined) {
                 accumulatedReasonContent = recursiveAccumulatedReasonContent
@@ -2509,7 +2501,7 @@ class Agent_Agentflow implements INode {
             usedTools,
             sourceDocuments,
             artifacts,
-            totalTokens,
+            tokenUsage,
             isWaitingForHumanInput,
             accumulatedReasonContent: accumulatedReasonContent || undefined,
             accumulatedReasoningDuration: accumulatedReasoningDuration || undefined
@@ -2554,7 +2546,7 @@ class Agent_Agentflow implements INode {
         usedTools: IUsedTool[]
         sourceDocuments: Array<any>
         artifacts: any[]
-        totalTokens: number
+        tokenUsage: AgentTokenUsage
         isWaitingForHumanInput?: boolean
         accumulatedReasonContent?: string
         accumulatedReasoningDuration?: number
@@ -2572,7 +2564,7 @@ class Agent_Agentflow implements INode {
                 usedTools: [],
                 sourceDocuments: [],
                 artifacts: [],
-                totalTokens: 0,
+                tokenUsage: emptyTokenUsage(),
                 accumulatedReasonContent: undefined,
                 accumulatedReasoningDuration: undefined
             }
@@ -2585,8 +2577,8 @@ class Agent_Agentflow implements INode {
         messages.length = 0
         messages.push(...lastCheckpointMessages.slice(0, lastCheckpointMessages.length - 1))
 
-        // Track total tokens used throughout this process
-        let totalTokens = response.usage_metadata?.total_tokens || 0
+        // Model calls made inside this handler. The call that produced `response` was counted by the caller.
+        let tokenUsage = emptyTokenUsage()
 
         if (!response.tool_calls || response.tool_calls.length === 0) {
             const acc = (response.additional_kwargs?.reasoning_content as string) || undefined
@@ -2599,7 +2591,7 @@ class Agent_Agentflow implements INode {
                 usedTools: [],
                 sourceDocuments: [],
                 artifacts: [],
-                totalTokens,
+                tokenUsage,
                 accumulatedReasonContent: acc,
                 accumulatedReasoningDuration: dur
             }
@@ -2782,7 +2774,7 @@ class Agent_Agentflow implements INode {
                     usedTools,
                     sourceDocuments,
                     artifacts,
-                    totalTokens,
+                    tokenUsage,
                     accumulatedReasonContent: acc,
                     accumulatedReasoningDuration: dur
                 }
@@ -2825,9 +2817,7 @@ class Agent_Agentflow implements INode {
         }
 
         // Add tokens from this response
-        if (newResponse.usage_metadata?.total_tokens) {
-            totalTokens += newResponse.usage_metadata.total_tokens
-        }
+        tokenUsage = addModelCallUsage(tokenUsage, newResponse.usage_metadata)
 
         // Accumulate reasoning and duration from checkpoint response and this turn
         let accumulatedReasonContent = (response.additional_kwargs?.reasoning_content as string) || ''
@@ -2846,7 +2836,7 @@ class Agent_Agentflow implements INode {
                 usedTools: recursiveUsedTools,
                 sourceDocuments: recursiveSourceDocuments,
                 artifacts: recursiveArtifacts,
-                totalTokens: recursiveTokens,
+                tokenUsage: recursiveTokenUsage,
                 isWaitingForHumanInput: recursiveIsWaitingForHumanInput,
                 accumulatedReasonContent: recursiveAccumulatedReasonContent,
                 accumulatedReasoningDuration: recursiveAccumulatedReasoningDuration
@@ -2873,7 +2863,7 @@ class Agent_Agentflow implements INode {
             usedTools.push(...recursiveUsedTools)
             sourceDocuments = [...sourceDocuments, ...recursiveSourceDocuments]
             artifacts = [...artifacts, ...recursiveArtifacts]
-            totalTokens += recursiveTokens
+            tokenUsage = mergeTokenUsage(tokenUsage, recursiveTokenUsage)
             isWaitingForHumanInput = recursiveIsWaitingForHumanInput
             if (recursiveAccumulatedReasonContent !== undefined) {
                 accumulatedReasonContent = recursiveAccumulatedReasonContent
@@ -2888,7 +2878,7 @@ class Agent_Agentflow implements INode {
             usedTools,
             sourceDocuments,
             artifacts,
-            totalTokens,
+            tokenUsage,
             isWaitingForHumanInput,
             accumulatedReasonContent: accumulatedReasonContent || undefined,
             accumulatedReasoningDuration: accumulatedReasoningDuration || undefined

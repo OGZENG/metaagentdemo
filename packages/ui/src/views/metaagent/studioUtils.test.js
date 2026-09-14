@@ -303,3 +303,16 @@ describe('deployed crew telemetry', () => {
         expect(summarizeResultSubset([{ scenarioId: 'a' }], new Set(['online_1']))).toBeNull()
     })
 })
+
+describe('tool-loop usage', () => {
+    it('counts every model call an agent node reports', () => {
+        const summary = summarizeExecutedData([
+            {
+                nodeLabel: 'Support',
+                data: { output: { usageMetadata: { input_tokens: 4845, output_tokens: 217, total_tokens: 5062, model_calls: 3 } } }
+            }
+        ])
+        expect(summary).toMatchObject({ inputTokens: 4845, outputTokens: 217, totalTokens: 5062, modelCalls: 3 })
+        expect(summary.agents[0].calls).toBe(3)
+    })
+})

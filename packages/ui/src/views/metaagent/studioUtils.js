@@ -64,8 +64,10 @@ export const summarizeExecutedData = (executionData = []) => {
             toolCalls: 0
         }
         if (usage) {
-            agent.calls += 1
-            totals.modelCalls += 1
+            // Agent nodes report every call of a tool loop in `model_calls`.
+            const calls = Math.max(1, numberValue(usage.model_calls, 1))
+            agent.calls += calls
+            totals.modelCalls += calls
         }
         agent.inputTokens += inputTokens
         agent.outputTokens += outputTokens
