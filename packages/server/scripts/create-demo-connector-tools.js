@@ -452,12 +452,93 @@ return JSON.stringify({
     }
 })
 `
+    },
+    {
+        /**
+         * The one tool here that is not a stand-in: it calls Google's
+         * Programmable Search JSON API for real. Create two Variables in Flowise
+         * first — GOOGLE_API_KEY and GOOGLE_CSE_ID — or every call answers
+         * `not_configured`. Free tier: 100 queries a day.
+         *
+         * Results change over time, so a crew bound to this tool is no longer
+         * reproducible: keep it out of the acceptance suite.
+         */
+        name: 'web_search',
+        description:
+            'Searches the public web with Google and returns the top results with title, URL and snippet. Use it for facts that are not in any internal system, and cite the URLs you used.',
+        params: [
+            ['query', 'What to search the web for'],
+            ['num_results', 'How many results to return, 1 to 10. Defaults to 5.', false]
+        ],
+        func: `/* google-custom-search — a real call to the Programmable Search JSON API */
+const axios = require('axios')
+
+const QUERY = (${arg('query')}).trim()
+const REQUESTED = parseInt((${arg('num_results')}) || '5', 10)
+const COUNT = Math.min(10, Math.max(1, isNaN(REQUESTED) ? 5 : REQUESTED))
+const API_KEY = ($vars && $vars.GOOGLE_API_KEY) || ''
+const SEARCH_ENGINE_ID = ($vars && $vars.GOOGLE_CSE_ID) || ''
+
+if (!QUERY) {
+    return JSON.stringify({ ok: false, status: 'invalid_request', source: 'google-custom-search', message: 'query is empty.' })
+}
+if (!API_KEY || !SEARCH_ENGINE_ID) {
+    return JSON.stringify({
+        ok: false,
+        status: 'not_configured',
+        source: 'google-custom-search',
+        message: 'Set the GOOGLE_API_KEY and GOOGLE_CSE_ID variables in Flowise before using web search.'
+    })
+}
+
+const url =
+    'https://www.googleapis.com/customsearch/v1?key=' +
+    encodeURIComponent(API_KEY) +
+    '&cx=' +
+    encodeURIComponent(SEARCH_ENGINE_ID) +
+    '&num=' +
+    COUNT +
+    '&safe=active&q=' +
+    encodeURIComponent(QUERY)
+
+try {
+    const response = await axios.get(url)
+    const items = (response && response.data && response.data.items) || []
+    const results = items.slice(0, COUNT).map(function (item, index) {
+        return {
+            rank: index + 1,
+            title: item.title || '',
+            url: item.link || '',
+            site: item.displayLink || '',
+            snippet: String(item.snippet || '').replace(/\\s+/g, ' ').trim()
+        }
+    })
+    if (!results.length) {
+        return JSON.stringify({ ok: false, status: 'not_found', source: 'google-custom-search', message: 'No result for this query.', query: QUERY })
+    }
+    return JSON.stringify({
+        ok: true,
+        status: 'ok',
+        source: 'google-custom-search',
+        data: { query: QUERY, count: results.length, fetched_at: new Date().toISOString(), results: results }
+    })
+} catch (error) {
+    const apiError = error && error.response && error.response.data && error.response.data.error
+    return JSON.stringify({
+        ok: false,
+        status: 'error',
+        source: 'google-custom-search',
+        message: (apiError && apiError.message) || String((error && error.message) || error),
+        query: QUERY
+    })
+}
+`
     }
 ]
 
 const schemaOf = (params) =>
     JSON.stringify(
-        params.map(([property, description]) => ({ property, type: 'string', description, required: true })),
+        params.map(([property, description, required = true]) => ({ property, type: 'string', description, required })),
         null,
         2
     )
