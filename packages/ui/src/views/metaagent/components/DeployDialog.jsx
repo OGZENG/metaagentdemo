@@ -22,7 +22,9 @@ import toolsApi from '@/api/tools'
 import { errorMessage } from '../studioRunner'
 import { formatCost, formatNumber, formatPercent } from '../deployments/format'
 
-const SIMULATED = ''
+// A real value, not an empty string: MUI hides the selected option when the
+// value is empty, which left every tool dropdown looking unset.
+const SIMULATED = 'simulated'
 
 /**
  * Promotes one measured crew into a deployment people can chat with.
@@ -57,7 +59,7 @@ const DeployDialog = ({ open, trial, session, selectedChatModel, cheapChatModel,
             .finally(() => setLoadingTools(false))
     }, [open, trial, design])
 
-    const boundCount = useMemo(() => Object.values(bindings).filter(Boolean).length, [bindings])
+    const boundCount = useMemo(() => Object.values(bindings).filter((toolId) => toolId && toolId !== SIMULATED).length, [bindings])
 
     if (!trial || !design) return null
 
@@ -65,6 +67,7 @@ const DeployDialog = ({ open, trial, session, selectedChatModel, cheapChatModel,
         setDeploying(true)
         setError('')
         try {
+            const realBindings = Object.fromEntries(Object.entries(bindings).filter(([, toolId]) => toolId && toolId !== SIMULATED))
             const { data } = await deploymentsApi.createDeployment({
                 name: name.trim(),
                 goal: session.goal,
@@ -72,7 +75,7 @@ const DeployDialog = ({ open, trial, session, selectedChatModel, cheapChatModel,
                 crew: trial.crew,
                 selectedChatModel,
                 cheapChatModel,
-                toolBindings: bindings,
+                toolBindings: realBindings,
                 metrics: trial.summary,
                 heldOutMetrics: trial.testSummary,
                 sourceTrialId: trial.id,
@@ -115,8 +118,16 @@ const DeployDialog = ({ open, trial, session, selectedChatModel, cheapChatModel,
 
                     {design.tools.length > 0 && (
                         <Box>
-                            <Typography variant='subtitle2' sx={{ mb: 0.75 }}>
+                            <Typography variant='subtitle2' sx={{ mb: 0.25 }}>
                                 Tool environment
+                            </Typography>
+                            <Typography variant='caption' color='text.secondary' display='block' sx={{ mb: 1 }}>
+                                {boundCount
+                                    ? `${boundCount} of ${design.tools.length} tool(s) call a real system.`
+                                    : `All ${design.tools.length} tool(s) stay simulated. Pick a workspace tool to call a real system instead.`}
+                                {!loadingTools && !tools.length
+                                    ? ' This workspace has no custom tools yet — create one under Tools to bind it here.'
+                                    : ''}
                             </Typography>
                             <Stack spacing={1.25}>
                                 {design.tools.map((tool) => (
