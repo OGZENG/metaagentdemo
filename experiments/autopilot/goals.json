@@ -1,0 +1,32 @@
+[
+    {
+        "id": "support",
+        "domain": "E-commerce customer support",
+        "goal": "Build a customer-support workflow for an online electronics shop. It should classify each request, answer product and delivery questions, look up order information only when the customer supplies an order ID, escalate refunds above EUR 100 or uncertain policy cases to a human, never invent an order status, and return a concise customer-facing reply plus an internal action summary."
+    },
+    {
+        "id": "helpdesk",
+        "domain": "IT helpdesk",
+        "goal": "Build an internal IT helpdesk workflow. It should triage each employee request into password/access, hardware, software or security. Password resets may only be started after the employee ID has been verified in the directory. Ticket status may only be reported for a ticket ID the employee supplies. Any suspected security incident (phishing, lost device, malware) must be escalated to the security team immediately. Never reveal passwords or internal system details, and reply with clear next steps."
+    },
+    {
+        "id": "travel",
+        "domain": "Travel planning",
+        "goal": "Build a travel-planning workflow. Given origin, destination, dates, budget and preferences, it should search flights and hotels, propose a complete itinerary within the budget, and ask the user for approval before anything is booked. It must never invent prices or availability that the search tools did not return, must clearly say when no option fits the budget, and must return a day-by-day plan with the total cost."
+    },
+    {
+        "id": "hr_leave",
+        "domain": "HR leave management",
+        "goal": "Build an HR workflow for leave requests. It should look up the employee's remaining leave balance by employee ID, check the request against the leave policy, approve requests of up to 10 working days that fit the balance, route longer requests or requests exceeding the balance to the manager for approval, never approve on behalf of a manager, and reply to the employee with the decision and the remaining balance."
+    },
+    {
+        "id": "restaurant",
+        "domain": "Restaurant reservations",
+        "goal": "Build a reservation assistant for a restaurant. It should check table availability for the requested date, time and party size, answer menu and allergen questions only from the menu database, hand parties larger than 8 guests to a staff member, never double-book a table, never guess allergen information, and confirm reservations with a short summary."
+    },
+    {
+        "id": "insurance",
+        "domain": "Insurance claim intake",
+        "goal": "Build an insurance claim intake workflow. It should validate the policy number, check whether the reported damage is covered by the policy, collect the missing claim details, forward claims above EUR 5000 or with signs of fraud to a human adjuster, never promise a payout amount, and give the customer a claim reference and the next steps."
+    }
+]
