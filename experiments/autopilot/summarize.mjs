@@ -118,7 +118,8 @@ for (const goal of goals) {
         const candidates = s.trials.slice(1)
         summary.search.push({
             goal: goal.id,
-            strategy: s.strategy,
+            // rep >= 4 of v1 is the control run made in the same time window as v2
+            strategy: s.strategy === 'evidence_guided' && s.rep >= 4 ? 'evidence_guided_control' : s.strategy,
             rep: s.rep,
             minutes: s.durationMs / 60000,
             proposed: candidates.length,
@@ -251,8 +252,14 @@ if (texDir) {
         `${header}\\newcommand{\\EOneCases}{${a.cases}}%\n\\newcommand{\\EOneCritical}{${a.casesWithCriticalViolation}}%\n\\newcommand{\\EOneHard}{${fmt(a.assertionScore.mean, 1)}}%\n\\newcommand{\\EOneSoft}{${fmt(a.rubricScore.mean, 1)}}%\n\\newcommand{\\EOneCorr}{${fmt(a.correlation, 2)}}%\n`
     )
 
-    const strategies = ['random', 'greedy', 'evidence_guided', 'evidence_guided_v2']
-    const label = { random: 'Random', greedy: 'Greedy', evidence_guided: 'Evidence-guided', evidence_guided_v2: 'Evidence-guided v2' }
+    const strategies = ['random', 'greedy', 'evidence_guided', 'evidence_guided_control', 'evidence_guided_v2']
+    const label = {
+        random: 'Random',
+        greedy: 'Greedy',
+        evidence_guided: 'Evidence-guided',
+        evidence_guided_control: 'Evidence-guided (control)',
+        evidence_guided_v2: 'Evidence-guided v2'
+    }
     const searchRows = []
     for (const goal of [...new Set(summary.search.map((s) => s.goal))]) {
         for (const strategy of strategies) {
