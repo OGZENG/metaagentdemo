@@ -23,6 +23,11 @@ export const SEARCH_STRATEGIES = [
         label: 'Evidence-guided',
         description: 'The model picks operators from the legal set using observed failures.'
     },
+    {
+        id: 'evidence_guided_v2',
+        label: 'Evidence-guided (checked)',
+        description: 'Like evidence-guided, but operators are shown with their effect and each pick must name its operator type.'
+    },
     { id: 'greedy', label: 'Greedy heuristic', description: 'Static priors rank the legal operator set; no extra model call.' },
     { id: 'random', label: 'Random (ablation)', description: 'Uniform sample of the same legal set, seeded for reproducibility.' }
 ]

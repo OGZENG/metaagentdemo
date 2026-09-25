@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals'
 import { normalizeCrewIR } from './crewIR'
-import { CrewOperatorType, OperatorNotApplicable, applyOperator, enumerateOperators, estimateCrewCost } from './crewOperators'
-import { rankOperators, selectOperators } from './crewSearch'
+import { CrewOperatorType, OperatorNotApplicable, applyOperator, describeOperatorEffect, enumerateOperators, estimateCrewCost } from './crewOperators'
+import { checkSelections, rankOperators, selectOperators } from './crewSearch'
 import { RunEvidenceType } from './crewSearch'
 import type { CrewIR } from './studioSchemas'
 
@@ -235,6 +235,29 @@ describe('operator search', () => {
         const first = selectOperators(source, ['check_order'], evidence(), 'random', 3, 42)
         const second = selectOperators(source, ['check_order'], evidence(), 'random', 3, 42)
         expect(first.map((item) => item.description)).toEqual(second.map((item) => item.description))
+    })
+
+    it('v2 discards selections whose operator type contradicts the index', () => {
+        const source = fanIn()
+        source.agents[0].tools = ['check_order']
+        const legal = rankOperators(source, ['check_order'], evidence())
+        expect(legal.some((item) => item.operator.type === 'unbind_tool')).toBe(true)
+        const unbindIndex = legal.findIndex((item) => item.operator.type === 'unbind_tool')
+        const otherIndex = legal.findIndex((item) => item.operator.type !== 'unbind_tool')
+        const { accepted, rejected } = checkSelections(legal, [
+            { index: unbindIndex, operatorType: 'bind_tool' },
+            { index: otherIndex, operatorType: legal[otherIndex].operator.type },
+            { index: 999, operatorType: 'merge_tasks' }
+        ])
+        expect(accepted.map((item) => item.index)).toEqual([otherIndex])
+        expect(rejected).toHaveLength(2)
+        expect(rejected[0].reason).toContain('unbind_tool')
+    })
+
+    it('spells out that unbinding removes the ability to call a tool', () => {
+        const effect = describeOperatorEffect(operator({ type: 'unbind_tool', agentIds: ['a_agent'], tool: 'check_order' }))
+        expect(effect).toContain('LOSES')
+        expect(effect).toContain('check_order')
     })
 
     it('greedy selection keeps the candidate set diverse', () => {

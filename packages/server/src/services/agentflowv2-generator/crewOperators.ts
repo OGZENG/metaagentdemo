@@ -337,6 +337,41 @@ export const describeOperator = (operator: CrewOperator) => {
     }
 }
 
+/**
+ * What an operator does to the crew, spelled out as a consequence. A bare
+ * "Remove X from Y" next to a failure that mentions X was read by the model as
+ * "do something about X": in the first experiments it picked unbind_tool eight
+ * times out of nine while arguing that the tool had to be kept or used.
+ */
+export const describeOperatorEffect = (operator: CrewOperator) => {
+    switch (operator.type) {
+        case 'merge_tasks':
+            return `One agent performs both tasks ${operator.taskIds.join(' and ')} in a single model call; one hand-off disappears.`
+        case 'merge_agents':
+            return `Agent ${operator.agentIds[1]} disappears; ${operator.agentIds[0]} takes over its tasks, tools and guardrails.`
+        case 'remove_task':
+            return `Task ${operator.taskIds[0]} and its output disappear; downstream tasks receive its inputs instead.`
+        case 'add_validator':
+            return 'An extra agent checks the final answer against the criteria and rewrites it; one more model call per request.'
+        case 'parallelize_task':
+            return `Task ${operator.taskIds[0]} no longer waits for, or receives, the output of its dependencies.`
+        case 'sequentialize_task':
+            return `Task ${operator.taskIds[0]} waits for and receives the output of ${operator.taskIds[1]}.`
+        case 'add_router':
+            return 'A router sends each request to exactly one entry task; the other branches do not run for that request.'
+        case 'remove_router':
+            return 'All entry tasks run for every request; nothing is skipped by routing any more.'
+        case 'bind_tool':
+            return `${operator.agentIds[0]} gains the ability to call ${operator.tool}. Only useful if no agent that the request reaches can call it yet.`
+        case 'unbind_tool':
+            return `${operator.agentIds[0]} LOSES the ability to call ${operator.tool}; it can no longer call it at all.`
+        case 'rewrite_prompt':
+            return `The goal and guardrails of ${operator.agentIds[0]} are replaced.`
+        default:
+            return ''
+    }
+}
+
 /* ------------------------------------------------------------------ *
  * Enumeration — the legal neighbourhood of an IR
  * ------------------------------------------------------------------ */

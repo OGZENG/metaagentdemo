@@ -20,7 +20,13 @@ import {
  * which is what makes the comparison meaningful.
  */
 
-export const SEARCH_STRATEGIES = ['random', 'greedy', 'evidence_guided'] as const
+/**
+ * `evidence_guided_v2` is the evidence-guided strategy with two fixes found in
+ * the thesis experiments: every legal operator is shown with its consequence,
+ * and each selection must name the operator type it refers to, which is
+ * checked against the index before the operator is applied.
+ */
+export const SEARCH_STRATEGIES = ['random', 'greedy', 'evidence_guided', 'evidence_guided_v2'] as const
 export type SearchStrategy = (typeof SEARCH_STRATEGIES)[number]
 
 export const RunEvidenceType = z.object({
@@ -245,7 +251,41 @@ export const OperatorSelectionType = z.object({
         .default([])
 })
 
-export const promptPatchToOperator = (patch: { agentId: string; goal: string; guardrails: string[] }): CrewOperator =>
+export const OperatorSelectionV2Type = OperatorSelectionType.extend({
+    selections: z
+        .array(
+            z.object({
+                index: z.number().int().min(0),
+                /** must equal the type of the operator at `index` */
+                operatorType: z.string().trim().min(1),
+                /** what the crew will do differently afterwards, in one sentence */
+                expectedEffect: z.string().trim().min(1),
+                rationale: z.string().trim().min(1)
+            })
+        )
+        .max(6)
+        .default([])
+})
+
+/**
+ * Keeps only selections whose declared operator type matches the operator the
+ * index points to. A mismatch means the model reasoned about one change and
+ * selected another; applying it would measure something nobody intended.
+ */
+export const checkSelections = <T extends { index: number; operatorType: string }>(legal: ScoredOperator[], selections: T[]) => {
+    const accepted: T[] = []
+    const rejected: (T & { reason: string })[] = []
+    for (const selection of selections) {
+        const candidate = legal[selection.index]
+        if (!candidate) rejected.push({ ...selection, reason: `index ${selection.index} is not in the legal list` })
+        else if (candidate.operator.type !== selection.operatorType.trim())
+            rejected.push({ ...selection, reason: `index ${selection.index} is ${candidate.operator.type}, not ${selection.operatorType}` })
+        else accepted.push(selection)
+    }
+    return { accepted, rejected }
+}
+
+export const promptPatchToOperator =(patch: { agentId: string; goal: string; guardrails: string[] }): CrewOperator =>
     CrewOperatorType.parse({
         type: 'rewrite_prompt',
         agentIds: [patch.agentId],

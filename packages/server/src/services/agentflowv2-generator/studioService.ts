@@ -23,15 +23,17 @@ import { provisionMockTools, purgeMockTools, resolveToolBindings } from './mockT
 import { combineScores, evaluateAssertions, rubricScore, summarizeAssertions, type RecordedToolCall } from './assertions'
 import {
     OperatorSelectionType,
+    OperatorSelectionV2Type,
     RunEvidenceType,
     SEARCH_STRATEGIES,
+    checkSelections,
     materializeCandidates,
     promptPatchToOperator,
     rankOperators,
     selectOperators,
     type SearchStrategy
 } from './crewSearch'
-import { applyOperator, describeOperator, CrewOperatorType } from './crewOperators'
+import { applyOperator, describeOperator, describeOperatorEffect, CrewOperatorType } from './crewOperators'
 
 /* ------------------------------------------------------------------ *
  * Model plumbing
@@ -684,6 +686,14 @@ const SELECTION_PROMPT = [
     'Return: selections (index plus rationale) and promptPatches.'
 ].join('\n')
 
+const SELECTION_PROMPT_V2 = [
+    ...SELECTION_PROMPT.split('\n').slice(0, -1),
+    'Every legal operator comes with its effect. Read the effect, not only the name: an operator that removes a tool makes the agent unable to call it.',
+    'If a required tool is already bound to an agent but was never called, no binding operator can help. Either write a promptPatch that instructs the agent holding the tool to call it before answering, or choose a structural change that makes the request reach that agent.',
+    'For every selection, repeat the operatorType of the chosen index exactly and state its expectedEffect on the crew in one sentence. A selection whose operatorType does not match its index is discarded.',
+    'Return: selections (index, operatorType, expectedEffect, rationale) and promptPatches.'
+].join('\n')
+
 export const proposeStudioCandidates = async (
     goal: string,
     designInput: unknown,
@@ -701,7 +711,8 @@ export const proposeStudioCandidates = async (
     const requested = SEARCH_STRATEGIES.includes(strategy) ? strategy : 'greedy'
     const wanted = Math.min(6, Math.max(1, Number(count) || 3))
 
-    if (requested !== 'evidence_guided') {
+    const modelGuided = requested === 'evidence_guided' || requested === 'evidence_guided_v2'
+    if (!modelGuided) {
         return {
             strategy: requested,
             candidates: materializeCandidates(ir, toolNames, selectOperators(ir, toolNames, evidence, requested, wanted, seed)).map(
@@ -713,10 +724,11 @@ export const proposeStudioCandidates = async (
     const legal = rankOperators(ir, toolNames, evidence)
     if (!legal.length) return { strategy: requested, candidates: [] }
 
+    const v2 = requested === 'evidence_guided_v2'
     const selection = await invokeStudioModel(
         selectedChatModel,
-        OperatorSelectionType,
-        SELECTION_PROMPT,
+        v2 ? OperatorSelectionV2Type : OperatorSelectionType,
+        v2 ? SELECTION_PROMPT_V2 : SELECTION_PROMPT,
         JSON.stringify(
             {
                 goal,
@@ -729,6 +741,7 @@ export const proposeStudioCandidates = async (
                     index,
                     type: candidate.operator.type,
                     description: candidate.description,
+                    ...(v2 ? { effect: describeOperatorEffect(candidate.operator) } : {}),
                     heuristicScore: candidate.score
                 })),
                 wantedCandidates: wanted
@@ -738,7 +751,11 @@ export const proposeStudioCandidates = async (
         )
     )
 
-    const chosen = selection.selections
+    // v2: discard selections whose declared operator type contradicts their index.
+    const { accepted, rejected: inconsistent } = v2
+        ? checkSelections(legal, selection.selections as { index: number; operatorType: string; rationale: string }[])
+        : { accepted: selection.selections, rejected: [] as { index: number; operatorType: string; reason: string }[] }
+    const chosen = accepted
         .filter((item) => legal[item.index])
         .slice(0, wanted)
         .map((item) => ({ ...legal[item.index], rationale: item.rationale }))
@@ -757,10 +774,11 @@ export const proposeStudioCandidates = async (
         return {
             strategy: requested,
             candidates: [],
+            inconsistentSelections: inconsistent,
             note: 'The search found no operator worth trying from here; every legal change was either already measured or judged unhelpful.'
         }
     }
-    return { strategy: requested, candidates }
+    return { strategy: requested, candidates, inconsistentSelections: inconsistent }
 }
 
 export const applyStudioOperator = async (designInput: unknown, crewInput: unknown, operatorInput: unknown) => {
