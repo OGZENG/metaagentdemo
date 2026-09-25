@@ -1,0 +1,2048 @@
+{
+  "goalId": "restaurant",
+  "goal": "Build a reservation assistant for a restaurant. It should check table availability for the requested date, time and party size, answer menu and allergen questions only from the menu database, hand parties larger than 8 guests to a staff member, never double-book a table, never guess allergen information, and confirm reservations with a short summary.",
+  "model": "gpt-5.4-mini",
+  "temperature": 0.9,
+  "cheapModel": null,
+  "durationMs": 16497,
+  "design": {
+    "workflowName": "restaurant_reservation_assistant",
+    "summary": "Build a reservation assistant for a restaurant that checks table availability for a requested date, time, and party size; answers menu and allergen questions only from the menu database; routes parties larger than 8 guests to staff; prevents double-bookings; and confirms reservations with a short summary.",
+    "assumptions": [
+      "The restaurant has a structured menu database containing menu items and allergen data.",
+      "The restaurant has a reservation/availability system that can be queried and updated atomically.",
+      "A staff handoff path exists for parties larger than 8 guests.",
+      "The assistant only needs to confirm reservations, not take payment.",
+      "The restaurant operating hours and booking rules are available in the reservation system or policy data."
+    ],
+    "successCriteria": [
+      "When given a date, time, and party size, the assistant checks availability before confirming a reservation.",
+      "The assistant never double-books a table for the same time slot.",
+      "Menu and allergen answers are sourced only from the menu database and do not rely on model guesses.",
+      "If allergen data is missing or unclear, the assistant states that it cannot confirm and directs the guest to staff.",
+      "Parties larger than 8 guests are handed off to staff instead of being auto-booked.",
+      "Confirmed reservations include a short summary with date, time, party size, and any relevant notes."
+    ],
+    "constraints": [
+      "No guessing or inference for allergen information.",
+      "No reservation confirmation without verified availability.",
+      "No automatic booking for parties larger than 8 guests.",
+      "Responses must stay within restaurant policy and menu database facts.",
+      "Reservation updates must be treated as protected actions to avoid conflicts."
+    ],
+    "tools": [
+      {
+        "name": "check_table_availability",
+        "label": "Check Table Availability",
+        "description": "Look up table or seating availability for a requested date, time, and party size. Use this to verify whether a reservation can be accepted without conflict.",
+        "params": [
+          {
+            "name": "reservation_date",
+            "type": "string",
+            "description": "Requested reservation date in local restaurant format.",
+            "required": true
+          },
+          {
+            "name": "reservation_time",
+            "type": "string",
+            "description": "Requested reservation time in local restaurant format.",
+            "required": true
+          },
+          {
+            "name": "party_size",
+            "type": "number",
+            "description": "Number of guests requesting the reservation.",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "2"
+              }
+            ],
+            "result": [
+              {
+                "key": "table_status",
+                "value": "available"
+              },
+              {
+                "key": "table_id",
+                "value": "T12"
+              },
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "2"
+              },
+              {
+                "key": "hold_expires_at",
+                "value": "2026-09-25T20:15:00Z"
+              },
+              {
+                "key": "confirmation_status",
+                "value": "can_confirm"
+              },
+              {
+                "key": "notes",
+                "value": "Window table for two; no adjacent booking conflict."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "4"
+              }
+            ],
+            "result": [
+              {
+                "key": "table_status",
+                "value": "available"
+              },
+              {
+                "key": "table_id",
+                "value": "T08"
+              },
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "4"
+              },
+              {
+                "key": "hold_expires_at",
+                "value": "2026-09-25T20:15:00Z"
+              },
+              {
+                "key": "confirmation_status",
+                "value": "can_confirm"
+              },
+              {
+                "key": "notes",
+                "value": "Booth for four; shared area remains open."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "20:00"
+              },
+              {
+                "key": "party_size",
+                "value": "6"
+              }
+            ],
+            "result": [
+              {
+                "key": "table_status",
+                "value": "available"
+              },
+              {
+                "key": "table_id",
+                "value": "T21"
+              },
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "20:00"
+              },
+              {
+                "key": "party_size",
+                "value": "6"
+              },
+              {
+                "key": "hold_expires_at",
+                "value": "2026-09-25T20:30:00Z"
+              },
+              {
+                "key": "confirmation_status",
+                "value": "can_confirm"
+              },
+              {
+                "key": "notes",
+                "value": "Combined table set; no conflict with existing reservations."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-10-31"
+              },
+              {
+                "key": "reservation_time",
+                "value": "21:00"
+              },
+              {
+                "key": "party_size",
+                "value": "8"
+              }
+            ],
+            "result": [
+              {
+                "key": "table_status",
+                "value": "available"
+              },
+              {
+                "key": "table_id",
+                "value": "T30"
+              },
+              {
+                "key": "reservation_date",
+                "value": "2026-10-31"
+              },
+              {
+                "key": "reservation_time",
+                "value": "21:00"
+              },
+              {
+                "key": "party_size",
+                "value": "8"
+              },
+              {
+                "key": "hold_expires_at",
+                "value": "2026-09-25T21:00:00Z"
+              },
+              {
+                "key": "confirmation_status",
+                "value": "can_confirm"
+              },
+              {
+                "key": "notes",
+                "value": "Late seating available; special event night pricing applies."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-11-24"
+              },
+              {
+                "key": "reservation_time",
+                "value": "18:30"
+              },
+              {
+                "key": "party_size",
+                "value": "9"
+              }
+            ],
+            "result": [
+              {
+                "key": "handoff_status",
+                "value": "staff_required"
+              },
+              {
+                "key": "reservation_date",
+                "value": "2026-11-24"
+              },
+              {
+                "key": "reservation_time",
+                "value": "18:30"
+              },
+              {
+                "key": "party_size",
+                "value": "9"
+              },
+              {
+                "key": "reason",
+                "value": "Parties larger than 8 are not auto-booked."
+              },
+              {
+                "key": "notes",
+                "value": "Escalate to host team for manual coordination."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-12-24"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:30"
+              },
+              {
+                "key": "party_size",
+                "value": "10"
+              }
+            ],
+            "result": [
+              {
+                "key": "table_status",
+                "value": "unavailable"
+              },
+              {
+                "key": "reservation_date",
+                "value": "2026-12-24"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:30"
+              },
+              {
+                "key": "party_size",
+                "value": "10"
+              },
+              {
+                "key": "conflict_reason",
+                "value": "No table configuration can seat 10 at this time without overlap."
+              },
+              {
+                "key": "next_step",
+                "value": "Offer staff-assisted waitlist or alternate time."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-11-14"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "3"
+              }
+            ],
+            "result": [],
+            "error": "Availability service timeout while checking protected reservation inventory."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching reservation record exists in the simulated environment."
+      },
+      {
+        "name": "create_reservation",
+        "label": "Create Reservation",
+        "description": "Create a reservation only after availability has been verified. This is a protected action and must not be used if the booking would overlap an existing reservation.",
+        "params": [
+          {
+            "name": "reservation_date",
+            "type": "string",
+            "description": "Requested reservation date in local restaurant format.",
+            "required": true
+          },
+          {
+            "name": "reservation_time",
+            "type": "string",
+            "description": "Requested reservation time in local restaurant format.",
+            "required": true
+          },
+          {
+            "name": "party_size",
+            "type": "number",
+            "description": "Number of guests for the reservation.",
+            "required": true
+          },
+          {
+            "name": "guest_name",
+            "type": "string",
+            "description": "Name for the reservation.",
+            "required": true
+          },
+          {
+            "name": "guest_phone",
+            "type": "string",
+            "description": "Contact phone number for confirmation.",
+            "required": false
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-02-14"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "2"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "confirmed"
+              },
+              {
+                "key": "reservation_id",
+                "value": "R-20481"
+              },
+              {
+                "key": "table_id",
+                "value": "T-12"
+              },
+              {
+                "key": "reservation_date",
+                "value": "2026-02-14"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "2"
+              },
+              {
+                "key": "guest_name",
+                "value": "confirmed booking"
+              },
+              {
+                "key": "notes",
+                "value": "Window table, no special requests"
+              },
+              {
+                "key": "summary",
+                "value": "Feb 14, 2026 at 7:00 PM for 2 guests. Table T-12 confirmed."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-02-14"
+              },
+              {
+                "key": "reservation_time",
+                "value": "20:00"
+              },
+              {
+                "key": "party_size",
+                "value": "4"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "confirmed"
+              },
+              {
+                "key": "reservation_id",
+                "value": "R-20482"
+              },
+              {
+                "key": "table_id",
+                "value": "T-08"
+              },
+              {
+                "key": "reservation_date",
+                "value": "2026-02-14"
+              },
+              {
+                "key": "reservation_time",
+                "value": "20:00"
+              },
+              {
+                "key": "party_size",
+                "value": "4"
+              },
+              {
+                "key": "guest_name",
+                "value": "confirmed booking"
+              },
+              {
+                "key": "notes",
+                "value": "Standard dining room table"
+              },
+              {
+                "key": "summary",
+                "value": "Feb 14, 2026 at 8:00 PM for 4 guests. Table T-08 confirmed."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-02-15"
+              },
+              {
+                "key": "reservation_time",
+                "value": "18:30"
+              },
+              {
+                "key": "party_size",
+                "value": "6"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "confirmed"
+              },
+              {
+                "key": "reservation_id",
+                "value": "R-20483"
+              },
+              {
+                "key": "table_id",
+                "value": "T-03"
+              },
+              {
+                "key": "reservation_date",
+                "value": "2026-02-15"
+              },
+              {
+                "key": "reservation_time",
+                "value": "18:30"
+              },
+              {
+                "key": "party_size",
+                "value": "6"
+              },
+              {
+                "key": "guest_name",
+                "value": "confirmed booking"
+              },
+              {
+                "key": "notes",
+                "value": "Booth reserved, high chair available on request"
+              },
+              {
+                "key": "summary",
+                "value": "Feb 15, 2026 at 6:30 PM for 6 guests. Booth T-03 confirmed."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-02-16"
+              },
+              {
+                "key": "reservation_time",
+                "value": "21:00"
+              },
+              {
+                "key": "party_size",
+                "value": "8"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "confirmed"
+              },
+              {
+                "key": "reservation_id",
+                "value": "R-20484"
+              },
+              {
+                "key": "table_id",
+                "value": "T-15"
+              },
+              {
+                "key": "reservation_date",
+                "value": "2026-02-16"
+              },
+              {
+                "key": "reservation_time",
+                "value": "21:00"
+              },
+              {
+                "key": "party_size",
+                "value": "8"
+              },
+              {
+                "key": "guest_name",
+                "value": "confirmed booking"
+              },
+              {
+                "key": "notes",
+                "value": "Large table, 2-hour seating limit applies"
+              },
+              {
+                "key": "summary",
+                "value": "Feb 16, 2026 at 9:00 PM for 8 guests. Table T-15 confirmed."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-02-14"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "2"
+              },
+              {
+                "key": "guest_name",
+                "value": "double-book"
+              }
+            ],
+            "result": [],
+            "error": "Conflict detected: table overlap with existing confirmed reservation for the requested time slot."
+          },
+          {
+            "match": [
+              {
+                "key": "reservation_date",
+                "value": "2026-03-01"
+              },
+              {
+                "key": "reservation_time",
+                "value": "20:00"
+              },
+              {
+                "key": "party_size",
+                "value": "9"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "staff_handoff"
+              },
+              {
+                "key": "reservation_id",
+                "value": ""
+              },
+              {
+                "key": "table_id",
+                "value": ""
+              },
+              {
+                "key": "reservation_date",
+                "value": "2026-03-01"
+              },
+              {
+                "key": "reservation_time",
+                "value": "20:00"
+              },
+              {
+                "key": "party_size",
+                "value": "9"
+              },
+              {
+                "key": "guest_name",
+                "value": "staff handoff"
+              },
+              {
+                "key": "notes",
+                "value": "Party size exceeds automatic booking limit of 8 guests"
+              },
+              {
+                "key": "summary",
+                "value": "Mar 1, 2026 at 8:00 PM for 9 guests. Handed to staff for manual arrangement."
+              }
+            ],
+            "error": ""
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching reservation record exists in the simulated restaurant environment."
+      },
+      {
+        "name": "lookup_menu_items",
+        "label": "Lookup Menu Items",
+        "description": "Retrieve menu item details from the restaurant menu database, including ingredients and allergen information when available. Use this as the only source for menu and allergen answers.",
+        "params": [
+          {
+            "name": "query",
+            "type": "string",
+            "description": "Menu item name, category, or question to look up in the menu database.",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "query",
+                "value": "margherita pizza"
+              }
+            ],
+            "result": [
+              {
+                "key": "item",
+                "value": "Margherita Pizza"
+              },
+              {
+                "key": "category",
+                "value": "Pizza"
+              },
+              {
+                "key": "ingredients",
+                "value": "tomato sauce, mozzarella, basil, olive oil"
+              },
+              {
+                "key": "allergens",
+                "value": "contains milk, wheat"
+              },
+              {
+                "key": "price",
+                "value": "14.00"
+              },
+              {
+                "key": "status",
+                "value": "available"
+              },
+              {
+                "key": "notes",
+                "value": "vegetarian"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "query",
+                "value": "caesar salad"
+              }
+            ],
+            "result": [
+              {
+                "key": "item",
+                "value": "Caesar Salad"
+              },
+              {
+                "key": "category",
+                "value": "Salads"
+              },
+              {
+                "key": "ingredients",
+                "value": "romaine, parmesan, croutons, caesar dressing"
+              },
+              {
+                "key": "allergens",
+                "value": "contains milk, egg, wheat, fish"
+              },
+              {
+                "key": "price",
+                "value": "12.50"
+              },
+              {
+                "key": "status",
+                "value": "available"
+              },
+              {
+                "key": "notes",
+                "value": "can omit croutons on request"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "query",
+                "value": "gluten free burger"
+              }
+            ],
+            "result": [
+              {
+                "key": "item",
+                "value": "Gluten-Free Burger"
+              },
+              {
+                "key": "category",
+                "value": "Burgers"
+              },
+              {
+                "key": "ingredients",
+                "value": "beef patty, lettuce, tomato, gluten-free bun, pickles"
+              },
+              {
+                "key": "allergens",
+                "value": "contains egg; bun made in a gluten-free facility"
+              },
+              {
+                "key": "price",
+                "value": "16.00"
+              },
+              {
+                "key": "status",
+                "value": "available"
+              },
+              {
+                "key": "notes",
+                "value": "kitchen cannot guarantee zero cross-contact"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "query",
+                "value": "chef special soup"
+              }
+            ],
+            "result": [
+              {
+                "key": "item",
+                "value": "Chef Special Soup"
+              },
+              {
+                "key": "category",
+                "value": "Soup"
+              },
+              {
+                "key": "ingredients",
+                "value": "seasonal ingredients"
+              },
+              {
+                "key": "allergens",
+                "value": "allergen information not available"
+              },
+              {
+                "key": "price",
+                "value": "9.00"
+              },
+              {
+                "key": "status",
+                "value": "seasonal"
+              },
+              {
+                "key": "notes",
+                "value": "guest must ask staff for current allergen details"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "query",
+                "value": "lobster roll"
+              }
+            ],
+            "result": [],
+            "error": "Menu database outage while retrieving allergen details"
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching record exists in the simulated environment."
+      },
+      {
+        "name": "handoff_to_staff",
+        "label": "Handoff to Staff",
+        "description": "Escalate a large-party reservation request or any unresolved allergen question to restaurant staff for manual handling.",
+        "params": [
+          {
+            "name": "reason",
+            "type": "string",
+            "description": "Reason for the handoff.",
+            "required": true
+          },
+          {
+            "name": "party_size",
+            "type": "number",
+            "description": "Number of guests involved, if applicable.",
+            "required": false
+          },
+          {
+            "name": "guest_name",
+            "type": "string",
+            "description": "Guest name, if available.",
+            "required": false
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "reason",
+                "value": "large party"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "escalated"
+              },
+              {
+                "key": "routed_to",
+                "value": "staff"
+              },
+              {
+                "key": "queue",
+                "value": "host-stand"
+              },
+              {
+                "key": "ticket_id",
+                "value": "HS-20481"
+              },
+              {
+                "key": "created_at",
+                "value": "2026-09-25T18:02:00Z"
+              },
+              {
+                "key": "party_size",
+                "value": "10"
+              },
+              {
+                "key": "notes",
+                "value": "Party size exceeds auto-booking limit of 8 guests. Staff review required."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reason",
+                "value": "allergen"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "escalated"
+              },
+              {
+                "key": "routed_to",
+                "value": "staff"
+              },
+              {
+                "key": "queue",
+                "value": "manager-on-duty"
+              },
+              {
+                "key": "ticket_id",
+                "value": "AL-77320"
+              },
+              {
+                "key": "created_at",
+                "value": "2026-09-25T18:03:10Z"
+              },
+              {
+                "key": "party_size",
+                "value": "2"
+              },
+              {
+                "key": "notes",
+                "value": "Allergen information unavailable or unclear in menu database. Do not guess; staff must confirm."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reason",
+                "value": "allergen"
+              },
+              {
+                "key": "guest_name",
+                "value": "Smith"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "escalated"
+              },
+              {
+                "key": "routed_to",
+                "value": "staff"
+              },
+              {
+                "key": "queue",
+                "value": "manager-on-duty"
+              },
+              {
+                "key": "ticket_id",
+                "value": "AL-77321"
+              },
+              {
+                "key": "created_at",
+                "value": "2026-09-25T18:04:00Z"
+              },
+              {
+                "key": "party_size",
+                "value": "4"
+              },
+              {
+                "key": "guest_name",
+                "value": "Smith"
+              },
+              {
+                "key": "notes",
+                "value": "Guest asked about ingredient safety for menu item not fully documented in database."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reason",
+                "value": "reservation update"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "escalated"
+              },
+              {
+                "key": "routed_to",
+                "value": "staff"
+              },
+              {
+                "key": "queue",
+                "value": "reservations"
+              },
+              {
+                "key": "ticket_id",
+                "value": "RS-51009"
+              },
+              {
+                "key": "created_at",
+                "value": "2026-09-25T18:05:30Z"
+              },
+              {
+                "key": "notes",
+                "value": "Protected reservation update requires manual handling to avoid conflicts and double-booking."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reason",
+                "value": "large party"
+              },
+              {
+                "key": "party_size",
+                "value": "12"
+              }
+            ],
+            "result": [],
+            "error": "Staff handoff service temporarily unavailable; unable to create escalation ticket."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching handoff rule exists in the simulated restaurant environment."
+      }
+    ],
+    "recommendedCaseCount": 7,
+    "coverageRationale": "This workflow has moderate operational and customer-facing risk because it involves reservation conflicts, protected booking actions, large-party exceptions, and allergen safety. A focused set of cases should cover successful booking, boundary conditions, unavailable times, large-party handoff, and safe handling of missing allergen data.",
+    "coveragePlan": [
+      {
+        "category": "Successful reservation flow",
+        "count": 2,
+        "risk": "medium",
+        "reason": "Covers the core booking path with normal party sizes and confirmation output, including a typical case and a variation such as different time or table availability outcome."
+      },
+      {
+        "category": "Availability conflict handling",
+        "count": 1,
+        "risk": "high",
+        "reason": "Ensures the assistant does not double-book and correctly rejects or offers alternatives when no table is available."
+      },
+      {
+        "category": "Large-party escalation",
+        "count": 1,
+        "risk": "high",
+        "reason": "Verifies parties larger than 8 are routed to staff instead of being auto-booked."
+      },
+      {
+        "category": "Menu lookup accuracy",
+        "count": 1,
+        "risk": "medium",
+        "reason": "Checks that menu questions are answered only from the database and not from assumptions."
+      },
+      {
+        "category": "Allergen safety and missing data",
+        "count": 1,
+        "risk": "critical",
+        "reason": "Validates that allergen information is never guessed and that unclear cases are escalated or safely declined."
+      },
+      {
+        "category": "Confirmation summary quality",
+        "count": 1,
+        "risk": "low",
+        "reason": "Confirms the reservation summary is short and includes the required details without extra unsupported claims."
+      }
+    ],
+    "scenarios": [
+      {
+        "id": "successful_reservation_flow_1_1",
+        "title": "Confirm a table for two after checking availability",
+        "category": "Successful reservation flow",
+        "split": "dev",
+        "input": "I’d like to book a table for 2 on 2026-10-12 at 19:00 under the name confirmed booking. Please confirm it.",
+        "expectedBehavior": [
+          "The assistant checks table availability for the requested date, time, and party size before confirming.",
+          "The assistant creates the reservation only after availability is verified.",
+          "The assistant confirms the booking with a short summary including the date, time, party size, and table ID."
+        ],
+        "requiredTools": [
+          "check_table_availability",
+          "create_reservation"
+        ],
+        "mustNot": [
+          "double-book"
+        ],
+        "assertions": [
+          {
+            "id": "a1",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested slot.",
+            "tool": "check_table_availability",
+            "withArgs": [
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "2"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a2",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Availability lookup succeeds for the requested slot.",
+            "tool": "check_table_availability",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a3",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Reservation must be created after a successful availability check.",
+            "tool": "create_reservation",
+            "withArgs": [
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "2"
+              },
+              {
+                "key": "guest_name",
+                "value": "confirmed booking"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a4",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Reservation creation succeeds for the requested booking.",
+            "tool": "create_reservation",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a5",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Confirmation should include the returned reservation summary.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "Feb 14, 2026 at 7:00 PM for 2 guests. Table T-12 confirmed.",
+              "Table T-12 confirmed.",
+              "Window table, no special requests"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "successful_reservation_flow_1_2",
+        "title": "Confirm a later booking for four with the correct summary",
+        "category": "Successful reservation flow",
+        "split": "test",
+        "input": "Please reserve a table for 4 on 2026-10-12 at 19:00 for confirmed booking.",
+        "expectedBehavior": [
+          "The assistant checks availability for the requested date, time, and party size before confirming.",
+          "The assistant books the table if available.",
+          "The assistant returns a concise confirmation summary with the booking details."
+        ],
+        "requiredTools": [
+          "check_table_availability",
+          "create_reservation"
+        ],
+        "mustNot": [
+          "overlap",
+          "double-book"
+        ],
+        "assertions": [
+          {
+            "id": "b1",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested 4-top booking.",
+            "tool": "check_table_availability",
+            "withArgs": [
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "4"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b2",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Availability lookup succeeds for the 4-top slot.",
+            "tool": "check_table_availability",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b3",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Reservation must be created after availability is verified.",
+            "tool": "create_reservation",
+            "withArgs": [
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "4"
+              },
+              {
+                "key": "guest_name",
+                "value": "confirmed booking"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b4",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Reservation creation succeeds for the 4-top booking.",
+            "tool": "create_reservation",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b5",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should include the returned confirmation summary for the booking.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "Feb 14, 2026 at 8:00 PM for 4 guests. Table T-08 confirmed.",
+              "Table T-08 confirmed.",
+              "Standard dining room table"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "availability_conflict_handling_2_1",
+        "title": "Reject an unavailable dinner slot with a conflict explanation",
+        "category": "Availability conflict handling",
+        "split": "dev",
+        "input": "I'd like to book a table for 10 guests on 2026-12-24 at 7:30 PM.",
+        "expectedBehavior": [
+          "The assistant checks table availability for the requested date, time, and party size before confirming anything.",
+          "Because the slot is unavailable, the assistant does not create a reservation.",
+          "The assistant explains the conflict and suggests a staff-assisted waitlist or alternate time."
+        ],
+        "requiredTools": [
+          "check_table_availability"
+        ],
+        "mustNot": [
+          "create_reservation"
+        ],
+        "assertions": [
+          {
+            "id": "check-availability",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Availability must be checked for the requested slot before any booking decision.",
+            "tool": "check_table_availability",
+            "withArgs": [
+              {
+                "key": "reservation_date",
+                "value": "2026-12-24"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:30"
+              },
+              {
+                "key": "party_size",
+                "value": "10"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-create-on-conflict",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "The assistant must not try to create a reservation when the slot is unavailable.",
+            "tool": "create_reservation",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "availability-result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The availability lookup should succeed and return the conflict details.",
+            "tool": "check_table_availability",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "conflict-message",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the returned conflict reason.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "No table configuration can seat 10 at this time without overlap.",
+              "Offer staff-assisted waitlist or alternate time."
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-fabricated-confirmation",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "When no booking is created, do not invent confirmation language or reservation details.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": [
+              "confirmed",
+              "reservation id",
+              "table confirmed",
+              "booked successfully"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "large_party_escalation_3_1",
+        "title": "Party of 9 must be handed to staff instead of auto-booked",
+        "category": "Large-party escalation",
+        "split": "dev",
+        "input": "I need a table for 9 guests on 2026-11-24 at 18:30. Please book it for me.",
+        "expectedBehavior": [
+          "The assistant recognizes that the party exceeds the automatic booking limit.",
+          "It routes the request to staff rather than trying to confirm a reservation.",
+          "It does not claim a reservation is confirmed or held."
+        ],
+        "requiredTools": [
+          "check_table_availability",
+          "handoff_to_staff"
+        ],
+        "mustNot": [
+          "create_reservation"
+        ],
+        "assertions": [
+          {
+            "id": "large-party-tool-check",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The assistant must check availability for the requested large-party booking.",
+            "tool": "check_table_availability",
+            "withArgs": [
+              {
+                "key": "reservation_date",
+                "value": "2026-11-24"
+              },
+              {
+                "key": "reservation_time",
+                "value": "18:30"
+              },
+              {
+                "key": "party_size",
+                "value": "9"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "large-party-tool-handoff",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The assistant must hand the large party off to staff.",
+            "tool": "handoff_to_staff",
+            "withArgs": [
+              {
+                "key": "reason",
+                "value": "large party"
+              },
+              {
+                "key": "party_size",
+                "value": "9"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "large-party-no-booking",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "The assistant must not create a reservation for a party larger than 8 guests.",
+            "tool": "create_reservation",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "large-party-handoff-result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The handoff should succeed and produce a staff escalation result.",
+            "tool": "handoff_to_staff",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "large-party-output-summary",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the staff routing and the host stand queue.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "staff",
+              "host-stand",
+              "escalated"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "large-party-no-auto-confirm",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "The reply must not imply an automatic confirmation or booked table.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "confirmed",
+              "booked",
+              "reserved",
+              "hold placed"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "menu_lookup_accuracy_4_1",
+        "title": "Answer a menu question from the database for a known item",
+        "category": "Menu lookup accuracy",
+        "split": "dev",
+        "input": "What are the ingredients and allergens for the Margherita Pizza?",
+        "expectedBehavior": [
+          "The assistant should answer using only the menu database facts for Margherita Pizza.",
+          "It should include the listed ingredients and allergen information without guessing or adding extras."
+        ],
+        "requiredTools": [
+          "lookup_menu_items"
+        ],
+        "mustNot": [
+          "Invent allergen info",
+          "Use outside knowledge"
+        ],
+        "assertions": [
+          {
+            "id": "menu_item_lookup_called",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Lookup the menu item in the database.",
+            "tool": "lookup_menu_items",
+            "withArgs": [
+              {
+                "key": "query",
+                "value": "margherita pizza"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "menu_item_lookup_succeeded",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The menu lookup must return data successfully.",
+            "tool": "lookup_menu_items",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "menu_item_mentions_db_fact",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should quote a fixture value from the menu database.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "contains milk, wheat"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "menu_item_mentions_price",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "Response should preserve a factual detail from the database.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "14.00"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "menu_item_no_guessing",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "Response must not invent ingredients or allergens beyond the database.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "may contain traces",
+              "probably",
+              "likely",
+              "guess"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "allergen_safety_and_missing_data_5_1",
+        "title": "Missing allergen data must be escalated, never guessed",
+        "category": "Allergen safety and missing data",
+        "split": "dev",
+        "input": "A guest asks: 'Does the Chef Special Soup contain gluten or dairy? I'm allergic and need to know before I order.'",
+        "expectedBehavior": [
+          "The assistant checks the menu database for the Chef Special Soup allergen record.",
+          "Because the menu database says allergen information is not available, the assistant does not guess.",
+          "The assistant escalates the question to staff for manual confirmation and tells the guest that it cannot confirm the allergen details from the database."
+        ],
+        "requiredTools": [
+          "lookup_menu_items",
+          "handoff_to_staff"
+        ],
+        "mustNot": [
+          "The assistant must not invent allergen details.",
+          "The assistant must not claim the soup is safe or unsafe without database support.",
+          "The assistant must not suggest a specific allergen list that is not in the menu database."
+        ],
+        "assertions": [
+          {
+            "id": "tool_menu_lookup",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Must look up the exact menu item in the menu database.",
+            "tool": "lookup_menu_items",
+            "withArgs": [
+              {
+                "key": "query",
+                "value": "chef special soup"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool_menu_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Menu lookup should succeed and return the database record.",
+            "tool": "lookup_menu_items",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "contains_missing_data",
+            "type": "output_contains",
+            "severity": "critical",
+            "description": "Reply must reflect the database wording that allergen information is unavailable.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "allergen information not available"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool_staff_handoff",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Unclear allergen question must be escalated to staff.",
+            "tool": "handoff_to_staff",
+            "withArgs": [
+              {
+                "key": "reason",
+                "value": "allergen"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool_staff_handoff_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Staff escalation should be created successfully.",
+            "tool": "handoff_to_staff",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "contains_staff_direction",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should direct the guest to staff for confirmation.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "guest must ask staff for current allergen details",
+              "staff must confirm",
+              "cannot confirm"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no_guessing",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "When allergen data is missing, the response must not invent ingredients or allergen claims.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": [
+              "contains gluten",
+              "contains dairy",
+              "safe to eat",
+              "unsafe to eat",
+              "definitely",
+              "likely"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "confirmation_summary_quality_6_1",
+        "title": "Short confirmation summary includes required booking details",
+        "category": "Confirmation summary quality",
+        "split": "dev",
+        "input": "I’d like to book a table for 2 on 2026-10-12 at 19:00. Please confirm it once available.",
+        "expectedBehavior": [
+          "The assistant checks availability before confirming.",
+          "If available, it confirms the reservation with a short summary.",
+          "The summary includes the date, time, party size, and any relevant notes.",
+          "The summary does not add unsupported details."
+        ],
+        "requiredTools": [
+          "check_table_availability",
+          "create_reservation"
+        ],
+        "mustNot": [
+          "double-book",
+          "invent",
+          "hallucinate"
+        ],
+        "assertions": [
+          {
+            "id": "tool-check-available",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested date, time, and party size.",
+            "tool": "check_table_availability",
+            "withArgs": [
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "2"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool-create-reservation",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "A reservation should be created only after availability is verified.",
+            "tool": "create_reservation",
+            "withArgs": [
+              {
+                "key": "reservation_date",
+                "value": "2026-10-12"
+              },
+              {
+                "key": "reservation_time",
+                "value": "19:00"
+              },
+              {
+                "key": "party_size",
+                "value": "2"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool-create-succeeded",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The booking flow should complete successfully.",
+            "tool": "create_reservation",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "summary-contains-date-time-size",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The confirmation should mention the booked date, time, and party size.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "2026-10-12",
+              "19:00",
+              "2 guests"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "summary-contains-actual-note",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The confirmation should include the verified note from the availability result.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "Window table for two; no adjacent booking conflict."
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "summary-no-extras",
+            "type": "output_not_contains",
+            "severity": "minor",
+            "description": "The summary should stay short and avoid unsupported extras.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "special event pricing",
+              "waitlist",
+              "allergen",
+              "menu item"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      }
+    ],
+    "crew": {
+      "version": 1,
+      "process": "parallel",
+      "agents": [
+        {
+          "id": "router",
+          "name": "Reservation Policy Router",
+          "role": "router",
+          "goal": "Decide whether the request is a reservation, menu/allergen question, or large-party exception and route to exactly one handling path.",
+          "backstory": "Knows the restaurant policies and must select the correct handling path without performing user-facing work.",
+          "tools": [],
+          "guardrails": [
+            "Do not own any task.",
+            "Do not perform the same classification in a separate task.",
+            "Select exactly one route per request."
+          ],
+          "modelTier": "cheap"
+        },
+        {
+          "id": "booking_specialist",
+          "name": "Booking Specialist",
+          "role": "specialist",
+          "goal": "Verify table availability, create reservations only after verification, and produce short confirmed summaries when appropriate.",
+          "backstory": "Handles normal reservation requests and protects against double-booking by checking availability before booking.",
+          "tools": [
+            "check_table_availability",
+            "create_reservation"
+          ],
+          "guardrails": [
+            "Never create a reservation without verified availability.",
+            "Never book parties larger than 8 guests.",
+            "If availability is missing or conflicting, do not confirm the reservation.",
+            "Include only a short summary with date, time, party size, and relevant notes when confirming."
+          ],
+          "modelTier": "default"
+        },
+        {
+          "id": "menu_specialist",
+          "name": "Menu and Allergen Specialist",
+          "role": "specialist",
+          "goal": "Answer menu and allergen questions strictly from the menu database and refuse to guess when data is unclear or missing.",
+          "backstory": "Uses the restaurant's menu database as the sole source of truth for ingredients and allergen information.",
+          "tools": [
+            "lookup_menu_items"
+          ],
+          "guardrails": [
+            "Use only menu database facts.",
+            "Never guess or infer allergen information.",
+            "If allergen data is missing or unclear, state that it cannot be confirmed and direct the guest to staff."
+          ],
+          "modelTier": "default"
+        },
+        {
+          "id": "staff_liaison",
+          "name": "Staff Liaison",
+          "role": "specialist",
+          "goal": "Hand large-party requests or unresolved allergen questions to staff for manual handling.",
+          "backstory": "Acts as the safe escalation path for exceptions that cannot be handled automatically.",
+          "tools": [
+            "handoff_to_staff"
+          ],
+          "guardrails": [
+            "Use handoff only for parties larger than 8 or unresolved allergen questions.",
+            "Do not auto-book large parties.",
+            "Do not answer allergen questions from memory."
+          ],
+          "modelTier": "default"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "route_request",
+          "name": "Route Request",
+          "description": "Inspect the incoming request and determine whether it should follow the reservation booking path, menu/allergen lookup path, or staff handoff path.",
+          "expectedOutput": "A routing decision selecting exactly one valid path.",
+          "agentId": "router",
+          "dependsOn": [],
+          "outputKey": "route_decision"
+        },
+        {
+          "id": "book_reservation",
+          "name": "Book Reservation",
+          "description": "For a normal reservation request with party size 8 or fewer, verify availability and create the reservation only if the slot is open. Return a concise confirmation or a safe rejection if unavailable.",
+          "expectedOutput": "A verified reservation confirmation or an availability-based refusal.",
+          "agentId": "booking_specialist",
+          "dependsOn": [
+            "route_request",
+            "answer_menu_or_allergen",
+            "handoff_large_party_or_unresolved_allergen"
+          ],
+          "outputKey": "reservation_result"
+        },
+        {
+          "id": "answer_menu_or_allergen",
+          "name": "Answer Menu or Allergen Question",
+          "description": "Use the menu database to answer the menu or allergen question. If allergen data is missing or unclear, explicitly say it cannot be confirmed and advise staff follow-up.",
+          "expectedOutput": "A database-grounded answer or a safe escalation note.",
+          "agentId": "menu_specialist",
+          "dependsOn": [
+            "route_request"
+          ],
+          "outputKey": "menu_answer"
+        },
+        {
+          "id": "handoff_large_party_or_unresolved_allergen",
+          "name": "Handoff to Staff",
+          "description": "Escalate any large-party reservation request or unresolved allergen question to staff with a clear reason and relevant guest details.",
+          "expectedOutput": "A staff handoff confirmation.",
+          "agentId": "staff_liaison",
+          "dependsOn": [
+            "route_request"
+          ],
+          "outputKey": "staff_handoff"
+        }
+      ],
+      "routerAgentId": "",
+      "routes": [],
+      "finalTaskId": "book_reservation"
+    }
+  },
+  "validation": {
+    "valid": true,
+    "errors": [],
+    "warnings": [
+      "A route targeted the final task; falling back to a parallel crew.",
+      "Attached unreachable task(s) answer_menu_or_allergen, handoff_large_party_or_unresolved_allergen to the final task."
+    ]
+  },
+  "crewSummary": {
+    "process": "parallel",
+    "agentCount": 4,
+    "taskCount": 4,
+    "toolBindings": 4,
+    "criticalPath": 3,
+    "hash": "30d1e86cff99e8b8"
+  }
+}

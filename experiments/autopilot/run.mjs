@@ -105,6 +105,51 @@ const commands = {
     }
 }
 
+/**
+ * E2b: re-measure the crew a search selected (and the baseline) on dev + test,
+ * `--reps` more times, to check whether a selected improvement survives fresh
+ * runs or was noise amplified by selection.
+ */
+commands.confirm = async () => {
+    const { design, goal } = readJson(designFile)
+    const reps = Number(flag('reps', 2))
+    const { dev, test } = splitScenarios(design.scenarios)
+    const base = readJson(baselineFile)
+    const { readdirSync } = await import('node:fs')
+    for (const file of readdirSync(dir).filter((name) => /^search-.*\.json$/.test(name))) {
+        const out = join(dir, file.replace(/^search-/, 'confirm-'))
+        if (existsSync(out)) continue
+        const search = readJson(join(dir, file))
+        const selected = search.trials.find((trial) => trial.id === search.selectedTrialId)
+        if (!selected || selected.id === 'baseline' || !selected.flowId) continue
+        const measure = async (trial, label) => {
+            const runsOut = []
+            for (let rep = 1; rep <= reps; rep += 1) {
+                // One case at a time for both crews: the saved trials no longer carry their graph size.
+                const common = { goal, design, selectedChatModel, settings: { ...DEFAULT_SETTINGS, concurrency: 1 }, runPrefix: `confirm-${goalId}-${label}-${rep}` }
+                const devResults = await runScenarios({ ...common, trial, scenarios: dev })
+                const testResults = await runScenarios({ ...common, trial, scenarios: test })
+                runsOut.push({ rep, summary: summarizeStudioResults(devResults), testSummary: summarizeStudioResults(testResults), devResults, testResults })
+            }
+            return runsOut
+        }
+        const selectedTrial = { ...selected, flowData: { nodes: [] } }
+        const baselineTrial = { ...base.trial, flowData: { nodes: [] } }
+        const result = {
+            goalId,
+            source: file,
+            strategy: search.strategy,
+            rep: search.rep,
+            selectedTrialId: selected.id,
+            selected: { searchSummary: selected.summary, searchTestSummary: selected.testSummary, runs: await measure(selectedTrial, `${search.strategy}-${search.rep}-sel`) },
+            baseline: { runs: await measure(baselineTrial, `${search.strategy}-${search.rep}-base`) }
+        }
+        writeJson(out, result)
+        const avg = (runs, key) => runs.reduce((sum, run) => sum + run.summary[key], 0) / runs.length
+        console.log(`confirm ${file}: selected dev pass ${avg(result.selected.runs, 'passRate').toFixed(2)} vs baseline ${avg(result.baseline.runs, 'passRate').toFixed(2)} (search reported ${selected.summary.passRate.toFixed(2)})`)
+    }
+}
+
 if (!commands[command]) {
     console.error('Usage: run.mjs design|baseline|search <goalId> [options]')
     process.exit(1)

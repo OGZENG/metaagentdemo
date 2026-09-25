@@ -56,6 +56,7 @@ export const isInfraError = (error) => error instanceof InfraError || INFRA_PATT
 export const request = async (method, path, body, { timeout = STUDIO_TIMEOUT, retries = 1 } = {}) => {
     if (!API_KEY) throw new Error('FLOWISE_API_KEY is not set (environment or experiments/autopilot/.env).')
     for (let attempt = 0; ; attempt += 1) {
+        const startedAt = Date.now()
         const controller = new AbortController()
         const timer = setTimeout(() => controller.abort(), timeout)
         try {
@@ -83,7 +84,13 @@ export const request = async (method, path, body, { timeout = STUDIO_TIMEOUT, re
             }
             return data
         } catch (error) {
-            if (error.name === 'AbortError') throw new ApiError(`${method} ${path} timed out after ${timeout / 1000}s`, 0)
+            if (error.name === 'AbortError') {
+                // Timers freeze while the machine sleeps; a "timeout" that fires long after it
+                // was due means the machine was suspended, not that the crew hung.
+                const elapsed = Date.now() - startedAt
+                if (elapsed > timeout * 1.5) throw new InfraError(`${method} ${path}: machine suspended (${Math.round(elapsed / 60000)} min elapsed)`)
+                throw new ApiError(`${method} ${path} timed out after ${timeout / 1000}s`, 0)
+            }
             if (!(error instanceof ApiError)) throw new InfraError(`${method} ${path}: ${error?.cause?.code || error.message}`)
             throw error
         } finally {

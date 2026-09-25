@@ -1,0 +1,2910 @@
+{
+  "generation": [
+    {
+      "goal": "support",
+      "domain": "E-commerce customer support",
+      "designSeconds": 26.276,
+      "tools": 5,
+      "fixtures": 29,
+      "failureFixtures": 5,
+      "dev": 6,
+      "test": 2,
+      "assertions": 50,
+      "agents": 5,
+      "tasks": 4,
+      "process": "routed",
+      "warnings": 1,
+      "errors": 0,
+      "baseline": {
+        "reps": 3,
+        "devPass": [
+          0.3333333333333333,
+          0.3333333333333333,
+          0.3333333333333333
+        ],
+        "devQuality": [
+          0.6444595620066208,
+          0.6481262286732875,
+          0.6774727527374587
+        ],
+        "testPass": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "failed": [
+          0,
+          0,
+          0
+        ],
+        "tokens": [
+          3221.8333333333335,
+          3203.3333333333335,
+          3211
+        ],
+        "cost": [
+          0.003213875,
+          0.0031612500000000004,
+          0.0031907499999999996
+        ],
+        "latency": [
+          6.400333333333333,
+          6.236666666666667,
+          5.632833333333333
+        ],
+        "modelCalls": [
+          3.8333333333333335,
+          3.8333333333333335,
+          3.8333333333333335
+        ]
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "domain": "IT helpdesk",
+      "designSeconds": 18.335,
+      "tools": 3,
+      "fixtures": 16,
+      "failureFixtures": 3,
+      "dev": 6,
+      "test": 5,
+      "assertions": 46,
+      "agents": 5,
+      "tasks": 4,
+      "process": "routed",
+      "warnings": 1,
+      "errors": 0,
+      "baseline": {
+        "reps": 3,
+        "devPass": [
+          0.8333333333333334,
+          0.6666666666666666,
+          0.6666666666666666
+        ],
+        "devQuality": [
+          0.9046790209790209,
+          0.8615354312354312,
+          0.8744123543123544
+        ],
+        "testPass": [
+          0.6,
+          0.5,
+          0.6
+        ],
+        "failed": [
+          0,
+          1,
+          0
+        ],
+        "tokens": [
+          3210,
+          3213.8333333333335,
+          3217.3333333333335
+        ],
+        "cost": [
+          0.002955625,
+          0.0029678750000000005,
+          0.0029880000000000006
+        ],
+        "latency": [
+          5.4085,
+          5.110333333333333,
+          5.614
+        ],
+        "modelCalls": [
+          3.8333333333333335,
+          3.8333333333333335,
+          3.8333333333333335
+        ]
+      }
+    },
+    {
+      "goal": "travel",
+      "domain": "Travel planning",
+      "designSeconds": 22.321,
+      "tools": 5,
+      "fixtures": 26,
+      "failureFixtures": 5,
+      "dev": 6,
+      "test": 3,
+      "assertions": 72,
+      "agents": 3,
+      "tasks": 3,
+      "process": "routed",
+      "warnings": 2,
+      "errors": 0,
+      "baseline": {
+        "reps": 3,
+        "devPass": [
+          0.6,
+          0.6,
+          0.6
+        ],
+        "devQuality": [
+          0.8434313090418354,
+          0.8331513090418353,
+          0.8351913090418353
+        ],
+        "testPass": [
+          0.6666666666666666,
+          0.6666666666666666,
+          0.3333333333333333
+        ],
+        "failed": [
+          1,
+          1,
+          1
+        ],
+        "tokens": [
+          7583,
+          7637.2,
+          7581.2
+        ],
+        "cost": [
+          0.009235499999999999,
+          0.0093849,
+          0.009222900000000001
+        ],
+        "latency": [
+          10.177200000000001,
+          9.557,
+          9.3952
+        ],
+        "modelCalls": [
+          5,
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "domain": "HR leave management",
+      "designSeconds": 22.606,
+      "tools": 5,
+      "fixtures": 27,
+      "failureFixtures": 5,
+      "dev": 6,
+      "test": 2,
+      "assertions": 65,
+      "agents": 4,
+      "tasks": 3,
+      "process": "parallel",
+      "warnings": 2,
+      "errors": 0,
+      "baseline": {
+        "reps": 3,
+        "devPass": [
+          0,
+          0,
+          0
+        ],
+        "devQuality": [
+          0.5552005012531328,
+          0.4896110275689222,
+          0.523348120300752
+        ],
+        "testPass": [
+          0.5,
+          1,
+          0
+        ],
+        "failed": [
+          0,
+          0,
+          0
+        ],
+        "tokens": [
+          9424,
+          9345.166666666666,
+          9289.5
+        ],
+        "cost": [
+          0.010000499999999999,
+          0.009852,
+          0.00971775
+        ],
+        "latency": [
+          9.525,
+          9.456666666666665,
+          9.547666666666666
+        ],
+        "modelCalls": [
+          6,
+          6,
+          6
+        ]
+      }
+    },
+    {
+      "goal": "restaurant",
+      "domain": "Restaurant reservations",
+      "designSeconds": 16.497,
+      "tools": 4,
+      "fixtures": 23,
+      "failureFixtures": 4,
+      "dev": 6,
+      "test": 1,
+      "assertions": 39,
+      "agents": 4,
+      "tasks": 4,
+      "process": "parallel",
+      "warnings": 2,
+      "errors": 0,
+      "baseline": {
+        "reps": 3,
+        "devPass": [
+          0.3333333333333333,
+          0.3333333333333333,
+          0.16666666666666666
+        ],
+        "devQuality": [
+          0.6439679875679876,
+          0.6559013209013209,
+          0.667001320901321
+        ],
+        "testPass": [
+          0,
+          0,
+          0
+        ],
+        "failed": [
+          0,
+          0,
+          0
+        ],
+        "tokens": [
+          5037,
+          4887.833333333333,
+          4867
+        ],
+        "cost": [
+          0.00440025,
+          0.004296500000000001,
+          0.004253375
+        ],
+        "latency": [
+          6.47,
+          6.257,
+          6.690166666666667
+        ],
+        "modelCalls": [
+          5.5,
+          5.333333333333333,
+          5.333333333333333
+        ]
+      }
+    },
+    {
+      "goal": "insurance",
+      "domain": "Insurance claim intake",
+      "designSeconds": 21.814,
+      "tools": 7,
+      "fixtures": 40,
+      "failureFixtures": 7,
+      "dev": 7,
+      "test": 3,
+      "assertions": 78,
+      "agents": 2,
+      "tasks": 4,
+      "process": "parallel",
+      "warnings": 2,
+      "errors": 0,
+      "baseline": {
+        "reps": 3,
+        "devPass": [
+          0.14285714285714285,
+          0.16666666666666666,
+          0
+        ],
+        "devQuality": [
+          0.662384901903345,
+          0.5553247616056339,
+          0.5265438173438713
+        ],
+        "testPass": [
+          0,
+          0,
+          0
+        ],
+        "failed": [
+          0,
+          2,
+          1
+        ],
+        "tokens": [
+          27600.285714285714,
+          23582.5,
+          26991.833333333332
+        ],
+        "cost": [
+          0.025168071428571432,
+          0.021904375,
+          0.025046375
+        ],
+        "latency": [
+          18.201571428571427,
+          16.573,
+          17.826833333333333
+        ],
+        "modelCalls": [
+          14.428571428571429,
+          12.5,
+          13.833333333333334
+        ]
+      }
+    }
+  ],
+  "search": [
+    {
+      "goal": "support",
+      "strategy": "evidence_guided",
+      "rep": 1,
+      "minutes": 3.0661833333333335,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 2,
+      "operators": [
+        "add_validator",
+        "rewrite_prompt",
+        "rewrite_prompt",
+        "unbind_tool",
+        "unbind_tool",
+        "bind_tool"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.3333333333333333,
+        "devQuality": 0.6444595620066208,
+        "testPass": 0.5,
+        "tokens": 3221.8333333333335,
+        "cost": 0.003213875,
+        "latency": 6.400333333333333
+      },
+      "best": null,
+      "bestDevPassAny": 0.3333333333333333,
+      "steps": [
+        {
+          "operator": "add_validator",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.08589439775910357,
+          "dTokensPct": 18.04355698101494
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.01812941176470584,
+          "dTokensPct": 1.0346076250581815
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.033829411764705775,
+          "dTokensPct": 1.6398530857172355
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.0031313725490196287,
+          "dTokensPct": 0.7888843648208521
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.01726470588235285,
+          "dTokensPct": -13.339780130293155
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.01448683473389345,
+          "dTokensPct": 32.298452768729646
+        }
+      ]
+    },
+    {
+      "goal": "support",
+      "strategy": "evidence_guided",
+      "rep": 2,
+      "minutes": 3.7551,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 2,
+      "operators": [
+        "add_validator",
+        "rewrite_prompt",
+        "rewrite_prompt",
+        "remove_router",
+        "unbind_tool",
+        "rewrite_prompt"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.3333333333333333,
+        "devQuality": 0.6444595620066208,
+        "testPass": 0.5,
+        "tokens": 3221.8333333333335,
+        "cost": 0.003213875,
+        "latency": 6.400333333333333
+      },
+      "best": null,
+      "bestDevPassAny": 0.3333333333333333,
+      "steps": [
+        {
+          "operator": "add_validator",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.07285910364145654,
+          "dTokensPct": 18.566033831669326
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.015931372549019662,
+          "dTokensPct": 2.1468108219957482
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.02263137254901959,
+          "dTokensPct": 1.3760281413274011
+        },
+        {
+          "operator": "remove_router",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.01166470588235291,
+          "dTokensPct": 41.154258304842585
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.006764705882353006,
+          "dTokensPct": -12.966270347502174
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.007500000000000062,
+          "dTokensPct": 1.867632800938912
+        }
+      ]
+    },
+    {
+      "goal": "support",
+      "strategy": "greedy",
+      "rep": 1,
+      "minutes": 3.1421666666666668,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 3,
+      "operators": [
+        "remove_task",
+        "remove_router",
+        "unbind_tool",
+        "bind_tool",
+        "add_validator",
+        "add_router"
+      ],
+      "selected": "r2-c1-bind_tool",
+      "selectedOperator": "bind_tool",
+      "base": {
+        "devPass": 0.3333333333333333,
+        "devQuality": 0.6444595620066208,
+        "testPass": 0.5,
+        "tokens": 3221.8333333333335,
+        "cost": 0.003213875,
+        "latency": 6.400333333333333
+      },
+      "best": {
+        "devPass": 0.6666666666666666,
+        "devQuality": 0.7795338680926917,
+        "testPass": 0.5,
+        "tokens": 5384.666666666667,
+        "cost": 0.005387875,
+        "latency": 7.946833333333333
+      },
+      "bestDevPassAny": 0.6666666666666666,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.033137254901960844,
+          "dTokensPct": -12.518752263204181
+        },
+        {
+          "operator": "remove_router",
+          "rejected": false,
+          "dPass": 0.16666666666666669,
+          "dQuality": 0.04511122994652417,
+          "dTokensPct": 43.16383011742795
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.018798039215686346,
+          "dTokensPct": -0.7449174900418964
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0.16666666666666663,
+          "dQuality": 0.08996307613954668,
+          "dTokensPct": 16.740740740740744
+        },
+        {
+          "operator": "add_validator",
+          "rejected": false,
+          "dPass": -0.16666666666666669,
+          "dQuality": 0.006133333333333102,
+          "dTokensPct": 10.630532971996388
+        },
+        {
+          "operator": "add_router",
+          "rejected": false,
+          "dPass": -0.16666666666666669,
+          "dQuality": -0.028177896613190923,
+          "dTokensPct": -34.370370370370374
+        }
+      ]
+    },
+    {
+      "goal": "support",
+      "strategy": "greedy",
+      "rep": 2,
+      "minutes": 3.554316666666667,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 1,
+      "operators": [
+        "remove_task",
+        "remove_router",
+        "unbind_tool",
+        "bind_tool",
+        "add_validator",
+        "bind_tool"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.3333333333333333,
+        "devQuality": 0.6444595620066208,
+        "testPass": 0.5,
+        "tokens": 3221.8333333333335,
+        "cost": 0.003213875,
+        "latency": 6.400333333333333
+      },
+      "best": null,
+      "bestDevPassAny": 0.5,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.028737254901960663,
+          "dTokensPct": -13.470591278257714
+        },
+        {
+          "operator": "remove_router",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.08325910364145661,
+          "dTokensPct": 39.39785836221614
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0.16666666666666669,
+          "dQuality": 0.028296078431372496,
+          "dTokensPct": -1.086338006311105
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.05847878787878802,
+          "dTokensPct": 15.64248731760891
+        },
+        {
+          "operator": "add_validator",
+          "rejected": false,
+          "dPass": -0.5,
+          "dQuality": -0.14382380952380946,
+          "dTokensPct": 20.715443752941788
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": -0.16666666666666669,
+          "dQuality": 0.012685714285714411,
+          "dTokensPct": 3.1536007530986954
+        }
+      ]
+    },
+    {
+      "goal": "support",
+      "strategy": "random",
+      "rep": 1,
+      "minutes": 3.1001,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 2,
+      "operators": [
+        "remove_task",
+        "add_validator",
+        "bind_tool",
+        "merge_tasks",
+        "merge_tasks",
+        "bind_tool"
+      ],
+      "selected": "r2-c3-bind_tool",
+      "selectedOperator": "bind_tool",
+      "base": {
+        "devPass": 0.3333333333333333,
+        "devQuality": 0.6444595620066208,
+        "testPass": 0.5,
+        "tokens": 3221.8333333333335,
+        "cost": 0.003213875,
+        "latency": 6.400333333333333
+      },
+      "best": {
+        "devPass": 0.6666666666666666,
+        "devQuality": 0.8454417366946778,
+        "testPass": 1,
+        "tokens": 3822.8333333333335,
+        "cost": 0.0037421250000000002,
+        "latency": 5.714833333333333
+      },
+      "bestDevPassAny": 0.6666666666666666,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": 0.01486274509803931,
+          "dTokensPct": -12.218716051937307
+        },
+        {
+          "operator": "add_validator",
+          "rejected": false,
+          "dPass": -0.3333333333333333,
+          "dQuality": -0.10859439775910362,
+          "dTokensPct": 19.786870829238
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.03629215686274512,
+          "dTokensPct": 8.46826341110134
+        },
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.021487675070028023,
+          "dTokensPct": -3.915490270888966
+        },
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.02519999999999989,
+          "dTokensPct": 8.579740557039294
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0.3333333333333333,
+          "dQuality": 0.1646900178253119,
+          "dTokensPct": 9.390499809233122
+        }
+      ]
+    },
+    {
+      "goal": "support",
+      "strategy": "random",
+      "rep": 2,
+      "minutes": 2.97455,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 4,
+      "operators": [
+        "merge_tasks",
+        "remove_task",
+        "unbind_tool",
+        "bind_tool",
+        "bind_tool",
+        "unbind_tool"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.3333333333333333,
+        "devQuality": 0.6444595620066208,
+        "testPass": 0.5,
+        "tokens": 3221.8333333333335,
+        "cost": 0.003213875,
+        "latency": 6.400333333333333
+      },
+      "best": null,
+      "bestDevPassAny": 0.5,
+      "steps": [
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.02909607843137263,
+          "dTokensPct": 1.7122756194713151
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.026127450980392153,
+          "dTokensPct": -7.169830841653302
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.03902941176470598,
+          "dTokensPct": -14.406911178935399
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.007600000000000051,
+          "dTokensPct": 16.717031306660225
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.013933333333333464,
+          "dTokensPct": 16.952737821830045
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0.16666666666666669,
+          "dQuality": -0.00023529411764700026,
+          "dTokensPct": 0.042306297594585374
+        }
+      ]
+    },
+    {
+      "goal": "helpdesk",
+      "strategy": "evidence_guided",
+      "rep": 1,
+      "minutes": 2.0058166666666666,
+      "proposed": 4,
+      "rejected": 0,
+      "improving": 0,
+      "operators": [
+        "merge_tasks",
+        "rewrite_prompt",
+        "remove_task",
+        "rewrite_prompt"
+      ],
+      "selected": "baseline",
+      "selectedOperator": "baseline",
+      "base": {
+        "devPass": 0.8333333333333334,
+        "devQuality": 0.9046790209790209,
+        "testPass": 0.6,
+        "tokens": 3210,
+        "cost": 0.002955625,
+        "latency": 5.4085
+      },
+      "best": {
+        "devPass": 0.8333333333333334,
+        "devQuality": 0.9046790209790209,
+        "testPass": 0.6,
+        "tokens": 3210,
+        "cost": 0.002955625,
+        "latency": 5.4085
+      },
+      "bestDevPassAny": 0.8333333333333334,
+      "steps": [
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": -0.5,
+          "dQuality": -0.1986839160839161,
+          "dTokensPct": -7.777777777777772
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": -0.16666666666666674,
+          "dQuality": -0.02273752913752891,
+          "dTokensPct": 1.4434060228452728
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.5,
+          "dQuality": -0.1718941724941725,
+          "dTokensPct": -10.44132917964693
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": -0.16666666666666674,
+          "dQuality": -0.02970419580419581,
+          "dTokensPct": 1.3707165109034358
+        }
+      ]
+    },
+    {
+      "goal": "helpdesk",
+      "strategy": "evidence_guided",
+      "rep": 2,
+      "minutes": 2.4101666666666666,
+      "proposed": 4,
+      "rejected": 0,
+      "improving": 0,
+      "operators": [
+        "merge_tasks",
+        "rewrite_prompt",
+        "remove_task",
+        "rewrite_prompt"
+      ],
+      "selected": "r2-c1-remove_task",
+      "selectedOperator": "remove_task",
+      "base": {
+        "devPass": 0.8333333333333334,
+        "devQuality": 0.9046790209790209,
+        "testPass": 0.6,
+        "tokens": 3210,
+        "cost": 0.002955625,
+        "latency": 5.4085
+      },
+      "best": {
+        "devPass": 0.6666666666666666,
+        "devQuality": 0.8346979020979022,
+        "testPass": 0.75,
+        "tokens": 2870.1666666666665,
+        "cost": 0.0026344999999999997,
+        "latency": 5.787333333333333
+      },
+      "bestDevPassAny": 0.8333333333333334,
+      "steps": [
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": -0.6666666666666667,
+          "dQuality": -0.220660839160839,
+          "dTokensPct": -6.1941848390446586
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.004072727272727339,
+          "dTokensPct": 1.266874350986491
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.16666666666666674,
+          "dQuality": -0.07405384615384603,
+          "dTokensPct": -11.705291222313374
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": -0.033333333333333326,
+          "dQuality": -0.009628111888111857,
+          "dTokensPct": 1.9790812141099234
+        }
+      ]
+    },
+    {
+      "goal": "helpdesk",
+      "strategy": "greedy",
+      "rep": 1,
+      "minutes": 2.9905,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 0,
+      "operators": [
+        "merge_tasks",
+        "remove_router",
+        "unbind_tool",
+        "merge_tasks",
+        "unbind_tool",
+        "remove_task"
+      ],
+      "selected": "r2-c3-remove_task",
+      "selectedOperator": "remove_task",
+      "base": {
+        "devPass": 0.8333333333333334,
+        "devQuality": 0.9046790209790209,
+        "testPass": 0.6,
+        "tokens": 3210,
+        "cost": 0.002955625,
+        "latency": 5.4085
+      },
+      "best": {
+        "devPass": 0.6666666666666666,
+        "devQuality": 0.8136002331002332,
+        "testPass": 0.25,
+        "tokens": 2977,
+        "cost": 0.0027565000000000003,
+        "latency": 5.273166666666667
+      },
+      "bestDevPassAny": 0.8333333333333334,
+      "steps": [
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": -0.5,
+          "dQuality": -0.13945384615384604,
+          "dTokensPct": -7.923156801661479
+        },
+        {
+          "operator": "remove_router",
+          "rejected": false,
+          "dPass": -0.16666666666666674,
+          "dQuality": -0.032199999999999895,
+          "dTokensPct": 50.09345794392524
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.16666666666666674,
+          "dQuality": -0.0923454545454544,
+          "dTokensPct": -6.339563862928344
+        },
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": -0.5,
+          "dQuality": -0.12671538461538434,
+          "dTokensPct": 0.6282450674973905
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.33333333333333337,
+          "dQuality": -0.10228717948717947,
+          "dTokensPct": -12.647975077881624
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.16666666666666674,
+          "dQuality": -0.09107878787878765,
+          "dTokensPct": -7.258566978193148
+        }
+      ]
+    },
+    {
+      "goal": "helpdesk",
+      "strategy": "greedy",
+      "rep": 2,
+      "minutes": 2.878233333333333,
+      "proposed": 6,
+      "rejected": 1,
+      "improving": 0,
+      "operators": [
+        "merge_tasks",
+        "remove_router",
+        "unbind_tool",
+        "merge_tasks",
+        "unbind_tool",
+        "remove_task"
+      ],
+      "selected": "r1-c3-unbind_tool",
+      "selectedOperator": "unbind_tool",
+      "base": {
+        "devPass": 0.8333333333333334,
+        "devQuality": 0.9046790209790209,
+        "testPass": 0.6,
+        "tokens": 3210,
+        "cost": 0.002955625,
+        "latency": 5.4085
+      },
+      "best": {
+        "devPass": 0.6666666666666666,
+        "devQuality": 0.8291566433566434,
+        "testPass": 0.5,
+        "tokens": 2993.3333333333335,
+        "cost": 0.0027925000000000003,
+        "latency": 7.0275
+      },
+      "bestDevPassAny": 0.8333333333333334,
+      "steps": [
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": -0.33333333333333337,
+          "dQuality": -0.11580512820512812,
+          "dTokensPct": -0.18691588785046953
+        },
+        {
+          "operator": "remove_router",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.008933333333333238,
+          "dTokensPct": 63.35410176531673
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.16666666666666674,
+          "dQuality": -0.07552237762237746,
+          "dTokensPct": -6.749740394600201
+        },
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": -0.5,
+          "dQuality": -0.18009417249417248,
+          "dTokensPct": -7.107995846313598
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": true,
+          "dPass": null,
+          "dQuality": null,
+          "dTokensPct": null
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.33333333333333337,
+          "dQuality": -0.12424545454545421,
+          "dTokensPct": -6.204569055036336
+        }
+      ]
+    },
+    {
+      "goal": "helpdesk",
+      "strategy": "random",
+      "rep": 1,
+      "minutes": 2.5491,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 0,
+      "operators": [
+        "merge_tasks",
+        "unbind_tool",
+        "remove_task",
+        "unbind_tool",
+        "remove_task",
+        "bind_tool"
+      ],
+      "selected": "r1-c2-unbind_tool",
+      "selectedOperator": "unbind_tool",
+      "base": {
+        "devPass": 0.8333333333333334,
+        "devQuality": 0.9046790209790209,
+        "testPass": 0.6,
+        "tokens": 3210,
+        "cost": 0.002955625,
+        "latency": 5.4085
+      },
+      "best": {
+        "devPass": 0.6666666666666666,
+        "devQuality": 0.8209335664335664,
+        "testPass": 0.6,
+        "tokens": 2999,
+        "cost": 0.002811125,
+        "latency": 4.879833333333333
+      },
+      "bestDevPassAny": 0.8333333333333334,
+      "steps": [
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": -0.33333333333333337,
+          "dQuality": -0.12038717948717947,
+          "dTokensPct": -0.903426791277262
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.16666666666666674,
+          "dQuality": -0.08374545454545446,
+          "dTokensPct": -6.57320872274143
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.5,
+          "dQuality": -0.17422750582750568,
+          "dTokensPct": -10.44132917964693
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.33333333333333337,
+          "dQuality": -0.09518717948717936,
+          "dTokensPct": -12.248182762201454
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.6666666666666667,
+          "dQuality": -0.15273076923076923,
+          "dTokensPct": -6.126687435098644
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": -0.5,
+          "dQuality": -0.10429487179487174,
+          "dTokensPct": 19.65212876427831
+        }
+      ]
+    },
+    {
+      "goal": "helpdesk",
+      "strategy": "random",
+      "rep": 2,
+      "minutes": 3.2489833333333333,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 0,
+      "operators": [
+        "remove_task",
+        "remove_task",
+        "bind_tool",
+        "remove_task",
+        "remove_router",
+        "bind_tool"
+      ],
+      "selected": "r1-c2-remove_task",
+      "selectedOperator": "remove_task",
+      "base": {
+        "devPass": 0.8333333333333334,
+        "devQuality": 0.9046790209790209,
+        "testPass": 0.6,
+        "tokens": 3210,
+        "cost": 0.002955625,
+        "latency": 5.4085
+      },
+      "best": {
+        "devPass": 0.6666666666666666,
+        "devQuality": 0.8121335664335665,
+        "testPass": 0.4,
+        "tokens": 2981.5,
+        "cost": 0.0027655000000000006,
+        "latency": 6.110833333333333
+      },
+      "bestDevPassAny": 0.8333333333333334,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.33333333333333337,
+          "dQuality": -0.16786083916083905,
+          "dTokensPct": -9.86500519210799
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.16666666666666674,
+          "dQuality": -0.09254545454545438,
+          "dTokensPct": -7.118380062305296
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": -0.33333333333333337,
+          "dQuality": -0.05087692307692293,
+          "dTokensPct": 5.103842159916927
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.33333333333333337,
+          "dQuality": -0.10002051282051261,
+          "dTokensPct": -5.747663551401871
+        },
+        {
+          "operator": "remove_router",
+          "rejected": false,
+          "dPass": -0.16666666666666674,
+          "dQuality": -0.027666666666666728,
+          "dTokensPct": 46.35514018691589
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.00019999999999986695,
+          "dTokensPct": 1.1993769470405091
+        }
+      ]
+    },
+    {
+      "goal": "travel",
+      "strategy": "evidence_guided",
+      "rep": 1,
+      "minutes": 2.6075333333333335,
+      "proposed": 3,
+      "rejected": 0,
+      "improving": 2,
+      "operators": [
+        "add_validator",
+        "rewrite_prompt",
+        "rewrite_prompt"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.6,
+        "devQuality": 0.8434313090418354,
+        "testPass": 0.6666666666666666,
+        "tokens": 7583,
+        "cost": 0.009235499999999999,
+        "latency": 10.177200000000001
+      },
+      "best": null,
+      "bestDevPassAny": 0.8,
+      "steps": [
+        {
+          "operator": "add_validator",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.05852070175438617,
+          "dTokensPct": 3.215086377423182
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0.20000000000000007,
+          "dQuality": 0.005187368421052607,
+          "dTokensPct": 0.21363576420940777
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.03139076923076922,
+          "dTokensPct": -16.518528286957668
+        }
+      ]
+    },
+    {
+      "goal": "travel",
+      "strategy": "greedy",
+      "rep": 1,
+      "minutes": 4.816883333333333,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 1,
+      "operators": [
+        "remove_task",
+        "remove_router",
+        "unbind_tool",
+        "remove_task",
+        "add_router",
+        "unbind_tool"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.6,
+        "devQuality": 0.8434313090418354,
+        "testPass": 0.6666666666666666,
+        "tokens": 7583,
+        "cost": 0.009235499999999999,
+        "latency": 10.177200000000001
+      },
+      "best": null,
+      "bestDevPassAny": 0.8,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.43333333333333335,
+          "dQuality": -0.251608023074277,
+          "dTokensPct": -38.04562837926942
+        },
+        {
+          "operator": "remove_router",
+          "rejected": false,
+          "dPass": 0.20000000000000007,
+          "dQuality": 0.01154736842105264,
+          "dTokensPct": 14.740867730449692
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.19999999999999996,
+          "dQuality": -0.13540434071604357,
+          "dTokensPct": -7.6355004615587525
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.20000000000000007,
+          "dQuality": -0.026105015479876092,
+          "dTokensPct": -23.16108863552776
+        },
+        {
+          "operator": "add_router",
+          "rejected": false,
+          "dPass": -0.20000000000000007,
+          "dQuality": -0.01386736842105274,
+          "dTokensPct": -11.752942258183152
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.30000000000000004,
+          "dQuality": -0.0842645709295865,
+          "dTokensPct": -4.34021392668873
+        }
+      ]
+    },
+    {
+      "goal": "travel",
+      "strategy": "random",
+      "rep": 1,
+      "minutes": 4.575316666666667,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 2,
+      "operators": [
+        "remove_task",
+        "unbind_tool",
+        "unbind_tool",
+        "bind_tool",
+        "remove_router",
+        "remove_task"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.6,
+        "devQuality": 0.8434313090418354,
+        "testPass": 0.6666666666666666,
+        "tokens": 7583,
+        "cost": 0.009235499999999999,
+        "latency": 10.177200000000001
+      },
+      "best": null,
+      "bestDevPassAny": 0.6,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.26666666666666666,
+          "dQuality": -0.22224070281283903,
+          "dTokensPct": -40.25231878324321
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.06600174962292615,
+          "dTokensPct": -32.63088487406039
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.26666666666666666,
+          "dQuality": -0.13356146701595617,
+          "dTokensPct": -7.730010110334529
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.013480000000000159,
+          "dTokensPct": 17.789792957932214
+        },
+        {
+          "operator": "remove_router",
+          "rejected": false,
+          "dPass": -0.19999999999999996,
+          "dQuality": -0.04250674922600628,
+          "dTokensPct": 16.72952657259661
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.005360000000000031,
+          "dTokensPct": -10.051430832124487
+        }
+      ]
+    },
+    {
+      "goal": "hr_leave",
+      "strategy": "evidence_guided",
+      "rep": 1,
+      "minutes": 5.697283333333333,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 4,
+      "operators": [
+        "unbind_tool",
+        "unbind_tool",
+        "rewrite_prompt",
+        "bind_tool",
+        "rewrite_prompt",
+        "rewrite_prompt"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0,
+        "devQuality": 0.5552005012531328,
+        "testPass": 0.5,
+        "tokens": 9424,
+        "cost": 0.010000499999999999,
+        "latency": 9.525
+      },
+      "best": null,
+      "bestDevPassAny": 0,
+      "steps": [
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.015192731829573924,
+          "dTokensPct": -2.3079371816638328
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.07214761904761896,
+          "dTokensPct": -7.249221844934917
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.08995112781954884,
+          "dTokensPct": 23.655913978494624
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.08730576441102744,
+          "dTokensPct": 5.895308924485132
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.0374057644110275,
+          "dTokensPct": -4.007437070938213
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.03149624060150369,
+          "dTokensPct": -1.0168764302059485
+        }
+      ]
+    },
+    {
+      "goal": "hr_leave",
+      "strategy": "evidence_guided",
+      "rep": 2,
+      "minutes": 5.168033333333334,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 5,
+      "operators": [
+        "unbind_tool",
+        "rewrite_prompt",
+        "rewrite_prompt",
+        "unbind_tool",
+        "unbind_tool",
+        "unbind_tool"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0,
+        "devQuality": 0.5552005012531328,
+        "testPass": 0.5,
+        "tokens": 9424,
+        "cost": 0.010000499999999999,
+        "latency": 9.525
+      },
+      "best": null,
+      "bestDevPassAny": 0.16666666666666666,
+      "steps": [
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.06895238095238088,
+          "dTokensPct": -3.5759762308998355
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.010854887218045062,
+          "dTokensPct": 19.80935200905489
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.03020125313283195,
+          "dTokensPct": 0.7869977362761738
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0.16666666666666666,
+          "dQuality": 0.02680852130325828,
+          "dTokensPct": -24.80625876448447
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.07966190476190471,
+          "dTokensPct": -20.590449479666397
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.018305764411027603,
+          "dTokensPct": -23.718355598199125
+        }
+      ]
+    },
+    {
+      "goal": "hr_leave",
+      "strategy": "greedy",
+      "rep": 1,
+      "minutes": 4.335133333333333,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 6,
+      "operators": [
+        "remove_task",
+        "unbind_tool",
+        "remove_task",
+        "parallelize_task",
+        "unbind_tool",
+        "unbind_tool"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0,
+        "devQuality": 0.5552005012531328,
+        "testPass": 0.5,
+        "tokens": 9424,
+        "cost": 0.010000499999999999,
+        "latency": 9.525
+      },
+      "best": null,
+      "bestDevPassAny": 0,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.22351779448621556,
+          "dTokensPct": -49.10158460667798
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.13471578947368418,
+          "dTokensPct": -10.681946802490094
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.05502756892230565,
+          "dTokensPct": -35.34769383135258
+        },
+        {
+          "operator": "parallelize_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.038385714285714356,
+          "dTokensPct": -9.34847198641766
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.007352380952380888,
+          "dTokensPct": -4.790959252971138
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.08074385964912278,
+          "dTokensPct": -6.485215053763438
+        }
+      ]
+    },
+    {
+      "goal": "hr_leave",
+      "strategy": "greedy",
+      "rep": 2,
+      "minutes": 4.581933333333334,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 6,
+      "operators": [
+        "remove_task",
+        "unbind_tool",
+        "remove_task",
+        "parallelize_task",
+        "unbind_tool",
+        "unbind_tool"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0,
+        "devQuality": 0.5552005012531328,
+        "testPass": 0.5,
+        "tokens": 9424,
+        "cost": 0.010000499999999999,
+        "latency": 9.525
+      },
+      "best": null,
+      "bestDevPassAny": 0,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.18713684210526316,
+          "dTokensPct": -49.21830786644029
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.13365964912280698,
+          "dTokensPct": -10.324702886247882
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.07392756892230579,
+          "dTokensPct": -35.0399688737974
+        },
+        {
+          "operator": "parallelize_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.09758571428571428,
+          "dTokensPct": -9.290110356536507
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.06809423558897243,
+          "dTokensPct": -3.4256508205998903
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.08359147869674188,
+          "dTokensPct": -8.145868704018099
+        }
+      ]
+    },
+    {
+      "goal": "hr_leave",
+      "strategy": "random",
+      "rep": 1,
+      "minutes": 4.318733333333333,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 4,
+      "operators": [
+        "remove_task",
+        "unbind_tool",
+        "unbind_tool",
+        "unbind_tool",
+        "bind_tool",
+        "bind_tool"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0,
+        "devQuality": 0.5552005012531328,
+        "testPass": 0.5,
+        "tokens": 9424,
+        "cost": 0.010000499999999999,
+        "latency": 9.525
+      },
+      "best": null,
+      "bestDevPassAny": 0,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.2255177944862155,
+          "dTokensPct": -48.66829371816639
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.10091328320802007,
+          "dTokensPct": -17.246745897000558
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.018607268170426017,
+          "dTokensPct": -4.2603989813242755
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.17473358395989974,
+          "dTokensPct": -10.309411656045075
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.020359649122806966,
+          "dTokensPct": 5.816939133647381
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.045345363408521244,
+          "dTokensPct": 18.16200240140389
+        }
+      ]
+    },
+    {
+      "goal": "hr_leave",
+      "strategy": "random",
+      "rep": 2,
+      "minutes": 5.29965,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 4,
+      "operators": [
+        "unbind_tool",
+        "parallelize_task",
+        "bind_tool",
+        "unbind_tool",
+        "unbind_tool",
+        "bind_tool"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0,
+        "devQuality": 0.5552005012531328,
+        "testPass": 0.5,
+        "tokens": 9424,
+        "cost": 0.010000499999999999,
+        "latency": 9.525
+      },
+      "best": null,
+      "bestDevPassAny": 0,
+      "steps": [
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.0707714285714286,
+          "dTokensPct": -5.178268251273344
+        },
+        {
+          "operator": "parallelize_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.04840476190476184,
+          "dTokensPct": -8.950551782682513
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.018375187969924767,
+          "dTokensPct": 17.58453593661573
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.13602631578947366,
+          "dTokensPct": -9.111488398415391
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.07064385964912279,
+          "dTokensPct": -7.486205432937176
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.028166666666666673,
+          "dTokensPct": 4.1825834748160595
+        }
+      ]
+    },
+    {
+      "goal": "restaurant",
+      "strategy": "evidence_guided",
+      "rep": 1,
+      "minutes": 3.5183,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 1,
+      "operators": [
+        "add_validator",
+        "remove_task",
+        "merge_tasks",
+        "unbind_tool",
+        "unbind_tool",
+        "rewrite_prompt"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.3333333333333333,
+        "devQuality": 0.6439679875679876,
+        "testPass": 0,
+        "tokens": 5037,
+        "cost": 0.00440025,
+        "latency": 6.47
+      },
+      "best": null,
+      "bestDevPassAny": 0.5,
+      "steps": [
+        {
+          "operator": "add_validator",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.016937373737373695,
+          "dTokensPct": 11.425451657732788
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": 0.01893333333333347,
+          "dTokensPct": -27.22850903315466
+        },
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": 0.03441111111111117,
+          "dTokensPct": 0.7180199854410763
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": 0.017484848484848436,
+          "dTokensPct": -15.710409635364964
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.02341666666666664,
+          "dTokensPct": -13.596055853351851
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": 0.16666666666666669,
+          "dQuality": 0.05077777777777781,
+          "dTokensPct": 3.8349546687843405
+        }
+      ]
+    },
+    {
+      "goal": "restaurant",
+      "strategy": "greedy",
+      "rep": 1,
+      "minutes": 3.0279,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 1,
+      "operators": [
+        "remove_task",
+        "unbind_tool",
+        "remove_task",
+        "remove_task",
+        "unbind_tool",
+        "merge_tasks"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.3333333333333333,
+        "devQuality": 0.6439679875679876,
+        "testPass": 0,
+        "tokens": 5037,
+        "cost": 0.00440025,
+        "latency": 6.47
+      },
+      "best": null,
+      "bestDevPassAny": 0.3333333333333333,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": 0.026311111111111285,
+          "dTokensPct": -9.75779233670836
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.08699696969696968,
+          "dTokensPct": -16.739461319568527
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.3333333333333333,
+          "dQuality": -0.051066666666666705,
+          "dTokensPct": -24.45569452716564
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.011733333333333373,
+          "dTokensPct": -26.867844616504534
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": 0.011329292929293078,
+          "dTokensPct": -13.920322943551067
+        },
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": 0.034911111111111115,
+          "dTokensPct": -4.056647475349074
+        }
+      ]
+    },
+    {
+      "goal": "restaurant",
+      "strategy": "random",
+      "rep": 1,
+      "minutes": 3.5995666666666666,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 0,
+      "operators": [
+        "remove_task",
+        "parallelize_task",
+        "add_validator",
+        "parallelize_task",
+        "merge_tasks",
+        "bind_tool"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.3333333333333333,
+        "devQuality": 0.6439679875679876,
+        "testPass": 0,
+        "tokens": 5037,
+        "cost": 0.00440025,
+        "latency": 6.47
+      },
+      "best": null,
+      "bestDevPassAny": 0.3333333333333333,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": 0.012337373737373758,
+          "dTokensPct": -2.832373767454177
+        },
+        {
+          "operator": "parallelize_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.0344444444444445,
+          "dTokensPct": 2.1672953477599233
+        },
+        {
+          "operator": "add_validator",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": 0.024766666666666604,
+          "dTokensPct": 7.080934418635443
+        },
+        {
+          "operator": "parallelize_task",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.05121025641025656,
+          "dTokensPct": 5.198043851410428
+        },
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.08991111111111116,
+          "dTokensPct": -12.52388509246365
+        },
+        {
+          "operator": "bind_tool",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.014500000000000068,
+          "dTokensPct": 11.895585711047051
+        }
+      ]
+    },
+    {
+      "goal": "insurance",
+      "strategy": "evidence_guided",
+      "rep": 1,
+      "minutes": 8.24855,
+      "proposed": 4,
+      "rejected": 0,
+      "improving": 1,
+      "operators": [
+        "add_validator",
+        "rewrite_prompt",
+        "add_router",
+        "rewrite_prompt"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.14285714285714285,
+        "devQuality": 0.662384901903345,
+        "testPass": 0,
+        "tokens": 27600.285714285714,
+        "cost": 0.025168071428571432,
+        "latency": 18.201571428571427
+      },
+      "best": null,
+      "bestDevPassAny": 0.2857142857142857,
+      "steps": [
+        {
+          "operator": "add_validator",
+          "rejected": false,
+          "dPass": 0.14285714285714285,
+          "dQuality": -0.002672327878519787,
+          "dTokensPct": -5.602944068901983
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": -0.14285714285714285,
+          "dQuality": -0.0418667247468989,
+          "dTokensPct": 36.712352874193854
+        },
+        {
+          "operator": "add_router",
+          "rejected": false,
+          "dPass": -0.14285714285714285,
+          "dQuality": -0.102942725099193,
+          "dTokensPct": -37.26511566699748
+        },
+        {
+          "operator": "rewrite_prompt",
+          "rejected": false,
+          "dPass": -0.2857142857142857,
+          "dQuality": -0.052930890483923965,
+          "dTokensPct": -6.493691638748301
+        }
+      ]
+    },
+    {
+      "goal": "insurance",
+      "strategy": "greedy",
+      "rep": 1,
+      "minutes": 9.158966666666666,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 2,
+      "operators": [
+        "remove_task",
+        "add_router",
+        "unbind_tool",
+        "remove_task",
+        "unbind_tool",
+        "remove_task"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.14285714285714285,
+        "devQuality": 0.662384901903345,
+        "testPass": 0,
+        "tokens": 27600.285714285714,
+        "cost": 0.025168071428571432,
+        "latency": 18.201571428571427
+      },
+      "best": null,
+      "bestDevPassAny": 0.14285714285714285,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.031014638899037772,
+          "dTokensPct": -44.96123228538007
+        },
+        {
+          "operator": "add_router",
+          "rejected": false,
+          "dPass": -0.14285714285714285,
+          "dQuality": -0.1782999200540073,
+          "dTokensPct": -52.133949614048156
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.14285714285714285,
+          "dQuality": -0.050085398883220056,
+          "dTokensPct": -7.630787120906268
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.14285714285714285,
+          "dQuality": -0.09826590470873875,
+          "dTokensPct": -43.960725044254204
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.14285714285714285,
+          "dQuality": -0.06605463954668611,
+          "dTokensPct": -8.293219876950896
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": -0.039680839292238534,
+          "dTokensPct": -30.454136085547777
+        }
+      ]
+    },
+    {
+      "goal": "insurance",
+      "strategy": "random",
+      "rep": 1,
+      "minutes": 9.228583333333333,
+      "proposed": 6,
+      "rejected": 0,
+      "improving": 1,
+      "operators": [
+        "remove_task",
+        "add_validator",
+        "merge_tasks",
+        "unbind_tool",
+        "add_router",
+        "remove_task"
+      ],
+      "selected": null,
+      "selectedOperator": null,
+      "base": {
+        "devPass": 0.14285714285714285,
+        "devQuality": 0.662384901903345,
+        "testPass": 0,
+        "tokens": 27600.285714285714,
+        "cost": 0.025168071428571432,
+        "latency": 18.201571428571427
+      },
+      "best": null,
+      "bestDevPassAny": 0.16666666666666666,
+      "steps": [
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.14285714285714285,
+          "dQuality": -0.036952378138690345,
+          "dTokensPct": -22.727853058802015
+        },
+        {
+          "operator": "add_validator",
+          "rejected": false,
+          "dPass": 0,
+          "dQuality": 0.020123833881378728,
+          "dTokensPct": -3.2629061810954263
+        },
+        {
+          "operator": "merge_tasks",
+          "rejected": false,
+          "dPass": 0.023809523809523808,
+          "dQuality": -0.08713522207718116,
+          "dTokensPct": -15.575753184059515
+        },
+        {
+          "operator": "unbind_tool",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.0058875799123476735,
+          "dTokensPct": -18.063344014648663
+        },
+        {
+          "operator": "add_router",
+          "rejected": false,
+          "dPass": -0.16666666666666666,
+          "dQuality": -0.021119394235747158,
+          "dTokensPct": -26.51677402478502
+        },
+        {
+          "operator": "remove_task",
+          "rejected": false,
+          "dPass": -0.023809523809523808,
+          "dQuality": 0.03032555591822761,
+          "dTokensPct": -39.63864728770885
+        }
+      ]
+    }
+  ],
+  "parallel": null,
+  "assertions": {
+    "cases": 152,
+    "casesWithCriticalViolation": 74,
+    "byType": {
+      "tool_called": {
+        "total": 353,
+        "failed": 138,
+        "criticalFailed": 44
+      },
+      "tool_succeeded": {
+        "total": 144,
+        "failed": 73,
+        "criticalFailed": 6
+      },
+      "output_contains": {
+        "total": 265,
+        "failed": 159,
+        "criticalFailed": 7
+      },
+      "grounded": {
+        "total": 42,
+        "failed": 13,
+        "criticalFailed": 13
+      },
+      "tool_not_called": {
+        "total": 125,
+        "failed": 21,
+        "criticalFailed": 15
+      },
+      "output_matches": {
+        "total": 6,
+        "failed": 6,
+        "criticalFailed": 0
+      },
+      "output_not_contains": {
+        "total": 71,
+        "failed": 20,
+        "criticalFailed": 20
+      }
+    },
+    "assertionScore": {
+      "mean": 62.01291908954933,
+      "std": 21.073036451824986
+    },
+    "rubricScore": {
+      "mean": 81.88651315789478,
+      "std": 23.278939811657928
+    },
+    "correlation": 0.4510743606499833
+  },
+  "evidenceConsistency": {
+    "picks": 45,
+    "byOperator": {
+      "evidence_guided:add_validator": {
+        "picks": 5,
+        "contradicting": 0
+      },
+      "evidence_guided:rewrite_prompt": {
+        "picks": 19,
+        "contradicting": 0
+      },
+      "evidence_guided:unbind_tool": {
+        "picks": 11,
+        "contradicting": 9
+      },
+      "evidence_guided:bind_tool": {
+        "picks": 2,
+        "contradicting": 0
+      },
+      "evidence_guided:remove_router": {
+        "picks": 1,
+        "contradicting": 0
+      },
+      "evidence_guided:merge_tasks": {
+        "picks": 3,
+        "contradicting": 0
+      },
+      "evidence_guided:remove_task": {
+        "picks": 3,
+        "contradicting": 0
+      },
+      "evidence_guided:add_router": {
+        "picks": 1,
+        "contradicting": 0
+      }
+    },
+    "droppedAsInconsistent": [],
+    "flagged": [
+      {
+        "goal": "support",
+        "strategy": "evidence_guided",
+        "file": "search-evidence_guided-1.json",
+        "id": "r2-c1-unbind_tool",
+        "operator": "unbind_tool",
+        "rationale": "The failures show classify_support_request was never called, causing missing classification on both delivery and order scenarios. The smallest plausible fix is to keep the router but ensure it can actually invoke the classifier rather than removing routing or changing task structure."
+      },
+      {
+        "goal": "support",
+        "strategy": "evidence_guided",
+        "file": "search-evidence_guided-1.json",
+        "id": "r2-c2-unbind_tool",
+        "operator": "unbind_tool",
+        "rationale": "Refund-above-threshold and uncertain-policy scenarios failed because escalate_human_review was never called. Binding the escalation tool to the refund specialist is the most direct way to enable the required protected action."
+      },
+      {
+        "goal": "support",
+        "strategy": "evidence_guided",
+        "file": "search-evidence_guided-2.json",
+        "id": "r2-c2-unbind_tool",
+        "operator": "unbind_tool",
+        "rationale": "Refund scenarios are failing because the workflow never escalates above-EUR-100 or uncertain policy cases, and the evidence shows missing escalate_human_review calls. The refund specialist already owns this logic, so ensuring the escalation tool remains available is the smallest change tied to the strongest refund failure evidence."
+      },
+      {
+        "goal": "hr_leave",
+        "strategy": "evidence_guided",
+        "file": "search-evidence_guided-1.json",
+        "id": "r1-c1-unbind_tool",
+        "operator": "unbind_tool",
+        "rationale": "The strongest failure is that get_leave_policy was never called with the required standard policy, causing the workflow to miss a critical factual prerequisite and fail auto-approval cases. Keeping the specialist responsible for factual decisioning but enforcing the policy lookup directly addresses the critical evaluator failure with the smallest change."
+      },
+      {
+        "goal": "hr_leave",
+        "strategy": "evidence_guided",
+        "file": "search-evidence_guided-1.json",
+        "id": "r1-c2-unbind_tool",
+        "operator": "unbind_tool",
+        "rationale": "check_leave_request never returned ok:true, which is the evaluator's critical requirement for the approved path and short-request threshold cases. Unbinding the tool would worsen the issue; instead, this candidate should be preserved and the workflow should be tightened around its use, but since the operator list cannot add control flow, the best actionable change is to keep the current toolset and avoid other destabilizing edits. However, among legal operators this is the only way to avoid harming the necessary validation path is to make no change; selecting a different operator would not plausibly help."
+      },
+      {
+        "goal": "hr_leave",
+        "strategy": "evidence_guided",
+        "file": "search-evidence_guided-2.json",
+        "id": "r1-c1-unbind_tool",
+        "operator": "unbind_tool",
+        "rationale": "The strongest evidence is that get_leave_policy was never called and the evaluator marks this as critical/major. Since the workflow must retrieve policy before deciding, removing the tool from the specialist would not help; instead the crew needs prompt-level enforcement, but no legal operator directly adds a stronger policy check. However the missing policy call is the clearest actionable gap among available operators: if the specialist has only balance, the current path may still incorrectly infer. Since no operator can add a new tool, the safest change is to reduce ambiguity by ensuring policy retrieval remains on the decision specialist? Not possible. Therefore this operator is not plausibly helpful."
+      },
+      {
+        "goal": "hr_leave",
+        "strategy": "evidence_guided",
+        "file": "search-evidence_guided-2.json",
+        "id": "r2-c1-unbind_tool",
+        "operator": "unbind_tool",
+        "rationale": "The dominant failure is that check_leave_request never returned ok:true, causing the expected auto-approval path to fail for valid short requests within balance. Keeping this tool is necessary because it is explicitly required to ground the approval decision in policy facts; removing it would worsen quality and not address the missing success path."
+      },
+      {
+        "goal": "hr_leave",
+        "strategy": "evidence_guided",
+        "file": "search-evidence_guided-2.json",
+        "id": "r2-c3-unbind_tool",
+        "operator": "unbind_tool",
+        "rationale": "Manager routing is currently isolated to a separate specialist, yet the workflow is failing to produce the required routed/notification outputs consistently and also never calls route_to_manager_for_approval. Binding the routing tool away from the manager specialist is not supported; removing this access would hurt. So no operator here is strongly justified."
+      },
+      {
+        "goal": "restaurant",
+        "strategy": "evidence_guided",
+        "file": "search-evidence_guided-1.json",
+        "id": "r2-c2-unbind_tool",
+        "operator": "unbind_tool",
+        "rationale": "There is a missing handoff_to_staff call and a large-party escalation failure. Since staff_liaison is the escalation path for parties larger than 8 and unresolved allergen questions, removing its tool would worsen the main safety route; therefore I do not select it. No other operator plausibly fixes the missing call failures without trading away required capabilities."
+      }
+    ]
+  },
+  "confirm": [
+    {
+      "goal": "support",
+      "strategy": "greedy",
+      "rep": 1,
+      "reportedDev": 0.3333333333333333,
+      "reportedTest": 0,
+      "confirmedDev": 0.3666666666666667,
+      "confirmedTest": -0.25,
+      "confirmedTokensPct": 62.605991194981755
+    }
+  ],
+  "operators": {
+    "add_validator": {
+      "n": 10,
+      "rejected": 0,
+      "dPass": [
+        -0.16666666666666666,
+        -0.16666666666666666,
+        -0.16666666666666669,
+        -0.5,
+        -0.3333333333333333,
+        0,
+        -0.16666666666666666,
+        -0.16666666666666666,
+        0.14285714285714285,
+        0
+      ],
+      "dTokens": [
+        18.04355698101494,
+        18.566033831669326,
+        10.630532971996388,
+        20.715443752941788,
+        19.786870829238,
+        3.215086377423182,
+        11.425451657732788,
+        7.080934418635443,
+        -5.602944068901983,
+        -3.2629061810954263
+      ],
+      "byStrategy": {
+        "evidence_guided": 5,
+        "greedy": 2,
+        "random": 3
+      }
+    },
+    "rewrite_prompt": {
+      "n": 19,
+      "rejected": 0,
+      "dPass": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        -0.16666666666666674,
+        -0.16666666666666674,
+        0,
+        -0.033333333333333326,
+        0.20000000000000007,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.16666666666666669,
+        -0.14285714285714285,
+        -0.2857142857142857
+      ],
+      "dTokens": [
+        1.0346076250581815,
+        1.6398530857172355,
+        2.1468108219957482,
+        1.3760281413274011,
+        1.867632800938912,
+        1.4434060228452728,
+        1.3707165109034358,
+        1.266874350986491,
+        1.9790812141099234,
+        0.21363576420940777,
+        -16.518528286957668,
+        23.655913978494624,
+        -4.007437070938213,
+        -1.0168764302059485,
+        19.80935200905489,
+        0.7869977362761738,
+        3.8349546687843405,
+        36.712352874193854,
+        -6.493691638748301
+      ],
+      "byStrategy": {
+        "evidence_guided": 19
+      }
+    },
+    "unbind_tool": {
+      "n": 42,
+      "rejected": 1,
+      "dPass": [
+        0,
+        0,
+        0,
+        0,
+        0.16666666666666669,
+        0,
+        0.16666666666666669,
+        -0.16666666666666674,
+        -0.33333333333333337,
+        -0.16666666666666674,
+        -0.16666666666666674,
+        -0.33333333333333337,
+        -0.19999999999999996,
+        -0.30000000000000004,
+        0,
+        -0.26666666666666666,
+        0,
+        0,
+        0,
+        0.16666666666666666,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -0.16666666666666666,
+        -0.16666666666666666,
+        -0.16666666666666666,
+        -0.16666666666666666,
+        -0.14285714285714285,
+        -0.14285714285714285,
+        -0.16666666666666666
+      ],
+      "dTokens": [
+        0.7888843648208521,
+        -13.339780130293155,
+        -12.966270347502174,
+        -0.7449174900418964,
+        -1.086338006311105,
+        -14.406911178935399,
+        0.042306297594585374,
+        -6.339563862928344,
+        -12.647975077881624,
+        -6.749740394600201,
+        -6.57320872274143,
+        -12.248182762201454,
+        -7.6355004615587525,
+        -4.34021392668873,
+        -32.63088487406039,
+        -7.730010110334529,
+        -2.3079371816638328,
+        -7.249221844934917,
+        -3.5759762308998355,
+        -24.80625876448447,
+        -20.590449479666397,
+        -23.718355598199125,
+        -10.681946802490094,
+        -4.790959252971138,
+        -6.485215053763438,
+        -10.324702886247882,
+        -3.4256508205998903,
+        -8.145868704018099,
+        -17.246745897000558,
+        -4.2603989813242755,
+        -10.309411656045075,
+        -5.178268251273344,
+        -9.111488398415391,
+        -7.486205432937176,
+        -15.710409635364964,
+        -13.596055853351851,
+        -16.739461319568527,
+        -13.920322943551067,
+        -7.630787120906268,
+        -8.293219876950896,
+        -18.063344014648663
+      ],
+      "byStrategy": {
+        "evidence_guided": 11,
+        "greedy": 18,
+        "random": 13
+      }
+    },
+    "bind_tool": {
+      "n": 18,
+      "rejected": 0,
+      "dPass": [
+        -0.16666666666666666,
+        0.16666666666666663,
+        0,
+        -0.16666666666666669,
+        0,
+        0.3333333333333333,
+        0,
+        0,
+        -0.5,
+        -0.33333333333333337,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -0.16666666666666666
+      ],
+      "dTokens": [
+        32.298452768729646,
+        16.740740740740744,
+        15.64248731760891,
+        3.1536007530986954,
+        8.46826341110134,
+        9.390499809233122,
+        16.717031306660225,
+        16.952737821830045,
+        19.65212876427831,
+        5.103842159916927,
+        1.1993769470405091,
+        17.789792957932214,
+        5.895308924485132,
+        5.816939133647381,
+        18.16200240140389,
+        17.58453593661573,
+        4.1825834748160595,
+        11.895585711047051
+      ],
+      "byStrategy": {
+        "evidence_guided": 2,
+        "greedy": 3,
+        "random": 13
+      }
+    },
+    "remove_router": {
+      "n": 8,
+      "rejected": 0,
+      "dPass": [
+        0,
+        0.16666666666666669,
+        -0.16666666666666666,
+        -0.16666666666666674,
+        0,
+        -0.16666666666666674,
+        0.20000000000000007,
+        -0.19999999999999996
+      ],
+      "dTokens": [
+        41.154258304842585,
+        43.16383011742795,
+        39.39785836221614,
+        50.09345794392524,
+        63.35410176531673,
+        46.35514018691589,
+        14.740867730449692,
+        16.72952657259661
+      ],
+      "byStrategy": {
+        "evidence_guided": 1,
+        "greedy": 5,
+        "random": 2
+      }
+    },
+    "remove_task": {
+      "n": 32,
+      "rejected": 0,
+      "dPass": [
+        -0.16666666666666666,
+        -0.16666666666666666,
+        -0.16666666666666666,
+        0,
+        -0.5,
+        -0.16666666666666674,
+        -0.16666666666666674,
+        -0.33333333333333337,
+        -0.5,
+        -0.6666666666666667,
+        -0.33333333333333337,
+        -0.16666666666666674,
+        -0.33333333333333337,
+        -0.43333333333333335,
+        -0.20000000000000007,
+        -0.26666666666666666,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -0.16666666666666666,
+        -0.16666666666666666,
+        -0.3333333333333333,
+        0,
+        -0.16666666666666666,
+        0,
+        -0.14285714285714285,
+        0,
+        -0.14285714285714285,
+        -0.023809523809523808
+      ],
+      "dTokens": [
+        -12.518752263204181,
+        -13.470591278257714,
+        -12.218716051937307,
+        -7.169830841653302,
+        -10.44132917964693,
+        -11.705291222313374,
+        -7.258566978193148,
+        -6.204569055036336,
+        -10.44132917964693,
+        -6.126687435098644,
+        -9.86500519210799,
+        -7.118380062305296,
+        -5.747663551401871,
+        -38.04562837926942,
+        -23.16108863552776,
+        -40.25231878324321,
+        -10.051430832124487,
+        -49.10158460667798,
+        -35.34769383135258,
+        -49.21830786644029,
+        -35.0399688737974,
+        -48.66829371816639,
+        -27.22850903315466,
+        -9.75779233670836,
+        -24.45569452716564,
+        -26.867844616504534,
+        -2.832373767454177,
+        -44.96123228538007,
+        -43.960725044254204,
+        -30.454136085547777,
+        -22.727853058802015,
+        -39.63864728770885
+      ],
+      "byStrategy": {
+        "greedy": 16,
+        "random": 13,
+        "evidence_guided": 3
+      }
+    },
+    "add_router": {
+      "n": 5,
+      "rejected": 0,
+      "dPass": [
+        -0.16666666666666669,
+        -0.20000000000000007,
+        -0.14285714285714285,
+        -0.14285714285714285,
+        -0.16666666666666666
+      ],
+      "dTokens": [
+        -34.370370370370374,
+        -11.752942258183152,
+        -37.26511566699748,
+        -52.133949614048156,
+        -26.51677402478502
+      ],
+      "byStrategy": {
+        "greedy": 3,
+        "evidence_guided": 1,
+        "random": 1
+      }
+    },
+    "merge_tasks": {
+      "n": 14,
+      "rejected": 0,
+      "dPass": [
+        0,
+        0,
+        0,
+        -0.5,
+        -0.6666666666666667,
+        -0.5,
+        -0.5,
+        -0.33333333333333337,
+        -0.5,
+        -0.33333333333333337,
+        -0.16666666666666666,
+        -0.16666666666666666,
+        -0.16666666666666666,
+        0.023809523809523808
+      ],
+      "dTokens": [
+        -3.915490270888966,
+        8.579740557039294,
+        1.7122756194713151,
+        -7.777777777777772,
+        -6.1941848390446586,
+        -7.923156801661479,
+        0.6282450674973905,
+        -0.18691588785046953,
+        -7.107995846313598,
+        -0.903426791277262,
+        0.7180199854410763,
+        -4.056647475349074,
+        -12.52388509246365,
+        -15.575753184059515
+      ],
+      "byStrategy": {
+        "random": 6,
+        "evidence_guided": 3,
+        "greedy": 5
+      }
+    },
+    "parallelize_task": {
+      "n": 5,
+      "rejected": 0,
+      "dPass": [
+        0,
+        0,
+        0,
+        0,
+        -0.16666666666666666
+      ],
+      "dTokens": [
+        -9.34847198641766,
+        -9.290110356536507,
+        -8.950551782682513,
+        2.1672953477599233,
+        5.198043851410428
+      ],
+      "byStrategy": {
+        "greedy": 2,
+        "random": 3
+      }
+    }
+  }
+}

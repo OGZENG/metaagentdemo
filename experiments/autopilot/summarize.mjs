@@ -182,6 +182,28 @@ for (const goal of goals) {
     }
 }
 
+/* ---------------- E2b: confirmation of selected crews ---------------- */
+summary.confirm = []
+for (const goal of goals) {
+    const dir = join(RES, goal.id)
+    if (!existsSync(dir)) continue
+    for (const file of readdirSync(dir).filter((name) => /^confirm-.*\.json$/.test(name))) {
+        const c = read(join(dir, file))
+        const search = read(join(dir, c.source))
+        const avg = (runs, field, key) => mean(runs.map((run) => run[field]?.[key]).filter(Number.isFinite))
+        summary.confirm.push({
+            goal: goal.id,
+            strategy: c.strategy === 'evidence_guided' && c.rep >= 4 ? 'evidence_guided_control' : c.strategy,
+            rep: c.rep,
+            reportedDev: c.selected.searchSummary.passRate - search.trials[0].summary.passRate,
+            reportedTest: Number.isFinite(c.selected.searchTestSummary?.passRate) && Number.isFinite(search.trials[0].testSummary?.passRate) ? c.selected.searchTestSummary.passRate - search.trials[0].testSummary.passRate : null,
+            confirmedDev: avg(c.selected.runs, 'summary', 'passRate') - avg(c.baseline.runs, 'summary', 'passRate'),
+            confirmedTest: avg(c.selected.runs, 'testSummary', 'passRate') - avg(c.baseline.runs, 'testSummary', 'passRate'),
+            confirmedTokensPct: (avg(c.selected.runs, 'summary', 'averageTokens') / avg(c.baseline.runs, 'summary', 'averageTokens') - 1) * 100
+        })
+    }
+}
+
 /* ---------------- E3: parallel ---------------- */
 if (existsSync(join(RES, 'parallel', 'parallel.json'))) {
     const p = read(join(RES, 'parallel', 'parallel.json'))
@@ -317,6 +339,23 @@ if (texDir) {
         `${header}\\begin{tabular}{lrrrrcrc}\n    \\toprule\n    Operator & Random & Greedy & Evidence & Rejected & $\\Delta$ dev pass & Improved & $\\Delta$ tokens [\\%] \\\\\n    \\midrule\n${opRows.join('\n')}\n    \\bottomrule\n\\end{tabular}%\n`
     )
     writeFileSync(join(RES, 'summary.json'), JSON.stringify(summary, null, 2))
+
+    if (summary.confirm.length) {
+        const confirmRows = strategies
+            .map((strategy) => {
+                const rows = summary.confirm.filter((row) => row.strategy === strategy)
+                if (!rows.length) return null
+                const pick = (key) => rows.map((row) => row[key]).filter((value) => Number.isFinite(value))
+                return `        ${label[strategy]} & ${rows.length} & ${pm(pick('reportedDev'))} & ${pm(pick('confirmedDev'))} & ${pm(pick('reportedTest'))} & ${pm(pick('confirmedTest'))} & ${pm(pick('confirmedTokensPct'), 0)} \\\\`
+            })
+            .filter(Boolean)
+        const all = (key) => summary.confirm.map((row) => row[key]).filter((value) => Number.isFinite(value))
+        confirmRows.push(`        \\midrule\n        All & ${summary.confirm.length} & ${pm(all('reportedDev'))} & ${pm(all('confirmedDev'))} & ${pm(all('reportedTest'))} & ${pm(all('confirmedTest'))} & ${pm(all('confirmedTokensPct'), 0)} \\\\`)
+        writeFileSync(
+            join(texDir, 'e2b_confirm.tex'),
+            `${header}\\begin{tabular}{lrccccc}\n    \\toprule\n    & & \\multicolumn{2}{c}{$\\Delta$ dev pass} & \\multicolumn{2}{c}{$\\Delta$ test pass} & \\\\\n    \\cmidrule(lr){3-4}\\cmidrule(lr){5-6}\n    Strategy & Crews & reported & re-measured & reported & re-measured & $\\Delta$ tokens [\\%] \\\\\n    \\midrule\n${confirmRows.join('\n')}\n    \\bottomrule\n\\end{tabular}%\n`
+        )
+    }
 
     if (summary.parallel) {
         const p = summary.parallel

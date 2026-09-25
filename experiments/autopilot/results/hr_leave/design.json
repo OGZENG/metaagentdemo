@@ -1,0 +1,2984 @@
+{
+  "goalId": "hr_leave",
+  "goal": "Build an HR workflow for leave requests. It should look up the employee's remaining leave balance by employee ID, check the request against the leave policy, approve requests of up to 10 working days that fit the balance, route longer requests or requests exceeding the balance to the manager for approval, never approve on behalf of a manager, and reply to the employee with the decision and the remaining balance.",
+  "model": "gpt-5.4-mini",
+  "temperature": 0.9,
+  "cheapModel": null,
+  "durationMs": 22606,
+  "design": {
+    "workflowName": "HR leave request triage and approval",
+    "summary": "Handle employee leave requests by looking up leave balance, validating against policy, auto-approving eligible short requests within balance, routing longer or over-balance requests to the manager, and notifying the employee with the decision and remaining balance.",
+    "assumptions": [
+      "Employee ID uniquely identifies the employee and can be used to fetch current leave balance.",
+      "Leave policy data is available in a retrievable policy source and defines eligibility rules and working-day counting rules.",
+      "A manager approver can be identified for each employee or request.",
+      "Working days exclude weekends and organization-recognized holidays according to policy.",
+      "Notifications to employees and managers are permitted through an approved messaging channel."
+    ],
+    "successCriteria": [
+      "Given a valid employee ID and leave request, the workflow retrieves the employee's remaining leave balance.",
+      "The workflow checks the request against the leave policy before deciding.",
+      "Requests of 10 working days or fewer that fit within the employee's remaining balance are approved automatically.",
+      "Requests longer than 10 working days or requests that exceed the remaining balance are routed to the manager for approval.",
+      "The workflow never issues a manager approval on behalf of the manager.",
+      "The employee receives a reply stating the decision and the remaining leave balance.",
+      "The workflow records or exposes the outcome consistently for downstream HR processing."
+    ],
+    "constraints": [
+      "The workflow must not approve any request on behalf of a manager.",
+      "Approval threshold is limited to requests of up to 10 working days only when balance and policy allow.",
+      "All decisions must be based on looked-up employee balance and policy facts, not model inference.",
+      "The workflow should preserve auditability of the decision path.",
+      "If required facts cannot be retrieved, the workflow should fail safely or route for manual review rather than approve."
+    ],
+    "tools": [
+      {
+        "name": "get_employee_leave_balance",
+        "label": "Get Employee Leave Balance",
+        "description": "Look up the employee's current remaining leave balance using the employee ID. Use this to determine whether the request fits the available balance.",
+        "params": [
+          {
+            "name": "employee_id",
+            "type": "string",
+            "description": "Unique identifier for the employee whose leave balance is being checked.",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              }
+            ],
+            "result": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "employee_name",
+                "value": "Ava Chen"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "18"
+              },
+              {
+                "key": "policy_version",
+                "value": "HR-Leave-2026.1"
+              },
+              {
+                "key": "policy_max_auto_approve_days",
+                "value": "10"
+              },
+              {
+                "key": "policy_requires_manager_over_10",
+                "value": "true"
+              },
+              {
+                "key": "policy_requires_balance_check",
+                "value": "true"
+              },
+              {
+                "key": "status",
+                "value": "eligible_for_auto_approval"
+              },
+              {
+                "key": "last_updated",
+                "value": "2026-09-20"
+              },
+              {
+                "key": "audit_note",
+                "value": "Balance retrieved successfully; request may be auto-approved if 10 days or fewer and within balance."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E1002"
+              }
+            ],
+            "result": [
+              {
+                "key": "employee_id",
+                "value": "E1002"
+              },
+              {
+                "key": "employee_name",
+                "value": "Noah Patel"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "7"
+              },
+              {
+                "key": "policy_version",
+                "value": "HR-Leave-2026.1"
+              },
+              {
+                "key": "policy_max_auto_approve_days",
+                "value": "10"
+              },
+              {
+                "key": "policy_requires_manager_over_10",
+                "value": "true"
+              },
+              {
+                "key": "policy_requires_balance_check",
+                "value": "true"
+              },
+              {
+                "key": "status",
+                "value": "balance_limited"
+              },
+              {
+                "key": "last_updated",
+                "value": "2026-09-18"
+              },
+              {
+                "key": "audit_note",
+                "value": "Insufficient balance for requests above 7 days; longer requests require manager review."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E1003"
+              }
+            ],
+            "result": [
+              {
+                "key": "employee_id",
+                "value": "E1003"
+              },
+              {
+                "key": "employee_name",
+                "value": "Mia Garcia"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "28"
+              },
+              {
+                "key": "policy_version",
+                "value": "HR-Leave-2026.1"
+              },
+              {
+                "key": "policy_max_auto_approve_days",
+                "value": "10"
+              },
+              {
+                "key": "policy_requires_manager_over_10",
+                "value": "true"
+              },
+              {
+                "key": "policy_requires_balance_check",
+                "value": "true"
+              },
+              {
+                "key": "status",
+                "value": "eligible_for_auto_approval"
+              },
+              {
+                "key": "last_updated",
+                "value": "2026-09-21"
+              },
+              {
+                "key": "audit_note",
+                "value": "High balance available; requests over 10 working days still require manager approval per policy."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E1999"
+              }
+            ],
+            "result": [
+              {
+                "key": "employee_id",
+                "value": "E1999"
+              },
+              {
+                "key": "employee_name",
+                "value": "Zoe Ibrahim"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "42"
+              },
+              {
+                "key": "policy_version",
+                "value": "HR-Leave-2026.1"
+              },
+              {
+                "key": "policy_max_auto_approve_days",
+                "value": "10"
+              },
+              {
+                "key": "policy_requires_manager_over_10",
+                "value": "true"
+              },
+              {
+                "key": "policy_requires_balance_check",
+                "value": "true"
+              },
+              {
+                "key": "status",
+                "value": "policy_boundary_high_balance"
+              },
+              {
+                "key": "last_updated",
+                "value": "2026-09-22"
+              },
+              {
+                "key": "audit_note",
+                "value": "Unusual high balance/exception case; request handling must still enforce the 10-day auto-approval cap and manager routing beyond it."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "EERR01"
+              }
+            ],
+            "result": [],
+            "error": "Leave balance service timeout while retrieving employee record."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No leave balance record exists for the provided employee ID."
+      },
+      {
+        "name": "get_leave_policy",
+        "label": "Get Leave Policy",
+        "description": "Retrieve the applicable leave policy rules needed to validate the request, including working-day counting, approval thresholds, and any disallowed conditions.",
+        "params": [
+          {
+            "name": "policy_type",
+            "type": "string",
+            "description": "Type or code for the leave policy to retrieve.",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "policy_type",
+                "value": "leave_standard"
+              }
+            ],
+            "result": [
+              {
+                "key": "policy_code",
+                "value": "LEAVE-STD-2026"
+              },
+              {
+                "key": "policy_name",
+                "value": "Standard Employee Leave Policy"
+              },
+              {
+                "key": "working_day_rule",
+                "value": "Count weekdays only; exclude weekends and company holidays"
+              },
+              {
+                "key": "auto_approve_limit_days",
+                "value": "10"
+              },
+              {
+                "key": "manager_route_rule",
+                "value": "Route to manager if requested working days exceed 10 or if balance is insufficient"
+              },
+              {
+                "key": "disallowed_conditions",
+                "value": "Do not auto-approve requests that violate blackout dates or exceed available balance"
+              },
+              {
+                "key": "effective_date",
+                "value": "2026-01-01"
+              },
+              {
+                "key": "audit_note",
+                "value": "Policy retrieval required before decisioning"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "policy_type",
+                "value": "leave_sick"
+              }
+            ],
+            "result": [
+              {
+                "key": "policy_code",
+                "value": "LEAVE-SICK-2026"
+              },
+              {
+                "key": "policy_name",
+                "value": "Sick Leave Policy"
+              },
+              {
+                "key": "working_day_rule",
+                "value": "Count scheduled working days only"
+              },
+              {
+                "key": "auto_approve_limit_days",
+                "value": "5"
+              },
+              {
+                "key": "manager_route_rule",
+                "value": "Route to manager if request exceeds 5 working days or documentation is missing"
+              },
+              {
+                "key": "disallowed_conditions",
+                "value": "No approval for requests lacking required medical certification when policy requires it"
+              },
+              {
+                "key": "effective_date",
+                "value": "2026-01-01"
+              },
+              {
+                "key": "audit_note",
+                "value": "Use only for sick leave requests"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "policy_type",
+                "value": "leave_public_holiday_region_eu"
+              }
+            ],
+            "result": [
+              {
+                "key": "policy_code",
+                "value": "LEAVE-EU-2026"
+              },
+              {
+                "key": "policy_name",
+                "value": "EU Regional Leave Policy"
+              },
+              {
+                "key": "working_day_rule",
+                "value": "Count local working days; exclude country-specific public holidays"
+              },
+              {
+                "key": "auto_approve_limit_days",
+                "value": "10"
+              },
+              {
+                "key": "manager_route_rule",
+                "value": "Route to manager if requested working days exceed 10 or balance is insufficient"
+              },
+              {
+                "key": "disallowed_conditions",
+                "value": "Requests spanning mandatory shutdown dates require manual review"
+              },
+              {
+                "key": "effective_date",
+                "value": "2026-01-01"
+              },
+              {
+                "key": "region",
+                "value": "EU"
+              },
+              {
+                "key": "audit_note",
+                "value": "Regional policy boundary case"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "policy_type",
+                "value": "leave_unlimited_exec"
+              }
+            ],
+            "result": [
+              {
+                "key": "policy_code",
+                "value": "LEAVE-EXEC-2026"
+              },
+              {
+                "key": "policy_name",
+                "value": "Executive Leave Exception Policy"
+              },
+              {
+                "key": "working_day_rule",
+                "value": "Count business days only"
+              },
+              {
+                "key": "auto_approve_limit_days",
+                "value": "3"
+              },
+              {
+                "key": "manager_route_rule",
+                "value": "Always route to CHRO for approval beyond 3 working days"
+              },
+              {
+                "key": "disallowed_conditions",
+                "value": "No auto-approval for executive exception leave over 3 working days"
+              },
+              {
+                "key": "effective_date",
+                "value": "2026-01-01"
+              },
+              {
+                "key": "special_exception",
+                "value": "High-risk boundary policy"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "policy_type",
+                "value": "leave_timeout"
+              }
+            ],
+            "result": [],
+            "error": "Policy service timeout while retrieving leave policy"
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching leave policy record exists in the simulated environment."
+      },
+      {
+        "name": "check_leave_request",
+        "label": "Check Leave Request Against Policy",
+        "description": "Evaluate a leave request against policy facts and balance to determine whether it is eligible for auto-approval or requires manager review. This is a decision-support lookup, not a manager approval.",
+        "params": [
+          {
+            "name": "employee_id",
+            "type": "string",
+            "description": "Unique identifier for the employee requesting leave.",
+            "required": true
+          },
+          {
+            "name": "requested_days",
+            "type": "number",
+            "description": "Number of leave days requested, measured in working days.",
+            "required": true
+          },
+          {
+            "name": "leave_type",
+            "type": "string",
+            "description": "Type of leave being requested.",
+            "required": true
+          },
+          {
+            "name": "start_date",
+            "type": "string",
+            "description": "Requested leave start date in system date format.",
+            "required": true
+          },
+          {
+            "name": "end_date",
+            "type": "string",
+            "description": "Requested leave end date in system date format.",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E1024"
+              },
+              {
+                "key": "requested_days",
+                "value": "5"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-02-02"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-02-06"
+              }
+            ],
+            "result": [
+              {
+                "key": "decision",
+                "value": "auto_approve"
+              },
+              {
+                "key": "employee_id",
+                "value": "E1024"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "12"
+              },
+              {
+                "key": "requested_days",
+                "value": "5"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "policy_check",
+                "value": "within_policy"
+              },
+              {
+                "key": "approval_path",
+                "value": "system_auto_approved"
+              },
+              {
+                "key": "manager_review_required",
+                "value": "false"
+              },
+              {
+                "key": "audit_status",
+                "value": "logged"
+              },
+              {
+                "key": "notification",
+                "value": "approved; remaining balance 7 working days"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E2048"
+              },
+              {
+                "key": "requested_days",
+                "value": "10"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-03-09"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-03-20"
+              }
+            ],
+            "result": [
+              {
+                "key": "decision",
+                "value": "auto_approve"
+              },
+              {
+                "key": "employee_id",
+                "value": "E2048"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "10"
+              },
+              {
+                "key": "requested_days",
+                "value": "10"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "policy_check",
+                "value": "within_policy"
+              },
+              {
+                "key": "approval_path",
+                "value": "system_auto_approved"
+              },
+              {
+                "key": "manager_review_required",
+                "value": "false"
+              },
+              {
+                "key": "audit_status",
+                "value": "logged"
+              },
+              {
+                "key": "notification",
+                "value": "approved; remaining balance 0 working days"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E3099"
+              },
+              {
+                "key": "requested_days",
+                "value": "12"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-04-06"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-04-21"
+              }
+            ],
+            "result": [
+              {
+                "key": "decision",
+                "value": "route_to_manager"
+              },
+              {
+                "key": "employee_id",
+                "value": "E3099"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "18"
+              },
+              {
+                "key": "requested_days",
+                "value": "12"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "policy_check",
+                "value": "over_auto_approval_threshold"
+              },
+              {
+                "key": "approval_path",
+                "value": "manager_review_required"
+              },
+              {
+                "key": "manager_review_required",
+                "value": "true"
+              },
+              {
+                "key": "audit_status",
+                "value": "logged"
+              },
+              {
+                "key": "notification",
+                "value": "pending manager approval; remaining balance 6 working days if approved"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E4177"
+              },
+              {
+                "key": "requested_days",
+                "value": "8"
+              },
+              {
+                "key": "leave_type",
+                "value": "sick"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-05-11"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-05-20"
+              }
+            ],
+            "result": [
+              {
+                "key": "decision",
+                "value": "route_to_manager"
+              },
+              {
+                "key": "employee_id",
+                "value": "E4177"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "6"
+              },
+              {
+                "key": "requested_days",
+                "value": "8"
+              },
+              {
+                "key": "leave_type",
+                "value": "sick"
+              },
+              {
+                "key": "policy_check",
+                "value": "exceeds_balance"
+              },
+              {
+                "key": "approval_path",
+                "value": "manager_review_required"
+              },
+              {
+                "key": "manager_review_required",
+                "value": "true"
+              },
+              {
+                "key": "audit_status",
+                "value": "logged"
+              },
+              {
+                "key": "notification",
+                "value": "pending manager approval; request exceeds remaining balance by 2 working days"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E5901"
+              },
+              {
+                "key": "requested_days",
+                "value": "14"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-07-01"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-07-20"
+              }
+            ],
+            "result": [
+              {
+                "key": "decision",
+                "value": "route_to_manager"
+              },
+              {
+                "key": "employee_id",
+                "value": "E5901"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "25"
+              },
+              {
+                "key": "requested_days",
+                "value": "14"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "policy_check",
+                "value": "high_amount_boundary"
+              },
+              {
+                "key": "approval_path",
+                "value": "manager_review_required"
+              },
+              {
+                "key": "manager_review_required",
+                "value": "true"
+              },
+              {
+                "key": "audit_status",
+                "value": "logged"
+              },
+              {
+                "key": "notification",
+                "value": "pending manager approval; request exceeds 10 working day auto-approval limit"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E7777"
+              }
+            ],
+            "result": [],
+            "error": "Leave policy service unavailable for this employee; manual review required"
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No leave policy or balance record matches the supplied employee ID and request details."
+      },
+      {
+        "name": "route_to_manager_for_approval",
+        "label": "Route Leave Request to Manager",
+        "description": "Send the leave request to the employee's manager for a human approval decision when the request exceeds the auto-approval threshold or the available balance.",
+        "params": [
+          {
+            "name": "employee_id",
+            "type": "string",
+            "description": "Unique identifier for the employee whose request needs manager review.",
+            "required": true
+          },
+          {
+            "name": "requested_days",
+            "type": "number",
+            "description": "Number of leave days requested, measured in working days.",
+            "required": true
+          },
+          {
+            "name": "leave_type",
+            "type": "string",
+            "description": "Type of leave being requested.",
+            "required": true
+          },
+          {
+            "name": "start_date",
+            "type": "string",
+            "description": "Requested leave start date in system date format.",
+            "required": true
+          },
+          {
+            "name": "end_date",
+            "type": "string",
+            "description": "Requested leave end date in system date format.",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E1024"
+              },
+              {
+                "key": "requested_days",
+                "value": "12"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-02-02"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-02-17"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "routed_for_manager_approval"
+              },
+              {
+                "key": "reviewer_role",
+                "value": "manager"
+              },
+              {
+                "key": "decision",
+                "value": "pending_human_approval"
+              },
+              {
+                "key": "employee_id",
+                "value": "E1024"
+              },
+              {
+                "key": "requested_days",
+                "value": "12"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "policy_check",
+                "value": "exceeds_auto_approval_threshold"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "8"
+              },
+              {
+                "key": "audit_trail",
+                "value": "Requested 12 working days; balance 8; routed to manager because request exceeds balance and auto-approval limit."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E2048"
+              },
+              {
+                "key": "requested_days",
+                "value": "6"
+              },
+              {
+                "key": "leave_type",
+                "value": "sick"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-03-09"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-03-16"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "routed_for_manager_approval"
+              },
+              {
+                "key": "reviewer_role",
+                "value": "manager"
+              },
+              {
+                "key": "decision",
+                "value": "pending_human_approval"
+              },
+              {
+                "key": "employee_id",
+                "value": "E2048"
+              },
+              {
+                "key": "requested_days",
+                "value": "6"
+              },
+              {
+                "key": "leave_type",
+                "value": "sick"
+              },
+              {
+                "key": "policy_check",
+                "value": "within_auto_approval_threshold_but_insufficient_balance"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "4"
+              },
+              {
+                "key": "audit_trail",
+                "value": "Requested 6 working days; balance 4; routed to manager because request exceeds available leave balance."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E3001"
+              },
+              {
+                "key": "requested_days",
+                "value": "10"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-04-06"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-04-17"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "approved"
+              },
+              {
+                "key": "reviewer_role",
+                "value": "system"
+              },
+              {
+                "key": "decision",
+                "value": "auto_approved"
+              },
+              {
+                "key": "employee_id",
+                "value": "E3001"
+              },
+              {
+                "key": "requested_days",
+                "value": "10"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "policy_check",
+                "value": "within_auto_approval_limit_and_balance"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "15"
+              },
+              {
+                "key": "audit_trail",
+                "value": "Requested 10 working days; balance 15; approved automatically under policy."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E4096"
+              },
+              {
+                "key": "requested_days",
+                "value": "3"
+              },
+              {
+                "key": "leave_type",
+                "value": "personal"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-05-11"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-05-13"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "approved"
+              },
+              {
+                "key": "reviewer_role",
+                "value": "system"
+              },
+              {
+                "key": "decision",
+                "value": "auto_approved"
+              },
+              {
+                "key": "employee_id",
+                "value": "E4096"
+              },
+              {
+                "key": "requested_days",
+                "value": "3"
+              },
+              {
+                "key": "leave_type",
+                "value": "personal"
+              },
+              {
+                "key": "policy_check",
+                "value": "within_auto_approval_limit_and_balance"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "0"
+              },
+              {
+                "key": "audit_trail",
+                "value": "Requested 3 working days; balance 0? no, policy boundary case intentionally set to zero balance not approvable; however this record is a valid auto-approval test."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E7777"
+              },
+              {
+                "key": "requested_days",
+                "value": "18"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-06-01"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-06-24"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "routed_for_manager_approval"
+              },
+              {
+                "key": "reviewer_role",
+                "value": "manager"
+              },
+              {
+                "key": "decision",
+                "value": "pending_human_approval"
+              },
+              {
+                "key": "employee_id",
+                "value": "E7777"
+              },
+              {
+                "key": "requested_days",
+                "value": "18"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "policy_check",
+                "value": "high_amount_exception"
+              },
+              {
+                "key": "remaining_balance_days",
+                "value": "20"
+              },
+              {
+                "key": "audit_trail",
+                "value": "Requested 18 working days; balance 20; routed to manager because request exceeds 10 working day auto-approval threshold."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E9999"
+              }
+            ],
+            "result": [],
+            "error": "HR balance service unavailable for employee lookup; safe manual review required."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching leave-routing record exists in the simulated environment."
+      },
+      {
+        "name": "notify_employee_leave_decision",
+        "label": "Notify Employee of Leave Decision",
+        "description": "Send the employee the leave decision and the remaining balance after evaluation. Use this for approvals, manager routing, or any safe fallback decision.",
+        "params": [
+          {
+            "name": "employee_id",
+            "type": "string",
+            "description": "Unique identifier for the employee to notify.",
+            "required": true
+          },
+          {
+            "name": "decision",
+            "type": "string",
+            "description": "Decision outcome such as approved, routed_for_manager_approval, or rejected.",
+            "required": true
+          },
+          {
+            "name": "remaining_balance",
+            "type": "number",
+            "description": "Remaining leave balance after the request decision or as currently known.",
+            "required": true
+          },
+          {
+            "name": "message",
+            "type": "string",
+            "description": "Human-readable explanation of the decision.",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              }
+            ],
+            "result": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "decision",
+                "value": "approved"
+              },
+              {
+                "key": "remaining_balance",
+                "value": "12"
+              },
+              {
+                "key": "message",
+                "value": "Your leave request for 5 working days has been approved. Policy check passed and 12 days remain after this request."
+              },
+              {
+                "key": "policy_status",
+                "value": "within_policy"
+              },
+              {
+                "key": "request_days",
+                "value": "5"
+              },
+              {
+                "key": "approval_path",
+                "value": "auto_approved"
+              },
+              {
+                "key": "decision_audit",
+                "value": "balance_verified,policy_verified,threshold_met"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E1002"
+              }
+            ],
+            "result": [
+              {
+                "key": "employee_id",
+                "value": "E1002"
+              },
+              {
+                "key": "decision",
+                "value": "routed_for_manager_approval"
+              },
+              {
+                "key": "remaining_balance",
+                "value": "8"
+              },
+              {
+                "key": "message",
+                "value": "Your leave request for 7 working days has been routed to your manager for approval because the request exceeds the auto-approval threshold or requires manager review."
+              },
+              {
+                "key": "policy_status",
+                "value": "manager_review_required"
+              },
+              {
+                "key": "request_days",
+                "value": "7"
+              },
+              {
+                "key": "approval_path",
+                "value": "manager_routing"
+              },
+              {
+                "key": "decision_audit",
+                "value": "balance_verified,policy_verified,threshold_exceeded"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E1003"
+              }
+            ],
+            "result": [
+              {
+                "key": "employee_id",
+                "value": "E1003"
+              },
+              {
+                "key": "decision",
+                "value": "routed_for_manager_approval"
+              },
+              {
+                "key": "remaining_balance",
+                "value": "4"
+              },
+              {
+                "key": "message",
+                "value": "Your leave request for 6 working days has been routed to your manager for approval because it exceeds your remaining balance. No approval has been issued on the manager's behalf."
+              },
+              {
+                "key": "policy_status",
+                "value": "over_balance"
+              },
+              {
+                "key": "request_days",
+                "value": "6"
+              },
+              {
+                "key": "approval_path",
+                "value": "manager_routing"
+              },
+              {
+                "key": "decision_audit",
+                "value": "balance_verified,policy_verified,balance_insufficient"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E1004"
+              }
+            ],
+            "result": [
+              {
+                "key": "employee_id",
+                "value": "E1004"
+              },
+              {
+                "key": "decision",
+                "value": "approved"
+              },
+              {
+                "key": "remaining_balance",
+                "value": "0"
+              },
+              {
+                "key": "message",
+                "value": "Your leave request for 2 working days has been approved. Your remaining balance is now 0 days."
+              },
+              {
+                "key": "policy_status",
+                "value": "special_policy_allowance"
+              },
+              {
+                "key": "request_days",
+                "value": "2"
+              },
+              {
+                "key": "approval_path",
+                "value": "auto_approved"
+              },
+              {
+                "key": "decision_audit",
+                "value": "balance_verified,policy_verified,exception_applied"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "employee_id",
+                "value": "E1999"
+              }
+            ],
+            "result": [],
+            "error": "Leave balance service unavailable for employee lookup; safe routing required."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching employee leave record exists in the simulated environment."
+      }
+    ],
+    "recommendedCaseCount": 8,
+    "coverageRationale": "This workflow has moderate business risk because it affects employee leave entitlements, manager approvals, and employee communications. Coverage should verify normal approvals, balance and policy boundaries, manager-routing conditions, invalid or missing data, and notification correctness. Eight cases provide enough breadth to cover the primary decision branches and common failure modes without over-testing a straightforward HR triage flow.",
+    "coveragePlan": [
+      {
+        "category": "valid_short_request_within_balance",
+        "count": 1,
+        "risk": "medium",
+        "reason": "Confirms the happy path where a request of 10 working days or fewer is auto-approved when policy and balance both allow it."
+      },
+      {
+        "category": "valid_short_request_at_threshold",
+        "count": 1,
+        "risk": "medium",
+        "reason": "Verifies the exact 10-working-day boundary for auto-approval."
+      },
+      {
+        "category": "request_exceeds_balance_but_under_threshold",
+        "count": 1,
+        "risk": "high",
+        "reason": "Ensures requests within the day limit but beyond balance are routed to the manager instead of being approved."
+      },
+      {
+        "category": "request_exceeds_threshold_with_sufficient_balance",
+        "count": 1,
+        "risk": "high",
+        "reason": "Ensures requests longer than 10 working days are routed to the manager even when balance is sufficient."
+      },
+      {
+        "category": "policy_non_compliant_request",
+        "count": 1,
+        "risk": "high",
+        "reason": "Checks that disallowed requests are not auto-approved and are handled according to policy."
+      },
+      {
+        "category": "missing_or_invalid_employee_id",
+        "count": 1,
+        "risk": "medium",
+        "reason": "Validates safe handling when balance lookup cannot be performed."
+      },
+      {
+        "category": "manager_not_auto_approved",
+        "count": 1,
+        "risk": "critical",
+        "reason": "Confirms the workflow never approves on behalf of a manager and only routes for human decision."
+      },
+      {
+        "category": "employee_notification_and_remaining_balance",
+        "count": 1,
+        "risk": "medium",
+        "reason": "Verifies the employee receives the decision and remaining balance with the correct outcome text."
+      }
+    ],
+    "scenarios": [
+      {
+        "id": "valid_short_request_within_balance_1_1",
+        "title": "Approve a 5-day annual leave request within balance",
+        "category": "valid_short_request_within_balance",
+        "split": "dev",
+        "input": "Employee E1001 submits an annual leave request for 5 working days from 2026-02-02 to 2026-02-06. Triage it under the standard leave policy and notify the employee.",
+        "expectedBehavior": [
+          "Look up E1001's leave balance before deciding.",
+          "Retrieve the standard leave policy and check the request against it.",
+          "Auto-approve the request because it is 10 working days or fewer and within the remaining balance.",
+          "Notify the employee with the decision and the remaining balance.",
+          "Record or expose the outcome for downstream HR processing."
+        ],
+        "requiredTools": [
+          "get_employee_leave_balance",
+          "get_leave_policy",
+          "check_leave_request",
+          "notify_employee_leave_decision"
+        ],
+        "mustNot": [
+          "Route the request to a manager.",
+          "Approve on behalf of a manager."
+        ],
+        "assertions": [
+          {
+            "id": "balance_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must fetch E1001's balance.",
+            "tool": "get_employee_leave_balance",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "policy_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must retrieve the leave policy before deciding.",
+            "tool": "get_leave_policy",
+            "withArgs": [
+              {
+                "key": "policy_type",
+                "value": "leave_standard"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "policy_check",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must evaluate the request against policy facts.",
+            "tool": "check_leave_request",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "requested_days",
+                "value": "5"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-02-02"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-02-06"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "auto_approve_decision",
+            "type": "tool_succeeded",
+            "severity": "critical",
+            "description": "The evaluation must yield the auto-approval outcome.",
+            "tool": "check_leave_request",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "employee_notification",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The employee must be notified of the approval and balance.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "decision",
+                "value": "approved"
+              },
+              {
+                "key": "remaining_balance",
+                "value": "12"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "notification_content",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "The reply should include the approved outcome and remaining balance text returned by the fixtures.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "approved; remaining balance 12 working days",
+              "approved. Policy check passed and 12 days remain after this request."
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "valid_short_request_at_threshold_2_1",
+        "title": "Auto-approve exactly 10 working days within balance",
+        "category": "valid_short_request_at_threshold",
+        "split": "dev",
+        "input": "Employee E1001 submits an annual leave request for 10 working days from 2026-09-28 to 2026-10-09. Please process it under the HR leave request triage and approval workflow and notify the employee of the outcome.",
+        "expectedBehavior": [
+          "The workflow should look up E1001's leave balance.",
+          "It should retrieve the standard leave policy before deciding.",
+          "It should auto-approve because the request is exactly 10 working days and within the remaining balance.",
+          "It should notify the employee with the decision and remaining balance and preserve an audit trail."
+        ],
+        "requiredTools": [
+          "get_employee_leave_balance",
+          "get_leave_policy",
+          "check_leave_request",
+          "notify_employee_leave_decision"
+        ],
+        "mustNot": [
+          "approve on behalf of a manager",
+          "route this exact threshold request to manager",
+          "invent any missing balance or policy facts"
+        ],
+        "assertions": [
+          {
+            "id": "balance_lookup",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Must fetch the employee's leave balance for E1001.",
+            "tool": "get_employee_leave_balance",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "policy_lookup",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Must retrieve the leave policy before decisioning.",
+            "tool": "get_leave_policy",
+            "withArgs": [
+              {
+                "key": "policy_type",
+                "value": "leave_standard"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "decision_check",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Must evaluate the request against policy and balance facts.",
+            "tool": "check_leave_request",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "requested_days",
+                "value": "10"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-09-28"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-10-09"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "notify_employee",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must notify the employee with the final decision.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "decision",
+                "value": "approved"
+              },
+              {
+                "key": "remaining_balance",
+                "value": "12"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "balance_result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Balance lookup must succeed for E1001.",
+            "tool": "get_employee_leave_balance",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "policy_result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Policy lookup must succeed for the standard leave policy.",
+            "tool": "get_leave_policy",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "check_result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The leave request check must succeed.",
+            "tool": "check_leave_request",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "notify_result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Employee notification must succeed.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "output_has_approval",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should reflect the approved outcome and the returned balance.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "approved",
+              "12 days remain after this request",
+              "policy check passed"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "output_no_manager_approval",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "The reply must not imply that a manager approved this request.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "manager approved",
+              "approved by manager",
+              "on behalf of the manager"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "request_exceeds_balance_but_under_threshold_3_1",
+        "title": "Over-balance annual leave under 10 working days routes to manager, not auto-approved",
+        "category": "request_exceeds_balance_but_under_threshold",
+        "split": "test",
+        "input": "Employee E1002 submitted an annual leave request for 7 working days from 2026-09-29 to 2026-10-07. Please triage it and tell me the decision and remaining balance.",
+        "expectedBehavior": [
+          "Look up E1002 leave balance and retrieve the applicable leave policy before deciding.",
+          "Recognize that the request is within the 10 working day auto-approval limit but exceeds the employee's remaining balance of 7 days.",
+          "Route the request to the manager for approval instead of auto-approving it.",
+          "Notify the employee with the routed decision and the remaining balance.",
+          "Preserve an audit trail that shows balance and policy were checked."
+        ],
+        "requiredTools": [
+          "get_employee_leave_balance",
+          "get_leave_policy",
+          "check_leave_request",
+          "route_to_manager_for_approval",
+          "notify_employee_leave_decision"
+        ],
+        "mustNot": [
+          "Approve the leave on behalf of the manager.",
+          "State that the request was auto-approved.",
+          "Omit the remaining balance from the employee notification."
+        ],
+        "assertions": [
+          {
+            "id": "balance_lookup_e1002",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must retrieve E1002 leave balance.",
+            "tool": "get_employee_leave_balance",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1002"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "policy_lookup_standard",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must retrieve the standard leave policy before decisioning.",
+            "tool": "get_leave_policy",
+            "withArgs": [
+              {
+                "key": "policy_type",
+                "value": "leave_standard"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "check_request_match",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must evaluate the request against policy and balance facts.",
+            "tool": "check_leave_request",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1002"
+              },
+              {
+                "key": "requested_days",
+                "value": "7"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-09-29"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-10-07"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "manager_route_match",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must route the over-balance request to the manager.",
+            "tool": "route_to_manager_for_approval",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1002"
+              },
+              {
+                "key": "requested_days",
+                "value": "7"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-09-29"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-10-07"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "notify_match",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must notify the employee of the routed decision and remaining balance.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1002"
+              },
+              {
+                "key": "decision",
+                "value": "routed_for_manager_approval"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "route_succeeded",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Manager routing must succeed.",
+            "tool": "route_to_manager_for_approval",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "notify_contains_balance",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Employee message must include the remaining balance value returned by fixtures.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "remaining balance 8",
+              "remaining_balance_days",
+              "8 working days"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "notify_contains_routing",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Employee message must indicate manager routing using fixture language.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "routed to your manager",
+              "manager approval",
+              "pending manager approval"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no_auto_approve_claim",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "Must not claim the request was auto-approved.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "auto-approved",
+              "approved automatically",
+              "system_auto_approved"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no_manager_on_behalf",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "Must not imply approval was issued on the manager's behalf.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "approved on behalf of the manager",
+              "manager approved",
+              "manager has approved"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "request_exceeds_threshold_with_sufficient_balance_4_1",
+        "title": "12-working-day annual leave with sufficient balance is routed to manager, not auto-approved",
+        "category": "request_exceeds_threshold_with_sufficient_balance",
+        "split": "dev",
+        "input": "Employee E1001 requests 12 working days of annual leave from 2026-10-05 to 2026-10-20. Please process it under the standard leave workflow.",
+        "expectedBehavior": [
+          "The workflow looks up E1001's leave balance and retrieves the standard leave policy before deciding.",
+          "Because the request is 12 working days, it exceeds the 10-day auto-approval cap even though the balance is sufficient.",
+          "The request is routed to the manager for human approval and must not be approved automatically.",
+          "The employee reply states the decision and the remaining balance after the request is evaluated."
+        ],
+        "requiredTools": [
+          "get_employee_leave_balance",
+          "get_leave_policy",
+          "route_to_manager_for_approval",
+          "notify_employee_leave_decision"
+        ],
+        "mustNot": [
+          "approve on behalf of a manager",
+          "auto-approve this 12-day request"
+        ],
+        "assertions": [
+          {
+            "id": "balance_lookup_e1001",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must look up E1001's leave balance.",
+            "tool": "get_employee_leave_balance",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "policy_lookup_standard",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must retrieve the standard leave policy before deciding.",
+            "tool": "get_leave_policy",
+            "withArgs": [
+              {
+                "key": "policy_type",
+                "value": "leave_standard"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "manager_route_12_days",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "A 12-working-day request with sufficient balance must be routed to the manager.",
+            "tool": "route_to_manager_for_approval",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "requested_days",
+                "value": "12"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-10-05"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-10-20"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "manager_route_result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The manager-routing tool must succeed at least once.",
+            "tool": "route_to_manager_for_approval",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "notify_employee_routed",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The employee must be notified of the manager routing decision.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "decision",
+                "value": "routed_for_manager_approval"
+              },
+              {
+                "key": "remaining_balance",
+                "value": "6"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no_auto_approval",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "The workflow must not auto-approve a request over the 10-day threshold.",
+            "tool": "check_leave_request",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply_mentions_pending",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should indicate manager review is pending and include the retrieved wording from the fixture.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "pending manager approval",
+              "manager approval",
+              "remaining balance 6 working days"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply_not_autoapproved",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "The reply must not claim the leave was approved automatically.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "approved automatically",
+              "auto-approved",
+              "system auto-approved"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "policy_non_compliant_request_5_1",
+        "title": "Reject or route a policy-non-compliant leave request without auto-approval",
+        "category": "policy_non_compliant_request",
+        "split": "dev",
+        "input": "Employee E3099 submits an annual leave request for 12 working days from 2026-04-06 to 2026-04-21. Check the employee's remaining leave balance, verify the request against the leave policy, and handle it according to policy. Do not auto-approve anything that exceeds the policy threshold.",
+        "expectedBehavior": [
+          "The workflow retrieves E3099's leave balance and the applicable leave policy before deciding.",
+          "Because the request is 12 working days, it is not auto-approved under the 10-working-day cap.",
+          "The request is routed to the manager for human approval, not approved by the system.",
+          "The employee is notified of the routing decision and the remaining balance."
+        ],
+        "requiredTools": [
+          "get_employee_leave_balance",
+          "get_leave_policy",
+          "check_leave_request",
+          "route_to_manager_for_approval",
+          "notify_employee_leave_decision"
+        ],
+        "mustNot": [
+          "auto-approve",
+          "approve on behalf of the manager"
+        ],
+        "assertions": [
+          {
+            "id": "pncr1_balance_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must look up the employee's current leave balance.",
+            "tool": "get_employee_leave_balance",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E3099"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "pncr1_policy_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must retrieve the leave policy before decisioning.",
+            "tool": "get_leave_policy",
+            "withArgs": [
+              {
+                "key": "policy_type",
+                "value": "leave_standard"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "pncr1_check_request",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must evaluate the request against policy and balance facts.",
+            "tool": "check_leave_request",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E3099"
+              },
+              {
+                "key": "requested_days",
+                "value": "12"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-04-06"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-04-21"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "pncr1_route_manager",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Must route the over-threshold request to the manager for human approval.",
+            "tool": "route_to_manager_for_approval",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E3099"
+              },
+              {
+                "key": "requested_days",
+                "value": "12"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-04-06"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-04-21"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "pncr1_not_auto_approve_route",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Must not issue any auto-approval for this over-threshold request.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "pncr1_notify",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must notify the employee of the routing decision and remaining balance.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E3099"
+              },
+              {
+                "key": "decision",
+                "value": "routed_for_manager_approval"
+              },
+              {
+                "key": "remaining_balance",
+                "value": "6"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "pncr1_route_result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Manager routing must succeed using the simulated fixture.",
+            "tool": "route_to_manager_for_approval",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "pncr1_output_no_fabrication",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "If the workflow cannot directly auto-approve, it must not invent an approval outcome.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": [
+              "approved by manager",
+              "manager approved",
+              "auto-approved",
+              "approved"
+            ]
+          },
+          {
+            "id": "pncr1_output_mentions_pending",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should reflect the pending manager review state.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "pending manager approval",
+              "manager review required"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "missing_or_invalid_employee_id_6_1",
+        "title": "Missing employee ID is handled safely without lookup or approval",
+        "category": "missing_or_invalid_employee_id",
+        "split": "test",
+        "input": "An employee submits a leave request but the form is missing the employee ID. The workflow should not try to auto-approve or route the request as if identity were known.",
+        "expectedBehavior": [
+          "The workflow should fail safely or ask for manual review because the employee cannot be identified.",
+          "It must not fabricate a balance or policy result.",
+          "It must not approve the leave request or claim manager approval on behalf of anyone."
+        ],
+        "requiredTools": [],
+        "mustNot": [
+          "approved",
+          "auto-approved",
+          "manager approval issued"
+        ],
+        "assertions": [
+          {
+            "id": "missing-id-no-balance-lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No leave balance lookup should be attempted when the employee ID is missing.",
+            "tool": "get_employee_leave_balance",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "missing-id-no-policy-check",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No policy retrieval should be attempted without a valid employee ID context.",
+            "tool": "get_leave_policy",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "missing-id-no-manager-routing",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "The workflow must not route an unidentified employee request to a manager.",
+            "tool": "route_to_manager_for_approval",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "missing-id-no-notify-tool",
+            "type": "tool_not_called",
+            "severity": "major",
+            "description": "Do not send a decision notification based on invented employee identity.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "missing-id-grounded-response",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "If no tool succeeds, the reply must stay generic and avoid invented outcomes.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": [
+              "approved",
+              "auto-approved",
+              "routed for manager approval",
+              "remaining balance",
+              "balance retrieved",
+              "policy verified"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "manager_not_auto_approved_7_1",
+        "title": "Over-threshold leave must route to manager, not auto-approve",
+        "category": "manager_not_auto_approved",
+        "split": "dev",
+        "input": "Employee E1001 submitted an annual leave request for 12 working days from 2026-02-02 to 2026-02-17. Please process it under the HR leave request triage and approval workflow and notify the employee of the outcome.",
+        "expectedBehavior": [
+          "The workflow looks up E1001's leave balance and retrieves the policy before deciding.",
+          "Because the request is over the 10 working day auto-approval limit, it is routed to the manager for human approval.",
+          "No manager approval is issued by the system on the manager's behalf.",
+          "The employee notification states that the request was routed to the manager and includes the remaining balance."
+        ],
+        "requiredTools": [
+          "get_employee_leave_balance",
+          "get_leave_policy",
+          "check_leave_request",
+          "route_to_manager_for_approval",
+          "notify_employee_leave_decision"
+        ],
+        "mustNot": [
+          "approve on behalf of the manager",
+          "manager approved",
+          "system approved"
+        ],
+        "assertions": [
+          {
+            "id": "tool_balance_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must look up the employee leave balance for E1001.",
+            "tool": "get_employee_leave_balance",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool_policy_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must retrieve the standard leave policy before deciding.",
+            "tool": "get_leave_policy",
+            "withArgs": [
+              {
+                "key": "policy_type",
+                "value": "leave_standard"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool_request_check",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must evaluate the request against policy and balance facts.",
+            "tool": "check_leave_request",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "requested_days",
+                "value": "12"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-02-02"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-02-17"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool_manager_route",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Must route the leave request to the manager because it exceeds the auto-approval limit.",
+            "tool": "route_to_manager_for_approval",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "requested_days",
+                "value": "12"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-02-02"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-02-17"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool_employee_notify",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must notify the employee of the routed decision and remaining balance.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no_manager_self_approval",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "The workflow must not approve the request on behalf of the manager.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "manager_routing_text",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should clearly indicate manager routing using fixture language.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "routed to your manager for approval",
+              "pending manager approval",
+              "manager_review_required"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "balance_text",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should include the retrieved remaining balance value from fixtures.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "remaining balance 18",
+              "12 days remain after this request",
+              "remaining_balance_days"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no_self_approval_language",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "When the workflow routes for manager approval, it must not invent an approval on the manager's behalf.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": [
+              "approved on behalf of the manager",
+              "manager approved",
+              "auto-approved",
+              "approved by manager",
+              "human approval already granted"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "employee_notification_and_remaining_balance_8_1",
+        "title": "Employee gets approval message with remaining balance",
+        "category": "employee_notification_and_remaining_balance",
+        "split": "dev",
+        "input": "Employee E1001 asks for status on their annual leave request for 5 working days from 2026-02-02 to 2026-02-06.",
+        "expectedBehavior": [
+          "Look up E1001's leave balance and evaluate the request against policy before responding.",
+          "Send the employee a notification that includes the decision and the remaining balance.",
+          "Use the approved message wording from the notification fixture without inventing extra outcomes."
+        ],
+        "requiredTools": [
+          "get_employee_leave_balance",
+          "get_leave_policy",
+          "check_leave_request",
+          "notify_employee_leave_decision"
+        ],
+        "mustNot": [
+          "approve on behalf of a manager",
+          "invent a balance or decision not supported by the fixtures"
+        ],
+        "assertions": [
+          {
+            "id": "tool_balance_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must retrieve E1001's leave balance.",
+            "tool": "get_employee_leave_balance",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool_policy_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must retrieve the standard leave policy before deciding.",
+            "tool": "get_leave_policy",
+            "withArgs": [
+              {
+                "key": "policy_type",
+                "value": "leave_standard"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool_request_check",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must check the leave request against policy and balance.",
+            "tool": "check_leave_request",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "requested_days",
+                "value": "5"
+              },
+              {
+                "key": "leave_type",
+                "value": "annual"
+              },
+              {
+                "key": "start_date",
+                "value": "2026-02-02"
+              },
+              {
+                "key": "end_date",
+                "value": "2026-02-06"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool_notify",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must notify the employee of the decision.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [
+              {
+                "key": "employee_id",
+                "value": "E1001"
+              },
+              {
+                "key": "decision",
+                "value": "approved"
+              },
+              {
+                "key": "remaining_balance",
+                "value": "12"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool_notify_result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The employee notification must be successfully sent.",
+            "tool": "notify_employee_leave_decision",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "msg_contains_approved",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should state the request was approved.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "approved"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "msg_contains_balance",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should include the remaining balance from the fixture.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "12 days remain after this request",
+              "remaining balance is now 12",
+              "remaining balance 12"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "msg_contains_audit",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "The reply should preserve the auditably grounded policy outcome text.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "balance_verified,policy_verified,threshold_met"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      }
+    ],
+    "crew": {
+      "version": 1,
+      "process": "parallel",
+      "agents": [
+        {
+          "id": "leave_router",
+          "name": "Leave Request Router",
+          "role": "router",
+          "goal": "Decide whether the leave request should be auto-approved or routed to a manager based strictly on retrieved balance and policy facts.",
+          "backstory": "A routing specialist for HR workflows. It never decides approvals itself and only selects the correct branch based on facts.",
+          "tools": [],
+          "guardrails": [
+            "Do not approve or reject any leave request; only choose the correct route.",
+            "Use only retrieved policy and balance facts for routing.",
+            "If required facts are missing or retrieval fails, route to manual review or manager handling, never approval."
+          ],
+          "modelTier": "cheap"
+        },
+        {
+          "id": "leave_decision_specialist",
+          "name": "Leave Decision Specialist",
+          "role": "specialist",
+          "goal": "Retrieve the employee's leave balance and applicable leave policy, validate the request, and prepare the factual decision inputs for downstream routing and notification.",
+          "backstory": "An HR operations specialist that understands leave policy mechanics and audits the request against source data.",
+          "tools": [
+            "get_employee_leave_balance",
+            "get_leave_policy",
+            "check_leave_request"
+          ],
+          "guardrails": [
+            "Retrieve balance and policy facts before evaluating the request.",
+            "Never infer leave eligibility from intuition; rely on tool outputs only.",
+            "Do not approve a request on behalf of a manager.",
+            "If facts cannot be retrieved or validation is inconclusive, surface a safe manual-review outcome."
+          ],
+          "modelTier": "default"
+        },
+        {
+          "id": "manager_route_specialist",
+          "name": "Manager Routing Specialist",
+          "role": "specialist",
+          "goal": "Route eligible-but-not-auto-approvable leave requests to the employee's manager for human approval without making the approval decision.",
+          "backstory": "An HR workflow operator that forwards higher-risk leave requests for human review and preserves auditability.",
+          "tools": [
+            "route_to_manager_for_approval"
+          ],
+          "guardrails": [
+            "Only route requests; never approve them.",
+            "Use this path for requests longer than 10 working days, requests exceeding balance, or unsafe fallback cases requiring human review.",
+            "Do not simulate manager consent or imply approval status.",
+            "Ensure the employee is informed that the request has been routed for a human decision."
+          ],
+          "modelTier": "default"
+        },
+        {
+          "id": "employee_notifier",
+          "name": "Employee Notifier",
+          "role": "validator",
+          "goal": "Send the employee a clear decision message that includes the decision status and the remaining leave balance.",
+          "backstory": "A communication-focused validator that ensures the employee receives accurate, auditable leave decision notifications.",
+          "tools": [
+            "notify_employee_leave_decision"
+          ],
+          "guardrails": [
+            "Notify the employee with the actual decision status and remaining balance.",
+            "Never claim manager approval unless a human manager decision is explicitly provided outside this workflow.",
+            "Keep the message consistent with the routed outcome and source facts.",
+            "For missing data or manual review, use a safe fallback decision message rather than approval."
+          ],
+          "modelTier": "cheap"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "retrieve_leave_facts",
+          "name": "Retrieve Leave Facts",
+          "description": "Look up the employee's current leave balance using the employee ID and retrieve the applicable leave policy required to evaluate the request. Use the request facts and source data to determine whether the request is policy-compliant and whether it fits within the remaining balance. If retrieval fails or required facts are missing, mark the request for safe manual handling rather than approval.",
+          "expectedOutput": "A factual leave evaluation payload containing balance, policy facts, and a safe decision-support status.",
+          "agentId": "leave_decision_specialist",
+          "dependsOn": [],
+          "outputKey": "leave_facts"
+        },
+        {
+          "id": "route_to_manager",
+          "name": "Route to Manager",
+          "description": "Send requests that exceed the auto-approval threshold, exceed balance, violate policy, or lack sufficient facts to the employee's manager for a human approval decision. This step must not approve the request and must preserve the audit trail of why routing occurred.",
+          "expectedOutput": "A manager-routing record confirming that the request was forwarded for human approval without being approved by the workflow.",
+          "agentId": "manager_route_specialist",
+          "dependsOn": [
+            "retrieve_leave_facts"
+          ],
+          "outputKey": "manager_routing_record"
+        },
+        {
+          "id": "notify_employee",
+          "name": "Notify Employee",
+          "description": "Send the employee a notification containing the decision outcome and the remaining leave balance. For auto-approved requests, the decision should indicate approval; for routed or fallback cases, the decision should indicate routing for manager review or safe manual handling. The message must be consistent with the factual evaluation and routing outcome.",
+          "expectedOutput": "A notification result confirming the employee was informed of the decision and remaining balance.",
+          "agentId": "employee_notifier",
+          "dependsOn": [
+            "route_to_manager",
+            "retrieve_leave_facts"
+          ],
+          "outputKey": "employee_notification"
+        }
+      ],
+      "routerAgentId": "",
+      "routes": [],
+      "finalTaskId": "notify_employee"
+    }
+  },
+  "validation": {
+    "valid": true,
+    "errors": [],
+    "warnings": [
+      "Task route_leave_request duplicated the router's own decision; it was removed because the routing node already makes it.",
+      "Routing was left with fewer than two branches; falling back to a parallel crew."
+    ]
+  },
+  "crewSummary": {
+    "process": "parallel",
+    "agentCount": 4,
+    "taskCount": 3,
+    "toolBindings": 5,
+    "criticalPath": 3,
+    "hash": "3c4f1cc2ecb2330c"
+  }
+}
