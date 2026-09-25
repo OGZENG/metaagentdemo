@@ -102,7 +102,6 @@ export const scoreOperator = (operator: CrewOperator, ir: CrewIR, evidence: RunE
     if (executionBroken) {
         if (operator.type === 'merge_tasks') return { score: 8, rationale: 'Execution failures usually come from too many hand-offs.' }
         if (operator.type === 'remove_task') return { score: 7, rationale: 'Removing a step reduces the number of ways a run can break.' }
-        if (family === 'cost') return { score: -5, rationale: 'Cost tuning is unsafe while runs still fail.' }
     }
 
     if (!healthy) {
@@ -111,14 +110,12 @@ export const scoreOperator = (operator: CrewOperator, ir: CrewIR, evidence: RunE
         if (operator.type === 'add_router' && mentions(evidence.evaluatorIssues, 'intent')) {
             return { score: 6, rationale: 'Evaluator feedback mentions intent handling, which routing addresses.' }
         }
-        if (family === 'cost') return { score: -3, rationale: 'Do not trade quality away before the baseline is healthy.' }
         if (operator.type === 'remove_task') return { score: -2, rationale: 'Removing work is risky while acceptance is failing.' }
         return { score: 1, rationale: 'Neutral structural exploration.' }
     }
 
     // Healthy baseline: buy efficiency without losing behaviour.
     if (operator.type === 'merge_tasks') return { score: 8, rationale: 'Merging independent tasks removes a model call at equal coverage.' }
-    if (operator.type === 'downgrade_model') return { score: 7, rationale: 'A healthy step is a candidate for the cheaper model tier.' }
     if (operator.type === 'parallelize_task') return { score: 6, rationale: 'Shortening the critical path lowers latency at equal cost.' }
     if (operator.type === 'remove_task') return { score: 5, rationale: 'A step that never changed the outcome can be dropped.' }
     if (operator.type === 'add_validator') return { score: -2, rationale: 'The run is already healthy; another call would only add cost.' }

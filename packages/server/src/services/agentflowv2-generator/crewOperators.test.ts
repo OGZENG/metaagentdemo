@@ -144,13 +144,6 @@ describe('operators', () => {
         expect(unbound.agents.find((item) => item.id === 'a_agent')?.tools).toEqual([])
     })
 
-    it('downgrade_model lowers the estimated weighted cost', () => {
-        const source = fanIn()
-        const { ir } = applyOperator(source, operator({ type: 'downgrade_model', agentIds: ['a_agent'] }))
-        expect(estimateCrewCost(ir).weightedCalls).toBeLessThan(estimateCrewCost(source).weightedCalls)
-        expect(() => applyOperator(ir, operator({ type: 'downgrade_model', agentIds: ['a_agent'] }))).toThrow(OperatorNotApplicable)
-    })
-
     it('rewrite_prompt replaces the goal and appends guardrails', () => {
         const { ir } = applyOperator(
             fanIn(),
@@ -225,15 +218,9 @@ describe('operator search', () => {
         expect(second.map((item) => item.description)).not.toContain(first[0].description)
     })
 
-    it('does not trade quality for cost while the baseline is failing', () => {
-        const ranked = rankOperators(fanIn(), [], evidence({ quality: 0.3, passRate: 0.2 }))
-        const downgrade = ranked.find((item) => item.operator.type === 'downgrade_model')
-        expect(downgrade && downgrade.score).toBeLessThan(0)
-    })
-
     it('buys efficiency once the baseline is healthy', () => {
         const ranked = rankOperators(fanIn(), [], evidence({ quality: 0.9, passRate: 1, failureRate: 0 }))
-        expect(['merge_tasks', 'downgrade_model']).toContain(ranked[0].operator.type)
+        expect(ranked[0].operator.type).toBe('merge_tasks')
     })
 
     it('tolerates partial evidence instead of crashing mid-search', () => {

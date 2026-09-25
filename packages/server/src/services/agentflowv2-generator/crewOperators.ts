@@ -22,8 +22,6 @@ export const OPERATOR_TYPES = [
     'remove_router',
     'bind_tool',
     'unbind_tool',
-    'downgrade_model',
-    'upgrade_model',
     'rewrite_prompt'
 ] as const
 
@@ -238,13 +236,6 @@ const unbindTool = (ir: CrewIR, operator: CrewOperator) => {
     return ir
 }
 
-const setModelTier = (ir: CrewIR, operator: CrewOperator, tier: CrewAgent['modelTier']) => {
-    const agent = requireAgent(ir, operator.agentIds[0])
-    if (agent.modelTier === tier) throw new OperatorNotApplicable(`${agent.id} already runs on the ${tier} tier.`)
-    agent.modelTier = tier
-    return ir
-}
-
 const rewritePrompt = (ir: CrewIR, operator: CrewOperator) => {
     const agent = requireAgent(ir, operator.agentIds[0])
     if (!operator.goal && !operator.guardrails.length) throw new OperatorNotApplicable('rewrite_prompt needs a goal or guardrails.')
@@ -295,12 +286,6 @@ export const applyOperator = (
         case 'unbind_tool':
             mutated = unbindTool(draft, operator)
             break
-        case 'downgrade_model':
-            mutated = setModelTier(draft, operator, 'cheap')
-            break
-        case 'upgrade_model':
-            mutated = setModelTier(draft, operator, 'default')
-            break
         case 'rewrite_prompt':
             mutated = rewritePrompt(draft, operator)
             break
@@ -345,10 +330,6 @@ export const describeOperator = (operator: CrewOperator) => {
             return `Give ${operator.agentIds[0]} access to ${operator.tool}`
         case 'unbind_tool':
             return `Remove ${operator.tool} from ${operator.agentIds[0]}`
-        case 'downgrade_model':
-            return `Run ${operator.agentIds[0]} on the cheap model tier`
-        case 'upgrade_model':
-            return `Run ${operator.agentIds[0]} on the default model tier`
         case 'rewrite_prompt':
             return `Rewrite the contract of ${operator.agentIds[0]}`
         default:
@@ -360,7 +341,7 @@ export const describeOperator = (operator: CrewOperator) => {
  * Enumeration — the legal neighbourhood of an IR
  * ------------------------------------------------------------------ */
 
-export type OperatorFamily = 'structure' | 'routing' | 'binding' | 'cost' | 'prompt'
+export type OperatorFamily = 'structure' | 'routing' | 'binding' | 'prompt'
 
 export const OPERATOR_FAMILY: Record<OperatorType, OperatorFamily> = {
     merge_tasks: 'structure',
@@ -373,8 +354,6 @@ export const OPERATOR_FAMILY: Record<OperatorType, OperatorFamily> = {
     remove_router: 'routing',
     bind_tool: 'binding',
     unbind_tool: 'binding',
-    downgrade_model: 'cost',
-    upgrade_model: 'cost',
     rewrite_prompt: 'prompt'
 }
 
@@ -403,7 +382,6 @@ export const enumerateOperators = (ir: CrewIR, availableToolNames: string[] = []
     else if (ir.tasks.filter((task) => !task.dependsOn.length && task.id !== ir.finalTaskId).length >= 2) push({ type: 'add_router' })
 
     for (const agent of ir.agents) {
-        if (agent.modelTier === 'default') push({ type: 'downgrade_model', agentIds: [agent.id] })
         for (const tool of availableToolNames) {
             if (!agent.tools.includes(tool)) push({ type: 'bind_tool', agentIds: [agent.id], tool })
         }
