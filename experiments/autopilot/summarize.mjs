@@ -145,6 +145,42 @@ for (const goal of goals) {
     }
 }
 
+/*
+ * Consistency of evidence-guided choices: for removal operators, does the
+ * model's own rationale argue for keeping, binding or using the thing it
+ * removes? Keyword-based and deliberately conservative; every flagged case is
+ * listed in summary.json for manual inspection.
+ */
+{
+    const CONTRADICTS = /\b(bind(ing)?|keep(ing)?|ensur(e|ing)|necessary|would not help|would worsen|worsen|preserve|give .* access|access to)\b/i
+    const removal = new Set(['unbind_tool'])
+    const picks = []
+    const dropped = []
+    for (const goal of goals) {
+        const dir = join(RES, goal.id)
+        if (!existsSync(dir)) continue
+        for (const file of readdirSync(dir).filter((name) => /^search-evidence_guided(_v2)?-.*\.json$/.test(name))) {
+            const run = read(join(dir, file))
+            for (const trial of run.trials.slice(1)) {
+                picks.push({ goal: goal.id, strategy: run.strategy, file, id: trial.id, operator: trial.operator?.type, rationale: trial.rationale || '' })
+            }
+            for (const round of run.rounds || []) dropped.push(...(round.inconsistentSelections || []).map((item) => ({ goal: goal.id, strategy: run.strategy, file, ...item })))
+        }
+    }
+    const byOperator = {}
+    for (const pick of picks) {
+        const entry = (byOperator[`${pick.strategy}:${pick.operator}`] ||= { picks: 0, contradicting: 0 })
+        entry.picks += 1
+        if (removal.has(pick.operator) && CONTRADICTS.test(pick.rationale)) entry.contradicting += 1
+    }
+    summary.evidenceConsistency = {
+        picks: picks.length,
+        byOperator,
+        droppedAsInconsistent: dropped,
+        flagged: picks.filter((pick) => removal.has(pick.operator) && CONTRADICTS.test(pick.rationale))
+    }
+}
+
 /* ---------------- E3: parallel ---------------- */
 if (existsSync(join(RES, 'parallel', 'parallel.json'))) {
     const p = read(join(RES, 'parallel', 'parallel.json'))
@@ -215,8 +251,8 @@ if (texDir) {
         `${header}\\newcommand{\\EOneCases}{${a.cases}}%\n\\newcommand{\\EOneCritical}{${a.casesWithCriticalViolation}}%\n\\newcommand{\\EOneHard}{${fmt(a.assertionScore.mean, 1)}}%\n\\newcommand{\\EOneSoft}{${fmt(a.rubricScore.mean, 1)}}%\n\\newcommand{\\EOneCorr}{${fmt(a.correlation, 2)}}%\n`
     )
 
-    const strategies = ['random', 'greedy', 'evidence_guided']
-    const label = { random: 'Random', greedy: 'Greedy', evidence_guided: 'Evidence-guided' }
+    const strategies = ['random', 'greedy', 'evidence_guided', 'evidence_guided_v2']
+    const label = { random: 'Random', greedy: 'Greedy', evidence_guided: 'Evidence-guided', evidence_guided_v2: 'Evidence-guided v2' }
     const searchRows = []
     for (const goal of [...new Set(summary.search.map((s) => s.goal))]) {
         for (const strategy of strategies) {

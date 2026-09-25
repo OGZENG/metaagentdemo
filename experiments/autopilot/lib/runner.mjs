@@ -135,6 +135,7 @@ export const runSearch = async ({ goal, design, baseline, selectedChatModel, che
     const startedAt = Date.now()
 
     let trials = []
+    const rounds = []
     if (baseline.devResults?.length) {
         trials = [{ ...baseline }]
     } else {
@@ -167,6 +168,7 @@ export const runSearch = async ({ goal, design, baseline, selectedChatModel, che
             })
             proposals = data.candidates || []
             proposalNote = data.note || ''
+            rounds.push({ round, parentId: parent.id, proposed: proposals.length, inconsistentSelections: data.inconsistentSelections || [], note: proposalNote })
         } catch (error) {
             if (isInfraError(error)) throw error
             proposalNote = `proposal failed: ${errorText(error)}`
@@ -229,6 +231,7 @@ export const runSearch = async ({ goal, design, baseline, selectedChatModel, che
         durationMs: Date.now() - startedAt,
         paretoTrialIds,
         selectedTrialId: selected?.id || null,
+        rounds,
         trials: trials.map(({ flowData: _flowData, ...trial }) => trial)
     }
 }
