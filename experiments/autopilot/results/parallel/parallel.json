@@ -1,0 +1,1231 @@
+{
+  "model": "gpt-5.4-mini",
+  "temperature": 0.9,
+  "reps": 3,
+  "questions": [
+    "A train leaves at 09:40 and arrives at 13:05. How long is the journey in minutes?",
+    "If 3 workers build a wall in 12 hours, how long do 4 workers need at the same rate?",
+    "Is 391 a prime number? Explain.",
+    "A shop raises a price by 20% and later lowers it by 20%. Is the final price higher, lower or equal to the original?",
+    "Alice is older than Bob, Bob is older than Carol, and Dave is younger than Carol. Who is the second youngest?",
+    "What is the sum of all integers from 1 to 200 that are divisible by 7?",
+    "A bag has 3 red and 5 blue balls. Two are drawn without replacement. What is the probability that both are red?",
+    "Convert 72 km/h into metres per second.",
+    "If today is Wednesday, what weekday will it be in 100 days?",
+    "A rectangle has perimeter 36 cm and its length is twice its width. What is its area?"
+  ],
+  "variants": [
+    {
+      "id": "serial",
+      "concurrency": 1,
+      "flowId": "39a56e92-3b7f-433e-b430-4844e9d3a2e8"
+    },
+    {
+      "id": "parallel",
+      "concurrency": 4,
+      "flowId": "f1d0cedd-9c4d-442d-86f2-2a53009bc9e6"
+    }
+  ],
+  "runs": [
+    {
+      "rep": 1,
+      "question": 0,
+      "variant": "parallel",
+      "executionId": "c17498e1-34e3-474d-91b8-eef3eb8bfa49",
+      "totalTokens": 1629,
+      "estimatedCost": 0.0022305,
+      "durationMs": 4327,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 136
+    },
+    {
+      "rep": 1,
+      "question": 0,
+      "variant": "serial",
+      "executionId": "d88d0600-7b17-485c-a17e-91edbc9419f1",
+      "totalTokens": 1637,
+      "estimatedCost": 0.0022552500000000003,
+      "durationMs": 4475,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 144
+    },
+    {
+      "rep": 1,
+      "question": 1,
+      "variant": "serial",
+      "executionId": "593ab535-26b3-4342-8beb-a9f60d8d8973",
+      "totalTokens": 1661,
+      "estimatedCost": 0.0022882500000000004,
+      "durationMs": 3907,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 126
+    },
+    {
+      "rep": 1,
+      "question": 1,
+      "variant": "parallel",
+      "executionId": "aa0f20f9-05f6-407b-9ec1-a2e241fd6814",
+      "totalTokens": 1643,
+      "estimatedCost": 0.0022485,
+      "durationMs": 1918,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 142
+    },
+    {
+      "rep": 1,
+      "question": 2,
+      "variant": "parallel",
+      "executionId": "fcb4e8c7-ee3f-4b9c-8cab-546f0ded33cd",
+      "totalTokens": 2032,
+      "estimatedCost": 0.0034514999999999997,
+      "durationMs": 2795,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 205
+    },
+    {
+      "rep": 1,
+      "question": 2,
+      "variant": "serial",
+      "executionId": "63b8daeb-ca95-42fb-80d8-3ae96aae050f",
+      "totalTokens": 1931,
+      "estimatedCost": 0.003162,
+      "durationMs": 4622,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 153
+    },
+    {
+      "rep": 1,
+      "question": 3,
+      "variant": "serial",
+      "executionId": "b5887ac5-8b26-41f6-bd47-9c4688ddfa15",
+      "totalTokens": 1771,
+      "estimatedCost": 0.0025545000000000003,
+      "durationMs": 4533,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 217
+    },
+    {
+      "rep": 1,
+      "question": 3,
+      "variant": "parallel",
+      "executionId": "409db43b-7009-436d-9b9b-4232242c9301",
+      "totalTokens": 1853,
+      "estimatedCost": 0.0027885,
+      "durationMs": 2134,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 201
+    },
+    {
+      "rep": 1,
+      "question": 4,
+      "variant": "parallel",
+      "executionId": "43c64393-c476-4e75-a98d-1816effea640",
+      "totalTokens": 1639,
+      "estimatedCost": 0.00224175,
+      "durationMs": 2234,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 193
+    },
+    {
+      "rep": 1,
+      "question": 4,
+      "variant": "serial",
+      "executionId": "9aad6cb8-5dae-4f58-b8af-38fdc270dd54",
+      "totalTokens": 1643,
+      "estimatedCost": 0.0022335000000000002,
+      "durationMs": 4371,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 150
+    },
+    {
+      "rep": 1,
+      "question": 5,
+      "variant": "serial",
+      "executionId": "66a415e0-2b91-4416-84b7-5d3aa45b13b4",
+      "totalTokens": 2169,
+      "estimatedCost": 0.0037230000000000006,
+      "durationMs": 5060,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 205
+    },
+    {
+      "rep": 1,
+      "question": 5,
+      "variant": "parallel",
+      "executionId": "4350e4de-ea3d-411a-b14a-52ae2059535c",
+      "totalTokens": 2207,
+      "estimatedCost": 0.00383775,
+      "durationMs": 2701,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 199
+    },
+    {
+      "rep": 1,
+      "question": 6,
+      "variant": "parallel",
+      "executionId": "d788dc4b-3896-4df6-bbbf-1ffc0fcfdbf9",
+      "totalTokens": 2192,
+      "estimatedCost": 0.0037289999999999997,
+      "durationMs": 2380,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 222
+    },
+    {
+      "rep": 1,
+      "question": 6,
+      "variant": "serial",
+      "executionId": "5560421f-4268-4124-92e3-ad82355b819e",
+      "totalTokens": 2168,
+      "estimatedCost": 0.0036247500000000004,
+      "durationMs": 4842,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 183
+    },
+    {
+      "rep": 1,
+      "question": 7,
+      "variant": "serial",
+      "executionId": "1bba7328-5a48-40d3-b442-aeca5f1144c1",
+      "totalTokens": 1527,
+      "estimatedCost": 0.0020715000000000004,
+      "durationMs": 3814,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 111
+    },
+    {
+      "rep": 1,
+      "question": 7,
+      "variant": "parallel",
+      "executionId": "8681d503-b601-41e6-ad27-cab093ace94e",
+      "totalTokens": 1601,
+      "estimatedCost": 0.0022807500000000002,
+      "durationMs": 2140,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 133
+    },
+    {
+      "rep": 1,
+      "question": 8,
+      "variant": "parallel",
+      "executionId": "67ca7866-2314-4845-88d9-e74a323a7fd9",
+      "totalTokens": 1666,
+      "estimatedCost": 0.002412,
+      "durationMs": 2008,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 173
+    },
+    {
+      "rep": 1,
+      "question": 8,
+      "variant": "serial",
+      "executionId": "559a51e6-7b2e-4f6c-af99-2e41a64e6700",
+      "totalTokens": 1552,
+      "estimatedCost": 0.0021089999999999998,
+      "durationMs": 4458,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 142
+    },
+    {
+      "rep": 1,
+      "question": 9,
+      "variant": "serial",
+      "executionId": "0c1d7446-6dfa-4981-9055-0faacc9251b9",
+      "totalTokens": 2231,
+      "estimatedCost": 0.003941999999999999,
+      "durationMs": 4948,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 265
+    },
+    {
+      "rep": 1,
+      "question": 9,
+      "variant": "parallel",
+      "executionId": "8512bdb7-c691-434b-91e2-efc3de461b63",
+      "totalTokens": 2203,
+      "estimatedCost": 0.00386475,
+      "durationMs": 2361,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 255
+    },
+    {
+      "rep": 2,
+      "question": 0,
+      "variant": "serial",
+      "executionId": "2eb4426f-5e34-49ef-9af8-ed970804deab",
+      "totalTokens": 1707,
+      "estimatedCost": 0.00242025,
+      "durationMs": 4623,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 134
+    },
+    {
+      "rep": 2,
+      "question": 0,
+      "variant": "parallel",
+      "executionId": "b5cccc1d-202a-4b01-b0ee-ff7b3ab3eb9d",
+      "totalTokens": 1715,
+      "estimatedCost": 0.00241125,
+      "durationMs": 1887,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 116
+    },
+    {
+      "rep": 2,
+      "question": 1,
+      "variant": "parallel",
+      "executionId": "50d10985-7a6f-48d4-90af-12a2f4031b8c",
+      "totalTokens": 1645,
+      "estimatedCost": 0.0022725,
+      "durationMs": 1957,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 181
+    },
+    {
+      "rep": 2,
+      "question": 1,
+      "variant": "serial",
+      "executionId": "c99ce507-4cdb-4d8f-8365-184aebad0aa7",
+      "totalTokens": 1648,
+      "estimatedCost": 0.00228225,
+      "durationMs": 4613,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 186
+    },
+    {
+      "rep": 2,
+      "question": 2,
+      "variant": "serial",
+      "executionId": "daf174c9-9ed8-4b11-a017-819d7ce9a134",
+      "totalTokens": 1807,
+      "estimatedCost": 0.002829,
+      "durationMs": 4807,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 125
+    },
+    {
+      "rep": 2,
+      "question": 2,
+      "variant": "parallel",
+      "executionId": "35f2a1d0-4086-4b54-af9e-17b14f0ecbb9",
+      "totalTokens": 1958,
+      "estimatedCost": 0.003261,
+      "durationMs": 2607,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 187
+    },
+    {
+      "rep": 2,
+      "question": 3,
+      "variant": "parallel",
+      "executionId": "a981aa90-8399-4550-9c77-fceb06c54014",
+      "totalTokens": 1786,
+      "estimatedCost": 0.00261825,
+      "durationMs": 2141,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 274
+    },
+    {
+      "rep": 2,
+      "question": 3,
+      "variant": "serial",
+      "executionId": "3f5b55e2-5fcb-4a6d-b92f-fe53fbd95568",
+      "totalTokens": 1810,
+      "estimatedCost": 0.0026699999999999996,
+      "durationMs": 4817,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 214
+    },
+    {
+      "rep": 2,
+      "question": 4,
+      "variant": "serial",
+      "executionId": "5393b5dd-7cac-465b-bda2-bfc25ef65e24",
+      "totalTokens": 1703,
+      "estimatedCost": 0.0023835,
+      "durationMs": 4361,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 165
+    },
+    {
+      "rep": 2,
+      "question": 4,
+      "variant": "parallel",
+      "executionId": "033007ca-07fa-4077-9e8e-85b2d20a9a77",
+      "totalTokens": 1728,
+      "estimatedCost": 0.00246225,
+      "durationMs": 2419,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 131
+    },
+    {
+      "rep": 2,
+      "question": 5,
+      "variant": "parallel",
+      "executionId": "ddb3d351-79b1-4d3e-a8d6-59296176aff6",
+      "totalTokens": 2147,
+      "estimatedCost": 0.00360525,
+      "durationMs": 2028,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 129
+    },
+    {
+      "rep": 2,
+      "question": 5,
+      "variant": "serial",
+      "executionId": "b5b2fcf2-b272-4e7c-800b-b8f35bb29053",
+      "totalTokens": 2209,
+      "estimatedCost": 0.00386925,
+      "durationMs": 5085,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 245
+    },
+    {
+      "rep": 2,
+      "question": 6,
+      "variant": "serial",
+      "executionId": "f7aa2fef-6bb7-4ac2-81fb-1f55298de91c",
+      "totalTokens": 2167,
+      "estimatedCost": 0.00364275,
+      "durationMs": 4908,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 210
+    },
+    {
+      "rep": 2,
+      "question": 6,
+      "variant": "parallel",
+      "executionId": "61a2af4e-ea5f-47d1-88d3-9f0a0a7d5324",
+      "totalTokens": 1995,
+      "estimatedCost": 0.0031987499999999998,
+      "durationMs": 2427,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 214
+    },
+    {
+      "rep": 2,
+      "question": 7,
+      "variant": "parallel",
+      "executionId": "8ae57bcb-0b7c-46c8-a02e-d3a2e927b5ac",
+      "totalTokens": 1562,
+      "estimatedCost": 0.00216525,
+      "durationMs": 1909,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 116
+    },
+    {
+      "rep": 2,
+      "question": 7,
+      "variant": "serial",
+      "executionId": "d725b89e-933b-4c5d-940e-21a7a2b14ac8",
+      "totalTokens": 1540,
+      "estimatedCost": 0.0021075,
+      "durationMs": 4419,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 114
+    },
+    {
+      "rep": 2,
+      "question": 8,
+      "variant": "serial",
+      "executionId": "cea3a39f-aaee-4d0f-abc0-c6b259bf0d43",
+      "totalTokens": 1588,
+      "estimatedCost": 0.0021922499999999998,
+      "durationMs": 4610,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 153
+    },
+    {
+      "rep": 2,
+      "question": 8,
+      "variant": "parallel",
+      "executionId": "39f95c0e-fcfa-46c8-ad9f-01e2484596a1",
+      "totalTokens": 1555,
+      "estimatedCost": 0.00210375,
+      "durationMs": 16492,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 141
+    },
+    {
+      "rep": 2,
+      "question": 9,
+      "variant": "parallel",
+      "executionId": "4894ef76-ff60-49c4-8c91-5c7e4f1d39f8",
+      "totalTokens": 2092,
+      "estimatedCost": 0.0034739999999999997,
+      "durationMs": 2281,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 129
+    },
+    {
+      "rep": 2,
+      "question": 9,
+      "variant": "serial",
+      "executionId": "23cea27d-fca3-4073-b013-b3de8515e139",
+      "totalTokens": 2281,
+      "estimatedCost": 0.004077,
+      "durationMs": 5032,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 264
+    },
+    {
+      "rep": 3,
+      "question": 0,
+      "variant": "parallel",
+      "executionId": "062604e8-b0e3-4708-965d-f4e8cdb22a08",
+      "totalTokens": 1677,
+      "estimatedCost": 0.00233025,
+      "durationMs": 1966,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 130
+    },
+    {
+      "rep": 3,
+      "question": 0,
+      "variant": "serial",
+      "executionId": "3038672b-a39a-438e-aed3-4de499d16616",
+      "totalTokens": 1636,
+      "estimatedCost": 0.0022395,
+      "durationMs": 4251,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 148
+    },
+    {
+      "rep": 3,
+      "question": 1,
+      "variant": "serial",
+      "executionId": "bfb92992-058e-4490-b1cd-6ed9c5040d7a",
+      "totalTokens": 1667,
+      "estimatedCost": 0.002319,
+      "durationMs": 4034,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 136
+    },
+    {
+      "rep": 3,
+      "question": 1,
+      "variant": "parallel",
+      "executionId": "76cb0f72-81c9-4644-bc7a-d52947014672",
+      "totalTokens": 1671,
+      "estimatedCost": 0.0023445000000000002,
+      "durationMs": 2426,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 140
+    },
+    {
+      "rep": 3,
+      "question": 2,
+      "variant": "parallel",
+      "executionId": "f466ce33-f52d-4dfc-8d84-36f4bc182eb0",
+      "totalTokens": 1956,
+      "estimatedCost": 0.00325575,
+      "durationMs": 2275,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 209
+    },
+    {
+      "rep": 3,
+      "question": 2,
+      "variant": "serial",
+      "executionId": "37a115b3-31a0-40b7-b8fe-5ba28bf1247b",
+      "totalTokens": 1927,
+      "estimatedCost": 0.003174,
+      "durationMs": 4787,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 206
+    },
+    {
+      "rep": 3,
+      "question": 3,
+      "variant": "serial",
+      "executionId": "11f89de8-73c0-43ca-b43e-5de4d946a7d1",
+      "totalTokens": 1901,
+      "estimatedCost": 0.0029445,
+      "durationMs": 5247,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 256
+    },
+    {
+      "rep": 3,
+      "question": 3,
+      "variant": "parallel",
+      "executionId": "b7525815-a923-4761-8b8c-b2072dedb69b",
+      "totalTokens": 1846,
+      "estimatedCost": 0.0028132499999999998,
+      "durationMs": 2187,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 263
+    },
+    {
+      "rep": 3,
+      "question": 4,
+      "variant": "parallel",
+      "executionId": "3da99ed9-d32c-43e1-8f71-cbba3e0d20d5",
+      "totalTokens": 1664,
+      "estimatedCost": 0.00230925,
+      "durationMs": 1914,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 161
+    },
+    {
+      "rep": 3,
+      "question": 4,
+      "variant": "serial",
+      "executionId": "6b1b9479-fb3e-4723-8e5c-dbc711fc38a8",
+      "totalTokens": 1723,
+      "estimatedCost": 0.0024585,
+      "durationMs": 18367,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 183
+    },
+    {
+      "rep": 3,
+      "question": 5,
+      "variant": "serial",
+      "executionId": "a36c2a1e-1706-4099-b423-0a368c571920",
+      "totalTokens": 2063,
+      "estimatedCost": 0.00345975,
+      "durationMs": 23236,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 199
+    },
+    {
+      "rep": 3,
+      "question": 5,
+      "variant": "parallel",
+      "executionId": "2462e22c-19b5-4049-b18f-3f2964a2428d",
+      "totalTokens": 2174,
+      "estimatedCost": 0.00375675,
+      "durationMs": 2558,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 224
+    },
+    {
+      "rep": 3,
+      "question": 6,
+      "variant": "parallel",
+      "executionId": "26f2d025-dea0-4fa6-826a-c2a04703356d",
+      "totalTokens": 2157,
+      "estimatedCost": 0.0036127499999999996,
+      "durationMs": 2743,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 178
+    },
+    {
+      "rep": 3,
+      "question": 6,
+      "variant": "serial",
+      "executionId": "05209b48-5ff7-4e7c-80d3-bd6bab01382f",
+      "totalTokens": 2192,
+      "estimatedCost": 0.0036915,
+      "durationMs": 5472,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 213
+    },
+    {
+      "rep": 3,
+      "question": 7,
+      "variant": "serial",
+      "executionId": "6d32a398-2e27-4341-bbc3-b49b7eb0f4de",
+      "totalTokens": 1520,
+      "estimatedCost": 0.00205125,
+      "durationMs": 4353,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 112
+    },
+    {
+      "rep": 3,
+      "question": 7,
+      "variant": "parallel",
+      "executionId": "cb0f278f-12e2-426d-86ba-3dfcf3a40ad0",
+      "totalTokens": 1566,
+      "estimatedCost": 0.0021757499999999997,
+      "durationMs": 2370,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 112
+    },
+    {
+      "rep": 3,
+      "question": 8,
+      "variant": "parallel",
+      "executionId": "6c92ab80-bf66-4f8d-9c1f-2454c122a8f2",
+      "totalTokens": 1538,
+      "estimatedCost": 0.002046,
+      "durationMs": 2203,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 161
+    },
+    {
+      "rep": 3,
+      "question": 8,
+      "variant": "serial",
+      "executionId": "10dcd52e-665c-486f-b544-b7180d5f045e",
+      "totalTokens": 1539,
+      "estimatedCost": 0.0020655,
+      "durationMs": 3710,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 143
+    },
+    {
+      "rep": 3,
+      "question": 9,
+      "variant": "serial",
+      "executionId": "11d756c9-d5a1-4286-84f9-7775c60721c2",
+      "totalTokens": 2213,
+      "estimatedCost": 0.0038422499999999997,
+      "durationMs": 4940,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 187
+    },
+    {
+      "rep": 3,
+      "question": 9,
+      "variant": "parallel",
+      "executionId": "49748b55-254a-459d-89bb-a497160d2a33",
+      "totalTokens": 2129,
+      "estimatedCost": 0.0035655,
+      "durationMs": 2541,
+      "modelCalls": 5,
+      "nodes": [
+        "Start",
+        "Direct solver · Direct solver",
+        "Stepwise solver · Stepwise solver",
+        "Verifying solver · Verifying solver",
+        "Skeptical solver · Skeptical solver",
+        "Aggregator · Aggregate",
+        "Direct Reply"
+      ],
+      "outputLength": 119
+    }
+  ]
+}

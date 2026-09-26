@@ -359,6 +359,12 @@ if (texDir) {
 
     if (summary.parallel) {
         const p = summary.parallel
+        const sorted = [...p.speedup].sort((x, y) => x - y)
+        const median = sorted.length % 2 ? sorted[(sorted.length - 1) / 2] : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+        writeFileSync(
+            join(texDir, 'e3_numbers.tex'),
+            `${header}\\newcommand{\\EThreePairs}{${p.speedup.length}}%\n\\newcommand{\\EThreeFaster}{${p.speedup.filter((s) => s > 1).length}}%\n\\newcommand{\\EThreeMedian}{${fmt(median, 2)}}%\n\\newcommand{\\EThreeMin}{${fmt(sorted[0], 2)}}%\n\\newcommand{\\EThreeMax}{${fmt(sorted.at(-1), 1)}}%\n\\newcommand{\\EThreeSerial}{${fmt(mean(p.serial), 1)}}%\n\\newcommand{\\EThreeParallel}{${fmt(mean(p.parallel), 1)}}%\n`
+        )
         writeFileSync(
             join(texDir, 'e3_parallel.tex'),
             `${header}\\begin{tabular}{lccc}\n    \\toprule\n    Executor & Latency [s] & Tokens & Runs \\\\\n    \\midrule\n        Serial (concurrency 1) & ${pm(p.serial, 1)} & ${pm(p.serialTokens, 0)} & ${p.serial.length} \\\\\n        Parallel (concurrency 4) & ${pm(p.parallel, 1)} & ${pm(p.parallelTokens, 0)} & ${p.parallel.length} \\\\\n    \\midrule\n        Paired speed-up & \\multicolumn{3}{l}{${pm(p.speedup, 2)}} \\\\\n    \\bottomrule\n\\end{tabular}%\n`
