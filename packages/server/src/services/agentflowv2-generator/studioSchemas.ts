@@ -336,7 +336,7 @@ export const StudioRubricScoreType = z.object({
     issues: z.array(z.string()).default([]),
     recommendation: z.string().default(''),
     /** verdicts on the phrase assertions handed to the grader (assertions.ts, factChecksFor) */
-    factChecks: z.array(z.object({ id: z.string(), holds: z.boolean(), reason: z.string().default('') })).default([])
+    factChecks: z.array(z.object({ id: z.string(), satisfied: z.boolean(), reason: z.string().default('') })).default([])
 })
 
 export const StudioRecommendationType = z.object({

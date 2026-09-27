@@ -106,11 +106,11 @@ describe('semantic fact checks', () => {
         const results = evaluateAssertions(assertions, context)
         const checks = factChecksFor(assertions, results, context)
         const judged = applyFactVerdicts(results, checks, [
-            { id: 'contains', holds: true },
-            { id: 'forbidden', holds: false }
+            { id: 'contains', satisfied: true },
+            { id: 'forbidden', satisfied: true }
         ])
         expect(judged.every((result) => result.passed)).toBe(true)
-        const violated = applyFactVerdicts(results, checks, [{ id: 'forbidden', holds: true }])
+        const violated = applyFactVerdicts(results, checks, [{ id: 'forbidden', satisfied: false }])
         expect(violated.find((result) => result.id === 'forbidden')?.passed).toBe(false)
     })
 })

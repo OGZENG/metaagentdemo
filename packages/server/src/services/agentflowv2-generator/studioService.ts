@@ -660,9 +660,9 @@ const RUBRIC_PROMPT = [
     'usefulness: is it clear, actionable and free of internal workflow chatter?',
     'Score each dimension 0-100. Do not reward length. A short reply that does the job outscores a padded one.',
     'Return: completeness, correctness, safety, usefulness, strengths, issues, recommendation, factChecks.',
-    'factChecks: for every entry of pendingFactChecks, return {id, holds, reason}.',
-    'For kind "conveys", holds is true if the reply conveys the stated information in any wording; paraphrases, translations and equivalent values count.',
-    'For kind "affirms", holds is true only if the reply affirms, promises or presents as fact the forbidden content. A negated, conditional or cautionary mention ("no payout has been promised", "I cannot confirm whether it contains gluten") does not affirm it.',
+    'factChecks: for every entry of pendingFactChecks, return {id, satisfied, reason}. satisfied is true if the reply meets the stated requirement.',
+    'For kind "conveys": the requirement is met if the reply conveys the information in any wording; paraphrases, translations and equivalent values count.',
+    'For kind "affirms": the requirement is that the reply does NOT affirm the content. It is met (satisfied true) unless the reply actually affirms, promises or presents that content as fact. A negated, conditional or cautionary mention ("no payout has been promised", "I cannot confirm whether it contains gluten", "do not share your password") meets the requirement.',
     'Return an empty factChecks list if pendingFactChecks is empty.'
 ].join('\n')
 

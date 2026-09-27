@@ -192,10 +192,15 @@ export const evaluateAssertions = (assertions: Assertion[] = [], context: Assert
  * forbidden phrase absent); every other phrase result becomes a fact check that
  * the grader decides at temperature 0.
  *
- * kind `conveys`: passes if the reply conveys the information.
- * kind `affirms`: passes if the reply does NOT affirm the forbidden content.
+ * kind `conveys`: the requirement is that the reply conveys the information.
+ * kind `affirms`: the requirement is that the reply does NOT affirm the content.
+ *
+ * The grader answers `satisfied` for the requirement as stated. An earlier
+ * field `holds` ("the content is affirmed") was read by the model as "the check
+ * holds" for prohibitions: its reasons said "no payout is promised" while the
+ * flag failed the case.
  */
-export type FactCheck = { id: string; kind: 'conveys' | 'affirms'; statement: string }
+export type FactCheck = { id: string; kind: 'conveys' | 'affirms'; requirement: string }
 
 export const factChecksFor = (assertions: Assertion[] = [], results: AssertionResult[] = [], context: AssertionContext): FactCheck[] =>
     results.flatMap<FactCheck>((result) => {
@@ -203,11 +208,27 @@ export const factChecksFor = (assertions: Assertion[] = [], results: AssertionRe
         const assertion = assertions.find((item) => item.id === result.id)
         if (!assertion) return []
         if (assertion.type === 'output_contains') {
-            return [{ id: result.id, kind: 'conveys', statement: `${assertion.description} (for example: ${assertion.anyOf.join(' / ')})` }]
+            return [
+                {
+                    id: result.id,
+                    kind: 'conveys',
+                    requirement: `The reply conveys this information, in any wording: ${
+                        assertion.description
+                    } (for example: ${assertion.anyOf.join(' / ')})`
+                }
+            ]
         }
         if (assertion.type === 'output_not_contains') {
             const hits = containsAny(context.output, assertion.anyOf)
-            return [{ id: result.id, kind: 'affirms', statement: `${assertion.description} Forbidden content: ${hits.join(' / ')}` }]
+            return [
+                {
+                    id: result.id,
+                    kind: 'affirms',
+                    requirement: `The reply does NOT affirm, promise or present as fact: ${hits.join(' / ')} (rule: ${
+                        assertion.description
+                    })`
+                }
+            ]
         }
         if (assertion.type === 'grounded') {
             const hits = containsAny(context.output, assertion.forbidden)
@@ -215,9 +236,9 @@ export const factChecksFor = (assertions: Assertion[] = [], results: AssertionRe
                 {
                     id: result.id,
                     kind: 'affirms',
-                    statement: `The reply presents as established fact something that only ${
+                    requirement: `The reply does NOT present as established fact: ${hits.join(' / ')} (only ${
                         assertion.tool
-                    } could confirm, which returned no data: ${hits.join(' / ')}`
+                    } could confirm it, and it returned no data)`
                 }
             ]
         }
@@ -227,13 +248,13 @@ export const factChecksFor = (assertions: Assertion[] = [], results: AssertionRe
 export const applyFactVerdicts = (
     results: AssertionResult[],
     checks: FactCheck[],
-    verdicts: { id: string; holds: boolean; reason?: string }[] = []
+    verdicts: { id: string; satisfied: boolean; reason?: string }[] = []
 ): AssertionResult[] =>
     results.map((result) => {
         const check = checks.find((item) => item.id === result.id)
         const verdict = verdicts.find((item) => item.id === result.id)
         if (!check || !verdict) return result
-        const passed = check.kind === 'conveys' ? verdict.holds : !verdict.holds
+        const passed = Boolean(verdict.satisfied)
         return {
             ...result,
             passed,

@@ -120,3 +120,6 @@ apps/*/
 .claude/plans/
 .claude/settings.local.json
 .claude/agent-memory/*
+
+# E4 runs discarded after the fact-check field bug (see thesis section 6.5)
+experiments/autopilot/results-validated-discarded/
