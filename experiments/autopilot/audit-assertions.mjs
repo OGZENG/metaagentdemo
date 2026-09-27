@@ -21,7 +21,10 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ROOT } from './lib/api.mjs'
 
-const RES = join(ROOT, 'results')
+// --results results-validated audits the repeated experiment on the validated test world.
+const resultsIndex = process.argv.indexOf('--results')
+const RES = join(ROOT, resultsIndex > 0 ? process.argv[resultsIndex + 1] : 'results')
+const texPrefix = resultsIndex > 0 && process.argv[resultsIndex + 1] === 'results-validated' ? 'e4' : 'e1'
 const SAMPLE = join(RES, 'assertion-audit-sample.json')
 const LABELS = join(RES, 'assertion-audit-labels.json')
 const read = (file) => JSON.parse(readFileSync(file, 'utf8'))
@@ -48,6 +51,7 @@ if (command === 'sample') {
     for (const goal of goals) {
         const file = join(RES, goal.id, 'baseline.json')
         if (!existsSync(file)) continue
+        if (!existsSync(join(RES, goal.id, 'design.json'))) continue
         const { design } = read(join(RES, goal.id, 'design.json'))
         for (const rep of read(file).repetitions) {
             for (const result of [...rep.devResults, ...rep.testResults]) {
@@ -121,13 +125,13 @@ if (command === 'sample') {
         const body = rows.map((row) => `        \\code{${row.type.replace(/_/g, '\\_')}} & ${row.population} & ${row.n} & ${row.valid} & ${row.false} & ${row.unclear} \\\\`).join('\n')
         const total = (key) => rows.reduce((sum, row) => sum + row[key], 0)
         writeFileSync(
-            join(texDir, 'e1_audit.tex'),
+            join(texDir, `${texPrefix}_audit.tex`),
             `${header}\\begin{tabular}{lrrrrr}\n    \\toprule\n    Assertion type & Failed & Sampled & Valid & False & Unclear \\\\\n    \\midrule\n${body}\n    \\midrule\n        Total & ${population} & ${total('n')} & ${total('valid')} & ${total('false')} & ${total('unclear')} \\\\\n    \\bottomrule\n\\end{tabular}%\n`
         )
         writeFileSync(
-            join(texDir, 'e1_audit_numbers.tex'),
-            `${header}\\newcommand{\\AuditN}{${total('n')}}%\n\\newcommand{\\AuditValid}{${total('valid')}}%\n\\newcommand{\\AuditFalse}{${total('false')}}%\n\\newcommand{\\AuditUnclear}{${total('unclear')}}%\n\\newcommand{\\AuditFalseWeighted}{${(weighted * 100).toFixed(0)}}%\n` +
-                `\\newcommand{\\AuditPopulation}{${population}}%\n\\newcommand{\\AuditRecordedPass}{${((recordedPass / cases) * 100).toFixed(0)}}%\n\\newcommand{\\AuditRubricPass}{${((rubricPass / cases) * 100).toFixed(0)}}%\n`
+            join(texDir, `${texPrefix}_audit_numbers.tex`),
+            (`${header}\\newcommand{\\AuditN}{${total('n')}}%\n\\newcommand{\\AuditValid}{${total('valid')}}%\n\\newcommand{\\AuditFalse}{${total('false')}}%\n\\newcommand{\\AuditUnclear}{${total('unclear')}}%\n\\newcommand{\\AuditFalseWeighted}{${(weighted * 100).toFixed(0)}}%\n` +
+                `\\newcommand{\\AuditPopulation}{${population}}%\n\\newcommand{\\AuditRecordedPass}{${((recordedPass / cases) * 100).toFixed(0)}}%\n\\newcommand{\\AuditRubricPass}{${((rubricPass / cases) * 100).toFixed(0)}}%\n`).replaceAll('\\newcommand{\\Audit', texPrefix === 'e4' ? '\\newcommand{\\AuditFour' : '\\newcommand{\\Audit')
         )
     }
 } else {

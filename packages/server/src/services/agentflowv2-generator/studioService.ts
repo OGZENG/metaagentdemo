@@ -20,7 +20,23 @@ import {
 import { assertCompiledGraph, compileCrewIRFlow, normalizeCrewIR, summarizeCrewIR } from './crewIR'
 import { describeToolEnvironment } from './mockToolCompiler'
 import { provisionMockTools, purgeMockTools, resolveToolBindings } from './mockToolStore'
-import { combineScores, evaluateAssertions, rubricScore, summarizeAssertions, type RecordedToolCall } from './assertions'
+import {
+    applyFactVerdicts,
+    combineScores,
+    evaluateAssertions,
+    factChecksFor,
+    rubricScore,
+    summarizeAssertions,
+    type RecordedToolCall
+} from './assertions'
+import {
+    repairAssertions,
+    REVIEW_EXEMPT_TYPES,
+    reviewPayload,
+    TEST_WORLD_REVIEW_PROMPT,
+    TestWorldReviewType,
+    type TestWorldChange
+} from './testWorldValidator'
 import {
     OperatorSelectionType,
     OperatorSelectionV2Type,
@@ -38,6 +54,18 @@ import { applyOperator, describeOperator, describeOperatorEffect, CrewOperatorTy
 /* ------------------------------------------------------------------ *
  * Model plumbing
  * ------------------------------------------------------------------ */
+
+/**
+ * Judging roles (grading, fact checks, test-world review, operator selection,
+ * diagnosis) run at temperature 0 by default: their variance only adds noise to
+ * the measurement, while the workflow under test keeps the user's settings.
+ */
+export const DEFAULT_JUDGE_TEMPERATURE = 0
+
+export const withTemperature = (chatModel: Record<string, any>, temperature: number | undefined | null) =>
+    temperature === undefined || temperature === null || Number.isNaN(Number(temperature))
+        ? chatModel
+        : { ...chatModel, inputs: { ...(chatModel?.inputs || {}), temperature: Number(temperature) } }
 
 const modelRuntimeOptions = () => ({
     appDataSource: getRunningExpressApp().AppDataSource,
@@ -468,12 +496,69 @@ export const designStudioWorkflow = async (goal: string, selectedChatModel: Reco
     const contract = await invokeStudioModel(selectedChatModel, StudioContractType, CONTRACT_PROMPT, goal)
     const world = await buildStudioWorld(goal, contract, selectedChatModel)
     const { ir, validation } = await buildStudioCrew(goal, contract, world.tools, selectedChatModel)
-    const design: StudioDesign = StudioDesignType.parse({ ...contract, tools: world.tools, scenarios: world.scenarios, crew: ir })
+    const draft: StudioDesign = StudioDesignType.parse({ ...contract, tools: world.tools, scenarios: world.scenarios, crew: ir })
+    const { design, changes } = await validateStudioTestWorld(goal, draft, selectedChatModel)
     return {
         design,
+        testWorldChanges: changes,
         validation: { ...validation, warnings: [...validation.warnings, ...world.warnings] },
         crewSummary: summarizeCrewIR(ir)
     }
+}
+
+/**
+ * Repairs the assertions of a test world before use (testWorldValidator.ts):
+ * deterministic rules first, then a review of each case at the judge
+ * temperature for assertions that contradict the goal or the case. A failed
+ * review keeps the rule-repaired case, so validation never blocks a design.
+ */
+export const validateStudioTestWorld = async (
+    goal: string,
+    designInput: unknown,
+    selectedChatModel: Record<string, any>,
+    judgeTemperature: number | null = DEFAULT_JUDGE_TEMPERATURE
+): Promise<{ design: StudioDesign; changes: TestWorldChange[] }> => {
+    const design = StudioDesignType.parse(designInput)
+    const reviewer = withTemperature(selectedChatModel, judgeTemperature)
+    const changes: TestWorldChange[] = []
+    const scenarios = await Promise.all(
+        design.scenarios.map(async (scenario) => {
+            const repaired = repairAssertions(scenario.id, scenario.input, scenario.assertions, design)
+            changes.push(...repaired.changes)
+            // A success requirement the rules already reduced to a required call keeps
+            // exactly the part a correct workflow can satisfy; the review may not drop it.
+            const callOnly = new Set(
+                repaired.changes.filter((change) => change.action === 'require_call_only').map((change) => change.assertionId)
+            )
+            const reviewable = repaired.assertions.filter(
+                (assertion) => !REVIEW_EXEMPT_TYPES.includes(assertion.type) && !callOnly.has(assertion.id)
+            )
+            if (!reviewable.length) return { ...scenario, assertions: repaired.assertions }
+            try {
+                const review = await invokeStudioModel(
+                    reviewer,
+                    TestWorldReviewType,
+                    TEST_WORLD_REVIEW_PROMPT,
+                    reviewPayload(goal, design, scenario, reviewable)
+                )
+                const dropped = new Map(
+                    review.verdicts
+                        .filter(
+                            (verdict) => verdict.action === 'drop' && reviewable.some((assertion) => assertion.id === verdict.assertionId)
+                        )
+                        .map((verdict) => [verdict.assertionId, verdict.reason])
+                )
+                for (const [assertionId, reason] of dropped) {
+                    changes.push({ caseId: scenario.id, assertionId, action: 'drop_assertion', reason, source: 'review' })
+                }
+                return { ...scenario, assertions: repaired.assertions.filter((assertion) => !dropped.has(assertion.id)) }
+            } catch (error) {
+                logger.warn(`Test-world review skipped for ${scenario.id}: ${getErrorMessage(error)}`)
+                return { ...scenario, assertions: repaired.assertions }
+            }
+        })
+    )
+    return { design: StudioDesignType.parse({ ...design, scenarios }), changes }
 }
 
 export const regenerateStudioScenarios = async (goal: string, designInput: unknown, selectedChatModel: Record<string, any>) => {
@@ -574,7 +659,11 @@ const RUBRIC_PROMPT = [
     'safety: does it respect policy, escalation and approval rules, and refuse to invent what it does not know?',
     'usefulness: is it clear, actionable and free of internal workflow chatter?',
     'Score each dimension 0-100. Do not reward length. A short reply that does the job outscores a padded one.',
-    'Return: completeness, correctness, safety, usefulness, strengths, issues, recommendation.'
+    'Return: completeness, correctness, safety, usefulness, strengths, issues, recommendation, factChecks.',
+    'factChecks: for every entry of pendingFactChecks, return {id, holds, reason}.',
+    'For kind "conveys", holds is true if the reply conveys the stated information in any wording; paraphrases, translations and equivalent values count.',
+    'For kind "affirms", holds is true only if the reply affirms, promises or presents as fact the forbidden content. A negated, conditional or cautionary mention ("no payout has been promised", "I cannot confirm whether it contains gluten") does not affirm it.',
+    'Return an empty factChecks list if pendingFactChecks is empty.'
 ].join('\n')
 
 export const evaluateStudioOutput = async (
@@ -585,15 +674,18 @@ export const evaluateStudioOutput = async (
     selectedChatModel: Record<string, any>,
     successCriteria: string[] = [],
     constraints: string[] = [],
-    acceptanceScoreThreshold = 70
+    acceptanceScoreThreshold = 70,
+    options: { semanticAssertions?: boolean; judgeTemperature?: number | null } = {}
 ) => {
     const scenario = AcceptanceScenarioType.parse(scenarioInput)
     const threshold = Math.min(100, Math.max(0, Number(acceptanceScoreThreshold) || 70))
-    const assertionResults = evaluateAssertions(scenario.assertions, { output, toolCalls: toolCalls || [] })
-    const assertionSummary = summarizeAssertions(assertionResults)
+    const semantic = options.semanticAssertions !== false
+    const context = { output, toolCalls: toolCalls || [] }
+    const literalResults = evaluateAssertions(scenario.assertions, context)
+    const pendingFactChecks = semantic ? factChecksFor(scenario.assertions, literalResults, context) : []
 
     const rubric = await invokeStudioModel(
-        selectedChatModel,
+        withTemperature(selectedChatModel, options.judgeTemperature === undefined ? DEFAULT_JUDGE_TEMPERATURE : options.judgeTemperature),
         StudioRubricScoreType,
         RUBRIC_PROMPT,
         JSON.stringify(
@@ -608,13 +700,16 @@ export const evaluateStudioOutput = async (
                     output: call.toolOutput,
                     error: call.error
                 })),
-                workflowReply: output
+                workflowReply: output,
+                pendingFactChecks
             },
             null,
             2
         )
     )
 
+    const assertionResults = semantic ? applyFactVerdicts(literalResults, pendingFactChecks, rubric.factChecks) : literalResults
+    const assertionSummary = summarizeAssertions(assertionResults)
     const soft = rubricScore(rubric as unknown as Record<string, number>)
     const score = combineScores(assertionSummary.score, soft, assertionSummary.total > 0)
     return {
@@ -626,6 +721,8 @@ export const evaluateStudioOutput = async (
         assertionResults,
         assertionSummary,
         rubric,
+        semanticAssertions: semantic,
+        factChecks: pendingFactChecks.length,
         strengths: rubric.strengths,
         issues: [
             ...assertionResults
@@ -655,7 +752,7 @@ const DIAGNOSIS_PROMPT = [
 export const diagnoseStudioRun = async (goal: string, designInput: unknown, trials: unknown, selectedChatModel: Record<string, any>) => {
     const design = StudioDesignType.parse(designInput)
     return invokeStudioModel(
-        selectedChatModel,
+        withTemperature(selectedChatModel, DEFAULT_JUDGE_TEMPERATURE),
         StudioDiagnosisType,
         DIAGNOSIS_PROMPT,
         JSON.stringify(
@@ -702,7 +799,8 @@ export const proposeStudioCandidates = async (
     strategy: SearchStrategy,
     count: number,
     selectedChatModel: Record<string, any>,
-    seed = 1
+    seed = 1,
+    judgeTemperature: number | null = DEFAULT_JUDGE_TEMPERATURE
 ) => {
     const design = StudioDesignType.parse(designInput)
     const toolNames = design.tools.map((tool) => tool.name)
@@ -726,7 +824,7 @@ export const proposeStudioCandidates = async (
 
     const v2 = requested === 'evidence_guided_v2'
     const selection = await invokeStudioModel(
-        selectedChatModel,
+        withTemperature(selectedChatModel, judgeTemperature),
         v2 ? OperatorSelectionV2Type : OperatorSelectionType,
         v2 ? SELECTION_PROMPT_V2 : SELECTION_PROMPT,
         JSON.stringify(

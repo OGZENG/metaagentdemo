@@ -183,6 +183,64 @@ export const evaluateAssertion = (assertion: Assertion, context: AssertionContex
 export const evaluateAssertions = (assertions: Assertion[] = [], context: AssertionContext) =>
     assertions.map((assertion) => evaluateAssertion(assertion, context))
 
+/**
+ * Phrase checks are literal, and literal was wrong most of the time: a correct
+ * reply paraphrased the required wording ("Classified as delivery inquiry"
+ * instead of "Classified as delivery_question"), and a forbidden phrase also
+ * matched its own negation ("no payout amount has been promised"). The literal
+ * result is kept wherever it is unambiguous (a required phrase found, a
+ * forbidden phrase absent); every other phrase result becomes a fact check that
+ * the grader decides at temperature 0.
+ *
+ * kind `conveys`: passes if the reply conveys the information.
+ * kind `affirms`: passes if the reply does NOT affirm the forbidden content.
+ */
+export type FactCheck = { id: string; kind: 'conveys' | 'affirms'; statement: string }
+
+export const factChecksFor = (assertions: Assertion[] = [], results: AssertionResult[] = [], context: AssertionContext): FactCheck[] =>
+    results.flatMap<FactCheck>((result) => {
+        if (result.passed) return []
+        const assertion = assertions.find((item) => item.id === result.id)
+        if (!assertion) return []
+        if (assertion.type === 'output_contains') {
+            return [{ id: result.id, kind: 'conveys', statement: `${assertion.description} (for example: ${assertion.anyOf.join(' / ')})` }]
+        }
+        if (assertion.type === 'output_not_contains') {
+            const hits = containsAny(context.output, assertion.anyOf)
+            return [{ id: result.id, kind: 'affirms', statement: `${assertion.description} Forbidden content: ${hits.join(' / ')}` }]
+        }
+        if (assertion.type === 'grounded') {
+            const hits = containsAny(context.output, assertion.forbidden)
+            return [
+                {
+                    id: result.id,
+                    kind: 'affirms',
+                    statement: `The reply presents as established fact something that only ${
+                        assertion.tool
+                    } could confirm, which returned no data: ${hits.join(' / ')}`
+                }
+            ]
+        }
+        return []
+    })
+
+export const applyFactVerdicts = (
+    results: AssertionResult[],
+    checks: FactCheck[],
+    verdicts: { id: string; holds: boolean; reason?: string }[] = []
+): AssertionResult[] =>
+    results.map((result) => {
+        const check = checks.find((item) => item.id === result.id)
+        const verdict = verdicts.find((item) => item.id === result.id)
+        if (!check || !verdict) return result
+        const passed = check.kind === 'conveys' ? verdict.holds : !verdict.holds
+        return {
+            ...result,
+            passed,
+            detail: `${result.detail} Judged semantically: ${verdict.reason || (passed ? 'satisfied' : 'violated')}.`
+        }
+    })
+
 export const summarizeAssertions = (results: AssertionResult[] = []) => {
     const total = results.reduce((sum, result) => sum + SEVERITY_WEIGHT[result.severity], 0)
     const earned = results.reduce((sum, result) => sum + (result.passed ? SEVERITY_WEIGHT[result.severity] : 0), 0)

@@ -79,7 +79,18 @@ const compileStudioWorkflow = async (req: Request, res: Response, next: NextFunc
 
 const evaluateStudioOutput = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { goal, scenario, output, toolCalls, selectedChatModel, successCriteria, constraints, acceptanceScoreThreshold } = req.body
+        const {
+            goal,
+            scenario,
+            output,
+            toolCalls,
+            selectedChatModel,
+            successCriteria,
+            constraints,
+            acceptanceScoreThreshold,
+            semanticAssertions,
+            judgeTemperature
+        } = req.body
         if (!goal || !scenario || typeof output !== 'string' || !selectedChatModel) {
             throw new Error('Goal, scenario, output and selectedChatModel are required')
         }
@@ -92,7 +103,25 @@ const evaluateStudioOutput = async (req: Request, res: Response, next: NextFunct
                 selectedChatModel,
                 successCriteria,
                 constraints,
-                acceptanceScoreThreshold
+                acceptanceScoreThreshold,
+                { semanticAssertions, judgeTemperature }
+            )
+        )
+    } catch (error) {
+        next(error)
+    }
+}
+
+const validateStudioTestWorld = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { goal, design, selectedChatModel, judgeTemperature } = req.body
+        if (!goal || !design || !selectedChatModel) throw new Error('Goal, design and selectedChatModel are required')
+        return res.json(
+            await agentflowv2Service.validateStudioTestWorld(
+                goal,
+                design,
+                selectedChatModel,
+                judgeTemperature === undefined ? 0 : judgeTemperature
             )
         )
     } catch (error) {
@@ -112,10 +141,20 @@ const diagnoseStudioRun = async (req: Request, res: Response, next: NextFunction
 
 const proposeStudioCandidates = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { goal, design, crew, evidence, strategy, count, selectedChatModel, seed } = req.body
+        const { goal, design, crew, evidence, strategy, count, selectedChatModel, seed, judgeTemperature } = req.body
         if (!goal || !design || !selectedChatModel) throw new Error('Goal, design and selectedChatModel are required')
         return res.json(
-            await agentflowv2Service.proposeStudioCandidates(goal, design, crew, evidence, strategy, count, selectedChatModel, seed)
+            await agentflowv2Service.proposeStudioCandidates(
+                goal,
+                design,
+                crew,
+                evidence,
+                strategy,
+                count,
+                selectedChatModel,
+                seed,
+                judgeTemperature === undefined ? 0 : judgeTemperature
+            )
         )
     } catch (error) {
         next(error)
@@ -148,6 +187,7 @@ export default {
     regenerateStudioCrew,
     compileStudioWorkflow,
     evaluateStudioOutput,
+    validateStudioTestWorld,
     diagnoseStudioRun,
     proposeStudioCandidates,
     applyStudioOperator,

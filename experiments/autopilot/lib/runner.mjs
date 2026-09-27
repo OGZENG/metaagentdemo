@@ -33,9 +33,33 @@ export const DEFAULT_SETTINGS = {
     seed: 1,
     runHeldOutSuite: true,
     // The thesis experiments were run with the earlier cost-first recommendation;
-    // chapter 6 re-selects every search offline under both rules (reselect.mjs).
-    selectionRule: 'cost_first'
+    // chapter 6 re-selects every search offline under both rules (analysis.mjs).
+    selectionRule: 'cost_first',
+    // First experiments (E1, E2): literal phrase assertions, judging at the model's
+    // own temperature, one measurement per case. These reproduce them.
+    semanticAssertions: false,
+    judgeTemperature: null,
+    measurementRepeats: 1,
+    minimumGain: 0
 }
+
+/**
+ * Settings of the repeated experiment on the validated test world (E4): semantic
+ * phrase checks, judging at temperature 0, every case measured twice, and a new
+ * crew must beat a feasible baseline by at least one development case.
+ */
+export const VALIDATED_SETTINGS = {
+    ...DEFAULT_SETTINGS,
+    selectionRule: 'pass_first',
+    semanticAssertions: true,
+    judgeTemperature: 0,
+    measurementRepeats: 2,
+    minimumGain: 'one_case'
+}
+
+/** `minimumGain: 'one_case'` resolves to one development case of the suite. */
+export const resolveMinimumGain = (settings, devCount) =>
+    settings.minimumGain === 'one_case' ? (devCount ? 1 / devCount : 0) : Number(settings.minimumGain || 0)
 
 const log = (...args) => console.log(new Date().toISOString().slice(11, 19), ...args)
 const errorText = (error) => error?.message || String(error)
@@ -54,8 +78,15 @@ export const compileTrial = async ({ goal, design, crew, name, selectedChatModel
     }
 }
 
-/** Same as runScenariosOnFlow: prediction, output validation, two-layer evaluation. */
-export const runScenarios = async ({ trial, scenarios, goal, design, selectedChatModel, settings, runPrefix }) => {
+/**
+ * Same as runScenariosOnFlow: prediction, output validation, two-layer evaluation.
+ * With `settings.measurementRepeats` > 1 every case is run that many times; the
+ * results carry a `repeat` index and all of them enter the summary, so a pass
+ * rate is the mean over repeats.
+ */
+export const runScenarios = async ({ trial, scenarios: cases, goal, design, selectedChatModel, settings, runPrefix }) => {
+    const repeats = Math.max(1, Number(settings.measurementRepeats) || 1)
+    const scenarios = Array.from({ length: repeats }, (_, repeat) => cases.map((scenario) => ({ scenario, repeat }))).flat()
     const results = new Array(scenarios.length)
     let cursor = 0
     const worker = async () => {
@@ -63,9 +94,9 @@ export const runScenarios = async ({ trial, scenarios, goal, design, selectedCha
             const index = cursor
             cursor += 1
             if (index >= scenarios.length) return
-            const scenario = scenarios[index]
+            const { scenario, repeat } = scenarios[index]
             const startedAt = Date.now()
-            const runId = `${runPrefix}-${trial.id}-${scenario.id}-${Date.now()}`.replace(/[^a-zA-Z0-9_-]/g, '-')
+            const runId = `${runPrefix}-${trial.id}-${scenario.id}-r${repeat}-${Date.now()}`.replace(/[^a-zA-Z0-9_-]/g, '-')
             try {
                 const prediction = await predict(trial.flowId, scenario.input, runId)
                 const output = extractStudioOutput(prediction)
@@ -80,13 +111,16 @@ export const runScenarios = async ({ trial, scenarios, goal, design, selectedCha
                     successCriteria: design.successCriteria,
                     constraints: design.constraints,
                     acceptanceScoreThreshold: settings.acceptanceScoreThreshold,
-                    selectedChatModel
+                    selectedChatModel,
+                    semanticAssertions: Boolean(settings.semanticAssertions),
+                    judgeTemperature: settings.judgeTemperature ?? null
                 })
                 results[index] = {
                     scenarioId: scenario.id,
                     title: scenario.title,
                     category: scenario.category,
                     split: scenario.split || 'dev',
+                    repeat,
                     output,
                     toolCalls,
                     trace: extractStudioTrace(prediction),
@@ -102,6 +136,7 @@ export const runScenarios = async ({ trial, scenarios, goal, design, selectedCha
                     title: scenario.title,
                     category: scenario.category,
                     split: scenario.split || 'dev',
+                    repeat,
                     durationMs: Date.now() - startedAt,
                     error: errorText(error)
                 }
@@ -204,7 +239,8 @@ export const runSearch = async ({ goal, design, baseline, selectedChatModel, che
                 strategy: settings.strategy,
                 count: settings.candidatesPerRound,
                 seed: Number(settings.seed) + round,
-                selectedChatModel
+                selectedChatModel,
+                judgeTemperature: settings.judgeTemperature ?? null
             })
             proposals = data.candidates || []
             proposalNote = data.note || ''
@@ -269,7 +305,8 @@ export const runSearch = async ({ goal, design, baseline, selectedChatModel, che
         settings.allowedQualityLoss,
         settings.minimumPassRate,
         settings.maximumFailureRate,
-        settings.selectionRule
+        settings.selectionRule,
+        resolveMinimumGain(settings, dev.length)
     )
 
     return {

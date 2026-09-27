@@ -213,6 +213,16 @@ describe('selection', () => {
         expect(selectNextTrial(trials, 0.9, 0.1)?.id).toBe('cheaper')
     })
 
+    it('keeps a feasible baseline unless a crew is better by the minimum gain', () => {
+        const trials = [
+            trial('baseline', { ...healthy, passRate: 0.67 }),
+            trial('slightly', { ...healthy, passRate: 0.75, averageCost: 0.01 }),
+            trial('clearly', { ...healthy, passRate: 0.84, averageCost: 0.03 })
+        ]
+        expect(selectNextTrial(trials, 0.9, 0.1, 0.6, 0.1, 'pass_first', 0.17)?.id).toBe('clearly')
+        expect(selectNextTrial(trials.slice(0, 2), 0.9, 0.1, 0.6, 0.1, 'pass_first', 0.17)?.id).toBe('baseline')
+    })
+
     it('does not trade a passed case for lower cost by default', () => {
         const trials = [
             trial('baseline', { ...healthy, passRate: 0.83 }),

@@ -13,7 +13,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ROOT, studio } from './lib/api.mjs'
-import { compileTrial, runScenarios, runSearch, DEFAULT_SETTINGS } from './lib/runner.mjs'
+import { compileTrial, runScenarios, runSearch, DEFAULT_SETTINGS, VALIDATED_SETTINGS } from './lib/runner.mjs'
 import { splitScenarios, summarizeStudioResults } from '../../packages/ui/src/views/metaagent/studioUtils.js'
 
 const [command, goalId, ...rest] = process.argv.slice(2)
@@ -33,7 +33,16 @@ if (!goalEntry) {
     console.error(`Unknown goal "${goalId}". Known: ${goals.map((entry) => entry.id).join(', ')}`)
     process.exit(1)
 }
-const dir = join(ROOT, 'results', goalId)
+// --world validated: the repeated experiment (E4) on the validated test world,
+// with its own results folder and the settings of VALIDATED_SETTINGS.
+const world = flag('world', 'original')
+if (!['original', 'validated'].includes(world)) {
+    console.error('--world must be original or validated')
+    process.exit(1)
+}
+const SETTINGS = world === 'validated' ? VALIDATED_SETTINGS : DEFAULT_SETTINGS
+const resultsRoot = world === 'validated' ? 'results-validated' : 'results'
+const dir = join(ROOT, resultsRoot, goalId)
 mkdirSync(dir, { recursive: true })
 const designFile = join(dir, 'design.json')
 const baselineFile = join(dir, 'baseline.json')
@@ -44,6 +53,25 @@ const modelInfo = {
 }
 
 const commands = {
+    /** Validated test world: the frozen original design with repaired assertions. */
+    async validate() {
+        const source = readJson(join(ROOT, 'results', goalId, 'design.json'))
+        const startedAt = Date.now()
+        const data = await studio('testworld/validate', { goal: source.goal, design: source.design, selectedChatModel, judgeTemperature: 0 })
+        const count = (scenarios) => scenarios.reduce((sum, scenario) => sum + (scenario.assertions || []).length, 0)
+        writeJson(designFile, {
+            ...source,
+            validatedFrom: `results/${goalId}/design.json`,
+            validationMs: Date.now() - startedAt,
+            design: data.design,
+            testWorldChanges: data.changes
+        })
+        console.log(
+            `validate: ${count(source.design.scenarios)} -> ${count(data.design.scenarios)} assertions, ` +
+                `${data.changes.length} change(s) (${data.changes.filter((change) => change.source === 'review').length} by review)`
+        )
+    },
+
     async design() {
         const startedAt = Date.now()
         const data = await studio('design', { goal: goalEntry.goal, selectedChatModel })
@@ -71,7 +99,7 @@ const commands = {
         const { dev, test } = splitScenarios(design.scenarios)
         const repetitions = []
         for (let rep = 1; rep <= reps; rep += 1) {
-            const common = { goal, design, selectedChatModel, settings: DEFAULT_SETTINGS, runPrefix: `exp-${goalId}-base${rep}` }
+            const common = { goal, design, selectedChatModel, settings: { ...SETTINGS, measurementRepeats: 1 }, runPrefix: `${world}-${goalId}-base${rep}` }
             const devResults = await runScenarios({ ...common, trial, scenarios: dev })
             const testResults = await runScenarios({ ...common, trial, scenarios: test })
             repetitions.push({ rep, devResults, summary: summarizeStudioResults(devResults), testResults, testSummary: summarizeStudioResults(testResults) })
@@ -87,17 +115,27 @@ const commands = {
         const base = readJson(baselineFile)
         const strategy = flag('strategy', 'evidence_guided')
         const rep = Number(flag('rep', 1))
-        const first = base.repetitions[0]
-        // Reuse the first baseline measurement so every strategy starts from the same numbers.
-        const baseline = { ...base.trial, flowData: base.flowData, devResults: first.devResults, summary: first.summary, testResults: first.testResults, testSummary: first.testSummary }
+        // Reuse the first baseline measurement(s) so every strategy starts from the same
+        // numbers; with repeated measurement, the first repetitions are pooled.
+        const pooled = base.repetitions.slice(0, Math.max(1, Number(SETTINGS.measurementRepeats) || 1))
+        const devResults = pooled.flatMap((item) => item.devResults)
+        const testResults = pooled.flatMap((item) => item.testResults)
+        const baseline = {
+            ...base.trial,
+            flowData: base.flowData,
+            devResults,
+            summary: summarizeStudioResults(devResults),
+            testResults,
+            testSummary: summarizeStudioResults(testResults)
+        }
         const result = await runSearch({
             goal,
             design,
             baseline,
             selectedChatModel,
             cheapChatModel,
-            settings: { strategy, seed: rep },
-            runPrefix: `exp-${goalId}-${strategy}-${rep}`
+            settings: { ...SETTINGS, strategy, seed: rep },
+            runPrefix: `${world}-${goalId}-${strategy}-${rep}`
         })
         writeJson(join(dir, `search-${strategy}-${rep}.json`), { goalId, strategy, rep, ...modelInfo, ...result })
         const selected = result.trials.find((trial) => trial.id === result.selectedTrialId)
@@ -126,7 +164,7 @@ commands.confirm = async () => {
             const runsOut = []
             for (let rep = 1; rep <= reps; rep += 1) {
                 // One case at a time for both crews: the saved trials no longer carry their graph size.
-                const common = { goal, design, selectedChatModel, settings: { ...DEFAULT_SETTINGS, concurrency: 1 }, runPrefix: `confirm-${goalId}-${label}-${rep}` }
+                const common = { goal, design, selectedChatModel, settings: { ...SETTINGS, measurementRepeats: 1, concurrency: 1 }, runPrefix: `${world}-confirm-${goalId}-${label}-${rep}` }
                 const devResults = await runScenarios({ ...common, trial, scenarios: dev })
                 const testResults = await runScenarios({ ...common, trial, scenarios: test })
                 runsOut.push({ rep, summary: summarizeStudioResults(devResults), testSummary: summarizeStudioResults(testResults), devResults, testResults })

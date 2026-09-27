@@ -309,13 +309,21 @@ export const getParetoTrialIds = (
  */
 export const SELECTION_RULES = ['pass_first', 'cost_first']
 
+/**
+ * `minimumGain` (pass_first only): a new crew replaces a feasible baseline
+ * (`trials[0]`) only if its pass rate is higher by at least this much. With six
+ * development cases, one case is 0.17, which is also the run-to-run variation of
+ * a single measurement; a smaller difference is indistinguishable from noise,
+ * and selecting on it overfits the development cases.
+ */
 export const selectNextTrial = (
     trials = [],
     baselineQuality = 0,
     allowedQualityLoss = 0.05,
     minimumPassRate = MIN_OPTIMIZATION_PASS_RATE,
     maximumFailureRate = MAX_OPTIMIZATION_FAILURE_RATE,
-    selectionRule = 'pass_first'
+    selectionRule = 'pass_first',
+    minimumGain = 0
 ) => {
     const qualityFloor = Math.max(0, baselineQuality - allowedQualityLoss)
     const paretoIds = new Set(getParetoTrialIds(trials, qualityFloor, minimumPassRate, maximumFailureRate, selectionRule))
@@ -325,7 +333,18 @@ export const selectNextTrial = (
         right.summary.quality - left.summary.quality
     const passFirst = (left, right) =>
         right.summary.passRate - left.summary.passRate || right.summary.quality - left.summary.quality || costFirst(left, right)
-    return trials.filter((trial) => paretoIds.has(trial.id)).sort(selectionRule === 'cost_first' ? costFirst : passFirst)[0]
+    const ranked = trials.filter((trial) => paretoIds.has(trial.id)).sort(selectionRule === 'cost_first' ? costFirst : passFirst)
+    if (selectionRule === 'cost_first' || !(minimumGain > 0) || !trials.length) return ranked[0]
+    const baseline = trials[0]
+    const baselineFeasible =
+        baseline?.summary &&
+        isTrialFeasible(baseline.summary, minimumPassRate, maximumFailureRate) &&
+        baseline.summary.quality >= qualityFloor
+    if (!baselineFeasible) return ranked[0]
+    const clearlyBetter = ranked.find(
+        (trial) => trial.id !== baseline.id && trial.summary.passRate >= baseline.summary.passRate + minimumGain - 1e-9
+    )
+    return clearlyBetter || baseline
 }
 
 /**
