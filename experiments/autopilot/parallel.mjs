@@ -7,7 +7,7 @@
  * node's maximum concurrency (1 = original serial executor, 4 = parallel), and
  * runs every probe question on both copies in alternating order.
  *
- *   node experiments/autopilot/parallel.mjs [--reps 3]
+ *   node experiments/autopilot/parallel.mjs [--reps 3] [--out parallel.json]
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -17,9 +17,12 @@ import { extractStudioOutput, summarizePrediction } from '../../packages/ui/src/
 
 const repsIndex = process.argv.indexOf('--reps')
 const reps = repsIndex > 0 ? Number(process.argv[repsIndex + 1]) : 3
+const outIndex = process.argv.indexOf('--out')
+const outFile = outIndex > 0 ? process.argv[outIndex + 1] : 'parallel.json'
 const selectedChatModel = JSON.parse(readFileSync(join(ROOT, 'model.json'), 'utf8'))
 
-// Probe inputs for latency only; correctness is not scored in this experiment.
+// Probe inputs with known answers. Latency is the primary measurement; the final
+// answer is also checked, to confirm that parallel execution leaves results intact.
 const QUESTIONS = [
     'A train leaves at 09:40 and arrives at 13:05. How long is the journey in minutes?',
     'If 3 workers build a wall in 12 hours, how long do 4 workers need at the same rate?',
@@ -32,6 +35,21 @@ const QUESTIONS = [
     'If today is Wednesday, what weekday will it be in 100 days?',
     'A rectangle has perimeter 36 cm and its length is twice its width. What is its area?'
 ]
+
+// Reference answers, checked against the end of the aggregator's reply (where it states the final answer).
+const ANSWERS = [
+    /\b205\b/,
+    /\b9\s*(h\b|hours?)/i,
+    /not\s+(a\s+)?prime|isn.t\s+(a\s+)?prime|composite|17\s*[×x*·]\s*23/i,
+    /\blower\b|\bless\b/i,
+    /\bcarol\b/i,
+    /2[,.\s]?842/,
+    /3\s*\/\s*28|0\.107/,
+    /\b20\s*(m\/s|metres|meters)/i,
+    /\bfriday\b/i,
+    /\b72\b/
+]
+const isCorrect = (index, output) => ANSWERS[index].test(String(output || '').slice(-300))
 
 const solver = (id, name, strategy) => ({
     agent: { id: `${id}_agent`, name, role: 'specialist', goal: `Solve the question using a ${strategy} strategy.`, backstory: '', tools: [], guardrails: [], modelTier: 'default' },
@@ -116,7 +134,8 @@ const main = async () => {
                     const prediction = await predict(variant.flowId, question, `e3-${variant.id}-${rep}-${index}-${Date.now()}`)
                     const durationMs = Date.now() - startedAt
                     const nodes = (prediction.agentFlowExecutedData || []).map((node) => node.nodeLabel || node.nodeId)
-                    runs.push({ rep, question: index, variant: variant.id, ...summarizePrediction(prediction, durationMs), nodes, outputLength: extractStudioOutput(prediction).length })
+                    const output = extractStudioOutput(prediction)
+                    runs.push({ rep, question: index, variant: variant.id, ...summarizePrediction(prediction, durationMs), nodes, output, correct: isCorrect(index, output) })
                     console.log(`rep ${rep} q${index} ${variant.id}: ${(durationMs / 1000).toFixed(1)}s`)
                 } catch (error) {
                     runs.push({ rep, question: index, variant: variant.id, durationMs: Date.now() - startedAt, error: String(error?.message || error) })
@@ -127,7 +146,7 @@ const main = async () => {
     }
     const dir = join(ROOT, 'results', 'parallel')
     mkdirSync(dir, { recursive: true })
-    writeFileSync(join(dir, 'parallel.json'), JSON.stringify({ model: selectedChatModel.inputs?.modelName, temperature: selectedChatModel.inputs?.temperature, reps, questions: QUESTIONS, variants, runs }, null, 2))
+    writeFileSync(join(dir, outFile), JSON.stringify({ model: selectedChatModel.inputs?.modelName, temperature: selectedChatModel.inputs?.temperature, reps, questions: QUESTIONS, variants, runs }, null, 2))
     const stat = (variant) => {
         const values = runs.filter((run) => run.variant === variant && !run.error).map((run) => run.durationMs)
         return (values.reduce((a, b) => a + b, 0) / values.length / 1000).toFixed(1)

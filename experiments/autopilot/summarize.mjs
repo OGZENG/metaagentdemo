@@ -21,7 +21,12 @@ const std = (values) => {
     const m = mean(values)
     return Math.sqrt(values.reduce((sum, value) => sum + (value - m) ** 2, 0) / (values.length - 1))
 }
-const fmt = (value, digits = 2) => (Number.isFinite(value) ? value.toFixed(digits) : '--')
+const fmt = (value, digits = 2) => {
+    if (!Number.isFinite(value)) return '--'
+    const text = value.toFixed(digits)
+    // A mean that rounds to zero is printed as 0.00, not -0.00.
+    return /^-0\.?0*$/.test(text) ? text.slice(1) : text
+}
 const pm = (values, digits = 2) => (values.length ? `${fmt(mean(values), digits)} $\\pm$ ${fmt(std(values), digits)}` : '--')
 const esc = (text) => String(text).replace(/_/g, '\\_').replace(/&/g, '\\&')
 
@@ -205,8 +210,11 @@ for (const goal of goals) {
 }
 
 /* ---------------- E3: parallel ---------------- */
-if (existsSync(join(RES, 'parallel', 'parallel.json'))) {
-    const p = read(join(RES, 'parallel', 'parallel.json'))
+// parallel-checked.json repeats E3 with the final answers stored and checked;
+// the first run (parallel.json) recorded latency only.
+const parallelFile = ['parallel-checked.json', 'parallel.json'].map((name) => join(RES, 'parallel', name)).find(existsSync)
+if (parallelFile) {
+    const p = read(parallelFile)
     const of = (variant, key) => p.runs.filter((run) => run.variant === variant && !run.error).map((run) => Number(run[key]))
     const serial = of('serial', 'durationMs').map((ms) => ms / 1000)
     const parallel = of('parallel', 'durationMs').map((ms) => ms / 1000)
@@ -223,7 +231,12 @@ if (existsSync(join(RES, 'parallel', 'parallel.json'))) {
         parallel,
         speedup: pairs,
         serialTokens: of('serial', 'totalTokens'),
-        parallelTokens: of('parallel', 'totalTokens')
+        parallelTokens: of('parallel', 'totalTokens'),
+        serialCalls: of('serial', 'modelCalls'),
+        parallelCalls: of('parallel', 'modelCalls'),
+        checked: p.runs.some((run) => 'correct' in run),
+        serialCorrect: p.runs.filter((run) => run.variant === 'serial' && !run.error && run.correct).length,
+        parallelCorrect: p.runs.filter((run) => run.variant === 'parallel' && !run.error && run.correct).length
     }
 }
 
@@ -274,13 +287,14 @@ if (texDir) {
         `${header}\\newcommand{\\EOneCases}{${a.cases}}%\n\\newcommand{\\EOneCritical}{${a.casesWithCriticalViolation}}%\n\\newcommand{\\EOneHard}{${fmt(a.assertionScore.mean, 1)}}%\n\\newcommand{\\EOneSoft}{${fmt(a.rubricScore.mean, 1)}}%\n\\newcommand{\\EOneCorr}{${fmt(a.correlation, 2)}}%\n`
     )
 
-    const strategies = ['random', 'greedy', 'evidence_guided', 'evidence_guided_control', 'evidence_guided_v2']
+    const strategies = ['random', 'greedy', 'evidence_guided', 'evidence_guided_control', 'evidence_guided_v2', 'regenerate']
     const label = {
         random: 'Random',
         greedy: 'Greedy',
         evidence_guided: 'Evidence-guided',
         evidence_guided_control: 'Evidence-guided (control)',
-        evidence_guided_v2: 'Evidence-guided v2'
+        evidence_guided_v2: 'Evidence-guided v2',
+        regenerate: 'Regenerate'
     }
     const searchRows = []
     for (const goal of [...new Set(summary.search.map((s) => s.goal))]) {
@@ -320,9 +334,13 @@ if (texDir) {
         `${header}\\begin{tabular}{lrrrrrcr}\n    \\toprule\n    Strategy & Searches & Candidates & Rejected & Cand. better than parent & Search improved & $\\Delta$ best dev pass & New crew selected \\\\\n    \\midrule\n${pooledRows.join('\n')}\n    \\bottomrule\n\\end{tabular}%\n`
     )
 
-    // Per operator type, pooled over all searches.
+    // Per operator type, pooled over all operator-based searches (the regenerate
+    // baseline applies no operator). The evidence-guided column counts the
+    // original runs, the control runs and v2.
     const opStats = {}
-    for (const step of summary.search.flatMap((s) => s.steps.map((x) => ({ ...x, strategy: s.strategy })))) {
+    for (const step of summary.search
+        .filter((s) => s.strategy !== 'regenerate')
+        .flatMap((s) => s.steps.map((x) => ({ ...x, strategy: s.strategy.startsWith('evidence_guided') ? 'evidence_guided' : s.strategy })))) {
         const entry = (opStats[step.operator] ||= { n: 0, rejected: 0, dPass: [], dTokens: [], byStrategy: {} })
         entry.n += 1
         entry.byStrategy[step.strategy] = (entry.byStrategy[step.strategy] || 0) + 1
@@ -363,11 +381,18 @@ if (texDir) {
         const median = sorted.length % 2 ? sorted[(sorted.length - 1) / 2] : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
         writeFileSync(
             join(texDir, 'e3_numbers.tex'),
-            `${header}\\newcommand{\\EThreePairs}{${p.speedup.length}}%\n\\newcommand{\\EThreeFaster}{${p.speedup.filter((s) => s > 1).length}}%\n\\newcommand{\\EThreeMedian}{${fmt(median, 2)}}%\n\\newcommand{\\EThreeMin}{${fmt(sorted[0], 2)}}%\n\\newcommand{\\EThreeMax}{${fmt(sorted.at(-1), 1)}}%\n\\newcommand{\\EThreeSerial}{${fmt(mean(p.serial), 1)}}%\n\\newcommand{\\EThreeParallel}{${fmt(mean(p.parallel), 1)}}%\n`
+            `${header}\\newcommand{\\EThreePairs}{${p.speedup.length}}%\n\\newcommand{\\EThreeFaster}{${p.speedup.filter((s) => s > 1).length}}%\n\\newcommand{\\EThreeMedian}{${fmt(median, 2)}}%\n\\newcommand{\\EThreeMin}{${fmt(sorted[0], 2)}}%\n\\newcommand{\\EThreeMax}{${fmt(sorted.at(-1), 1)}}%\n\\newcommand{\\EThreeSerial}{${fmt(mean(p.serial), 1)}}%\n\\newcommand{\\EThreeParallel}{${fmt(mean(p.parallel), 1)}}%\n` +
+                `\\newcommand{\\EThreeRatioOfMeans}{${fmt(mean(p.serial) / mean(p.parallel), 2)}}%\n\\newcommand{\\EThreeMeanSpeedup}{${fmt(mean(p.speedup), 2)}}%\n` +
+                `\\newcommand{\\EThreeRuns}{${p.serial.length}}%\n\\newcommand{\\EThreeErrors}{${p.errors}}%\n` +
+                `\\newcommand{\\EThreeSerialCorrect}{${p.serialCorrect}}%\n\\newcommand{\\EThreeParallelCorrect}{${p.parallelCorrect}}%\n`
         )
+        const correct = (value) => (p.checked ? String(value) : '--')
         writeFileSync(
             join(texDir, 'e3_parallel.tex'),
-            `${header}\\begin{tabular}{lccc}\n    \\toprule\n    Executor & Latency [s] & Tokens & Runs \\\\\n    \\midrule\n        Serial (concurrency 1) & ${pm(p.serial, 1)} & ${pm(p.serialTokens, 0)} & ${p.serial.length} \\\\\n        Parallel (concurrency 4) & ${pm(p.parallel, 1)} & ${pm(p.parallelTokens, 0)} & ${p.parallel.length} \\\\\n    \\midrule\n        Paired speed-up & \\multicolumn{3}{l}{${pm(p.speedup, 2)}} \\\\\n    \\bottomrule\n\\end{tabular}%\n`
+            `${header}\\begin{tabular}{lccccc}\n    \\toprule\n    Executor & Latency [s] & Tokens & Model calls & Correct & Runs \\\\\n    \\midrule\n` +
+                `        Serial (concurrency 1) & ${pm(p.serial, 1)} & ${pm(p.serialTokens, 0)} & ${pm(p.serialCalls, 1)} & ${correct(p.serialCorrect)} & ${p.serial.length} \\\\\n` +
+                `        Parallel (concurrency 4) & ${pm(p.parallel, 1)} & ${pm(p.parallelTokens, 0)} & ${pm(p.parallelCalls, 1)} & ${correct(p.parallelCorrect)} & ${p.parallel.length} \\\\\n` +
+                `    \\midrule\n        Paired speed-up & \\multicolumn{5}{l}{${pm(p.speedup, 2)}, median ${fmt(median, 2)}} \\\\\n    \\bottomrule\n\\end{tabular}%\n`
         )
     }
     console.log(`LaTeX tables written to ${texDir}`)

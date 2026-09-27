@@ -84,6 +84,14 @@ describe('assertions', () => {
         expect(result.passed).toBe(true)
     })
 
+    it('output_matches accepts PCRE-style inline flags', () => {
+        const result = evaluateAssertion(assertion({ type: 'output_matches', pattern: '(?is).*customer.*internal.*summary.*' }), {
+            output: 'Customer reply: done.\nInternal action summary: none.',
+            toolCalls: []
+        })
+        expect(result.passed).toBe(true)
+    })
+
     it('output_matches reports an invalid pattern instead of throwing', () => {
         const result = evaluateAssertion(assertion({ type: 'output_matches', pattern: '([unclosed' }), {
             output: 'anything',

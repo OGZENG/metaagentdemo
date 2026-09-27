@@ -208,9 +208,18 @@ describe('selection', () => {
         expect(pareto).not.toContain('dominated')
     })
 
-    it('recommends the cheapest trial on the frontier', () => {
+    it('recommends the cheapest trial on the frontier when pass rates are equal', () => {
         const trials = [trial('baseline', healthy), trial('cheaper', { ...healthy, averageCost: 0.01 })]
         expect(selectNextTrial(trials, 0.9, 0.1)?.id).toBe('cheaper')
+    })
+
+    it('does not trade a passed case for lower cost by default', () => {
+        const trials = [
+            trial('baseline', { ...healthy, passRate: 0.83 }),
+            trial('cheaper', { ...healthy, passRate: 0.67, quality: 0.95, averageCost: 0.01 })
+        ]
+        expect(selectNextTrial(trials, 0.9, 0.1)?.id).toBe('baseline')
+        expect(selectNextTrial(trials, 0.9, 0.1, 0.6, 0.1, 'cost_first')?.id).toBe('cheaper')
     })
 
     it('picks the highest pass rate as the next search parent', () => {

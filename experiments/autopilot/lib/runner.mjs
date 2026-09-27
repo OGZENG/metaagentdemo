@@ -31,7 +31,10 @@ export const DEFAULT_SETTINGS = {
     allowedQualityLoss: 0.1,
     concurrency: 2,
     seed: 1,
-    runHeldOutSuite: true
+    runHeldOutSuite: true,
+    // The thesis experiments were run with the earlier cost-first recommendation;
+    // chapter 6 re-selects every search offline under both rules (reselect.mjs).
+    selectionRule: 'cost_first'
 }
 
 const log = (...args) => console.log(new Date().toISOString().slice(11, 19), ...args)
@@ -114,6 +117,23 @@ export const runScenarios = async ({ trial, scenarios, goal, design, selectedCha
     return results.filter(Boolean)
 }
 
+/** The parent's failures as plain-language findings for the crew designer. */
+const regenerationGuidance = (parent, evidence) => {
+    const findings = []
+    for (const result of parent.devResults || []) {
+        if (result.error) findings.push(`Case "${result.title}" failed to execute: ${String(result.error).slice(0, 200)}`)
+        const failed = (result.evaluation?.assertionResults || []).filter((item) => !item.passed)
+        if (result.evaluation?.passed === false && failed.length) {
+            findings.push(`Case "${result.title}" failed: ${failed.map((item) => `${item.description || item.type} (${item.detail || 'failed'})`).slice(0, 4).join('; ')}`)
+        }
+    }
+    if (evidence.unboundRequiredTools.length) findings.push(`Required tools that no agent holds: ${evidence.unboundRequiredTools.join(', ')}`)
+    const unreached = evidence.missingToolCalls.filter((tool) => !evidence.unboundRequiredTools.includes(tool))
+    if (unreached.length) findings.push(`Required tools that an agent holds but never called: ${unreached.join(', ')}`)
+    for (const issue of evidence.evaluatorIssues.slice(0, 6)) findings.push(`Evaluator: ${issue}`)
+    return findings.slice(0, 16)
+}
+
 export const preflight = async (trial, scenarios) => {
     for (const scenario of selectPreflightScenarios(scenarios)) {
         const prediction = await predict(trial.flowId, scenario.input, `${trial.id}-preflight-${scenario.id}-${Date.now()}`)
@@ -155,7 +175,27 @@ export const runSearch = async ({ goal, design, baseline, selectedChatModel, che
         )
         let proposals = []
         let proposalNote = ''
-        try {
+        if (settings.strategy === 'regenerate') {
+            // Baseline without operators: the designer regenerates the whole crew from the
+            // failure evidence of the parent, with the same candidate budget as the search.
+            const guidance = regenerationGuidance(parent, evidence)
+            for (let index = 0; index < settings.candidatesPerRound; index += 1) {
+                try {
+                    const data = await studio('crew/regenerate', { goal, design, selectedChatModel, guidance })
+                    proposals.push({
+                        operator: { type: 'regenerate' },
+                        signature: `regenerate:r${round}c${index + 1}`,
+                        description: 'Regenerate the whole crew from the failure evidence',
+                        rationale: '',
+                        ir: data.crew
+                    })
+                } catch (error) {
+                    if (isInfraError(error)) throw error
+                    proposalNote = `regeneration failed: ${errorText(error).slice(0, 200)}`
+                }
+            }
+            rounds.push({ round, parentId: parent.id, proposed: proposals.length, guidance, note: proposalNote })
+        } else try {
             const data = await studio('candidates', {
                 goal,
                 design,
@@ -213,7 +253,7 @@ export const runSearch = async ({ goal, design, baseline, selectedChatModel, che
 
     const baselineQuality = Number(trials[0].summary?.quality || 0)
     const qualityFloor = Math.max(0, baselineQuality - settings.allowedQualityLoss)
-    let paretoTrialIds = getParetoTrialIds(trials, qualityFloor, settings.minimumPassRate, settings.maximumFailureRate)
+    let paretoTrialIds = getParetoTrialIds(trials, qualityFloor, settings.minimumPassRate, settings.maximumFailureRate, settings.selectionRule)
     if (settings.runHeldOutSuite && test.length) {
         const heldOut = [...new Set([trials[0].id, ...paretoTrialIds])].map((id) => trials.find((trial) => trial.id === id)).filter(Boolean)
         for (const trial of heldOut) {
@@ -223,7 +263,14 @@ export const runSearch = async ({ goal, design, baseline, selectedChatModel, che
             Object.assign(trial, { testResults, testSummary: summarizeStudioResults(testResults) })
         }
     }
-    const selected = selectNextTrial(trials, baselineQuality, settings.allowedQualityLoss, settings.minimumPassRate, settings.maximumFailureRate)
+    const selected = selectNextTrial(
+        trials,
+        baselineQuality,
+        settings.allowedQualityLoss,
+        settings.minimumPassRate,
+        settings.maximumFailureRate,
+        settings.selectionRule
+    )
 
     return {
         settings,

@@ -260,12 +260,16 @@ export const isTrialFeasible = (
     return Number(summary?.failed || 0) / total <= Number(maximumFailureRate) && Number(summary?.passRate || 0) >= Number(minimumPassRate)
 }
 
-const noWorse = (left, right) =>
+// Under `pass_first`, pass rate is an objective of its own: a crew that passes
+// more cases is never dominated by a cheaper one that passes fewer.
+const noWorse = (left, right, withPassRate) =>
+    (!withPassRate || Number(left.summary.passRate || 0) >= Number(right.summary.passRate || 0)) &&
     left.summary.quality >= right.summary.quality &&
     left.summary.averageCost <= right.summary.averageCost &&
     left.summary.averageDurationMs <= right.summary.averageDurationMs
 
-const strictlyBetter = (left, right) =>
+const strictlyBetter = (left, right, withPassRate) =>
+    (withPassRate && Number(left.summary.passRate || 0) > Number(right.summary.passRate || 0)) ||
     left.summary.quality > right.summary.quality ||
     left.summary.averageCost < right.summary.averageCost ||
     left.summary.averageDurationMs < right.summary.averageDurationMs
@@ -274,8 +278,10 @@ export const getParetoTrialIds = (
     trials = [],
     qualityFloor = 0,
     minimumPassRate = MIN_OPTIMIZATION_PASS_RATE,
-    maximumFailureRate = MAX_OPTIMIZATION_FAILURE_RATE
+    maximumFailureRate = MAX_OPTIMIZATION_FAILURE_RATE,
+    selectionRule = 'pass_first'
 ) => {
+    const withPassRate = selectionRule !== 'cost_first'
     const feasible = trials.filter(
         (trial) =>
             trial.summary && isTrialFeasible(trial.summary, minimumPassRate, maximumFailureRate) && trial.summary.quality >= qualityFloor
@@ -283,28 +289,43 @@ export const getParetoTrialIds = (
     return feasible
         .filter(
             (candidate) =>
-                !feasible.some((other) => other.id !== candidate.id && noWorse(other, candidate) && strictlyBetter(other, candidate))
+                !feasible.some(
+                    (other) =>
+                        other.id !== candidate.id &&
+                        noWorse(other, candidate, withPassRate) &&
+                        strictlyBetter(other, candidate, withPassRate)
+                )
         )
         .map((trial) => trial.id)
 }
+
+/**
+ * Final recommendation among the feasible Pareto crews. `pass_first` (default)
+ * puts correctness before cost: highest pass rate, then quality, then cost and
+ * latency, on a frontier that includes pass rate. `cost_first` is the earlier
+ * rule (frontier over quality, cost and latency only; cheapest, then fastest,
+ * then best quality), kept because the thesis experiments were run with it; it
+ * traded a passed case for a few percent fewer tokens on healthy crews.
+ */
+export const SELECTION_RULES = ['pass_first', 'cost_first']
 
 export const selectNextTrial = (
     trials = [],
     baselineQuality = 0,
     allowedQualityLoss = 0.05,
     minimumPassRate = MIN_OPTIMIZATION_PASS_RATE,
-    maximumFailureRate = MAX_OPTIMIZATION_FAILURE_RATE
+    maximumFailureRate = MAX_OPTIMIZATION_FAILURE_RATE,
+    selectionRule = 'pass_first'
 ) => {
     const qualityFloor = Math.max(0, baselineQuality - allowedQualityLoss)
-    const paretoIds = new Set(getParetoTrialIds(trials, qualityFloor, minimumPassRate, maximumFailureRate))
-    return trials
-        .filter((trial) => paretoIds.has(trial.id))
-        .sort(
-            (left, right) =>
-                left.summary.averageCost - right.summary.averageCost ||
-                left.summary.averageDurationMs - right.summary.averageDurationMs ||
-                right.summary.quality - left.summary.quality
-        )[0]
+    const paretoIds = new Set(getParetoTrialIds(trials, qualityFloor, minimumPassRate, maximumFailureRate, selectionRule))
+    const costFirst = (left, right) =>
+        left.summary.averageCost - right.summary.averageCost ||
+        left.summary.averageDurationMs - right.summary.averageDurationMs ||
+        right.summary.quality - left.summary.quality
+    const passFirst = (left, right) =>
+        right.summary.passRate - left.summary.passRate || right.summary.quality - left.summary.quality || costFirst(left, right)
+    return trials.filter((trial) => paretoIds.has(trial.id)).sort(selectionRule === 'cost_first' ? costFirst : passFirst)[0]
 }
 
 /**

@@ -83,9 +83,16 @@ const containsAny = (haystack: string, needles: string[]) => {
     return needles.filter((needle) => lowered.includes(normalize(needle)))
 }
 
+/**
+ * Models write patterns in PCRE style with leading inline flags such as (?i) or
+ * (?is), which JavaScript rejects. Such a prefix is translated into flags
+ * instead of turning the assertion into a guaranteed failure.
+ */
 const safeRegExp = (pattern: string) => {
+    const inline = /^\(\?([imsx]+)\)/.exec(pattern)
+    const flags = new Set(['i', ...(inline ? inline[1].split('').filter((flag) => flag === 's' || flag === 'm') : [])])
     try {
-        return new RegExp(pattern, 'i')
+        return new RegExp(inline ? pattern.slice(inline[0].length) : pattern, [...flags].join(''))
     } catch (_) {
         return null
     }
