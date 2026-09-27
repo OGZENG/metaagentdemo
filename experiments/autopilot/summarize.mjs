@@ -10,6 +10,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ROOT } from './lib/api.mjs'
+import { isCorrect } from './lib/e3answers.mjs'
 
 const RES = join(ROOT, 'results')
 const texIndex = process.argv.indexOf('--tex')
@@ -234,9 +235,10 @@ if (parallelFile) {
         parallelTokens: of('parallel', 'totalTokens'),
         serialCalls: of('serial', 'modelCalls'),
         parallelCalls: of('parallel', 'modelCalls'),
-        checked: p.runs.some((run) => 'correct' in run),
-        serialCorrect: p.runs.filter((run) => run.variant === 'serial' && !run.error && run.correct).length,
-        parallelCorrect: p.runs.filter((run) => run.variant === 'parallel' && !run.error && run.correct).length
+        // Answers are re-checked from the stored replies with the current rules.
+        checked: p.runs.some((run) => 'output' in run),
+        serialCorrect: p.runs.filter((run) => run.variant === 'serial' && !run.error && isCorrect(run.question, run.output)).length,
+        parallelCorrect: p.runs.filter((run) => run.variant === 'parallel' && !run.error && isCorrect(run.question, run.output)).length
     }
 }
 

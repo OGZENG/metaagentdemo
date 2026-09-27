@@ -1,0 +1,242 @@
+{
+  "hr_leave/rep3/policy_non_compliant_request_5_1/pncr1_policy_lookup": {
+    "label": "false",
+    "reason": "Workflow retrieved the policy; the fixture is keyed on the code leave_standard, which neither the request nor the tool description reveals."
+  },
+  "support/rep3/uncertain_policy_escalation_and_no_fabricated_status_8_1/classify_policy_uncertain": {
+    "label": "unclear",
+    "reason": "The crew classified the request through its router and escalated correctly; whether the declared classify tool must also be called is left open by the goal."
+  },
+  "support/rep2/uncertain_policy_escalation_and_no_fabricated_status_8_1/escalate_uncertain_policy": {
+    "label": "false",
+    "reason": "Escalation was called correctly; the assertion requires the literal argument uncertain_policy, which a free-text reason cannot contain."
+  },
+  "restaurant/rep1/availability_conflict_handling_2_1/check-availability": {
+    "label": "false",
+    "reason": "The case contradicts the goal (parties above 8 go to staff); the crew followed the goal."
+  },
+  "support/rep3/product_question_answerability_2_1/prod_tool_classify": {
+    "label": "false",
+    "reason": "The assertion requires the classify tool to be called with the argument \"product\", which is not a message."
+  },
+  "insurance/rep3/customer_notification_wording_9_1/next_steps_sent": {
+    "label": "false",
+    "reason": "The required claim reference is only returned by a fixture the crew could not reach with the case data (coverage fixtures are keyed on POL-, the case uses PN-)."
+  },
+  "hr_leave/rep2/valid_short_request_within_balance_1_1/policy_lookup": {
+    "label": "false",
+    "reason": "Workflow retrieved the policy with \"standard leave policy\"; the fixture requires the undisclosed code leave_standard."
+  },
+  "insurance/rep2/happy_path_uncovered_claim_2_1/coverage_checked": {
+    "label": "false",
+    "reason": "The assertion expects POL-1001 while the case input gives PN-1001; the crew used the number from the input."
+  },
+  "restaurant/rep2/successful_reservation_flow_1_2/b3": {
+    "label": "false",
+    "reason": "The assertion expects guest name \"confirmed booking\" taken from the request wording; the call was otherwise correct."
+  },
+  "hr_leave/rep3/valid_short_request_at_threshold_2_1/notify_employee": {
+    "label": "false",
+    "reason": "Approval was impossible because the policy lookup fails for any disclosed argument (undisclosed code); routing to the manager was the safe behavior."
+  },
+  "restaurant/rep1/large_party_escalation_3_1/large-party-tool-check": {
+    "label": "false",
+    "reason": "The case expectations route a party of 9 to staff; the assertion additionally requires an availability check that the goal does not ask for."
+  },
+  "insurance/rep3/boundary_conditions_around_eur_5000_and_borderline_fraud_signals_10_1/a2": {
+    "label": "false",
+    "reason": "The case describes a valid policy, but the validation fixture does not know POL-3003; the crew correctly stopped."
+  },
+  "travel/rep3/happy_path_complete_trip_within_budget_1_2/b1": {
+    "label": "false",
+    "reason": "The assertion expects a flight budget of 1500, which the request does not state; the crew passed the stated 3000."
+  },
+  "support/rep3/order_lookup_with_valid_order_id_4_1/classify_order_lookup": {
+    "label": "unclear",
+    "reason": "Order lookup was correct; only the separate classify tool was not called (see item 1)."
+  },
+  "insurance/rep2/reference_generation_8_1/policy-validated": {
+    "label": "false",
+    "reason": "The assertion expects PN-1001 while the case input gives POL-1001."
+  },
+  "support/rep3/order_lookup_blocked_without_order_id_5_1/reply_asks_for_order_id": {
+    "label": "false",
+    "reason": "The reply asks for the order ID and refuses to guess; the assertion requires literal fixture wording."
+  },
+  "hr_leave/rep3/request_exceeds_balance_but_under_threshold_3_1/notify_contains_routing": {
+    "label": "false",
+    "reason": "The reply says the request was routed for manager review; the assertion requires one of three literal phrasings."
+  },
+  "insurance/rep3/reference_generation_8_1/output-has-next-steps": {
+    "label": "false",
+    "reason": "The reply lists the next steps in its own words; the assertion requires the literal fixture text."
+  },
+  "restaurant/rep1/successful_reservation_flow_1_1/a5": {
+    "label": "false",
+    "reason": "The reservation fixture returns a Feb 14 booking for an Oct 12 request and create_reservation fails; the reply reports the failure correctly."
+  },
+  "insurance/rep2/fraud_signal_escalation_6_1/output-has-next-steps": {
+    "label": "false",
+    "reason": "The case expects successful validation, but the environment injects a timeout for PN-9009; the crew reported the timeout correctly."
+  },
+  "travel/rep3/no_availability_or_partial_availability_3_2/b3_error_message_preserved": {
+    "label": "false",
+    "reason": "The reply reports the provider outage in its own words; the assertion requires the exact error message."
+  },
+  "hr_leave/rep3/valid_short_request_at_threshold_2_1/output_has_approval": {
+    "label": "false",
+    "reason": "Approval was impossible because the policy lookup fails (undisclosed code); the expected balance of 12 also contradicts the returned balance of 18."
+  },
+  "hr_leave/rep1/policy_non_compliant_request_5_1/pncr1_output_mentions_pending": {
+    "label": "false",
+    "reason": "The reply states routed_for_manager_approval; the assertion requires \"pending manager approval\" or \"manager review required\"."
+  },
+  "support/rep1/general_request_classification_1_1/summary-contains-category": {
+    "label": "false",
+    "reason": "The summary says \"Classified as delivery inquiry\"; the assertion requires the literal \"Classified as delivery_question\"."
+  },
+  "restaurant/rep3/successful_reservation_flow_1_1/a5": {
+    "label": "false",
+    "reason": "Same fixture inconsistency as item 18."
+  },
+  "restaurant/rep2/successful_reservation_flow_1_2/b5": {
+    "label": "false",
+    "reason": "Same fixture inconsistency as item 18."
+  },
+  "support/rep2/general_request_classification_1_1/summary-contains-category": {
+    "label": "false",
+    "reason": "Same literal wording as item 23."
+  },
+  "helpdesk/rep3/security_incident_immediate_escalation_5_2/reply-lost-device-next-step": {
+    "label": "false",
+    "reason": "The reply gives the lost-device guidance in its own words; the assertion requires a literal fixture sentence."
+  },
+  "restaurant/rep2/confirmation_summary_quality_6_1/summary-contains-actual-note": {
+    "label": "false",
+    "reason": "Reservation creation fails in the environment; the expected note can only follow a successful booking."
+  },
+  "insurance/rep2/threshold_escalation_above_eur_5000_5_1/reference_in_response": {
+    "label": "false",
+    "reason": "The claim reference can only be created after validation, which the environment rejects for POL-3003."
+  },
+  "support/rep1/refund_below_threshold_6_1/classification_succeeds": {
+    "label": "unclear",
+    "reason": "The crew wrongly escalated a small refund (a real defect), but this assertion only checks the separate classify tool (see item 1)."
+  },
+  "restaurant/rep1/successful_reservation_flow_1_2/b4": {
+    "label": "false",
+    "reason": "create_reservation fails for every guest name the request allows."
+  },
+  "restaurant/rep3/large_party_escalation_3_1/large-party-handoff-result": {
+    "label": "false",
+    "reason": "The handoff call was correct; the environment has no matching fixture."
+  },
+  "restaurant/rep2/allergen_safety_and_missing_data_5_1/tool_staff_handoff_succeeds": {
+    "label": "valid",
+    "reason": "The case requires a staff escalation for the allergen question; the crew only told the guest to ask staff."
+  },
+  "insurance/rep1/missing_mandatory_details_4_1/details-output": {
+    "label": "false",
+    "reason": "The call was reasonable; the environment has no matching fixture."
+  },
+  "restaurant/rep3/allergen_safety_and_missing_data_5_1/tool_staff_handoff_succeeds": {
+    "label": "valid",
+    "reason": "As item 33."
+  },
+  "travel/rep3/happy_path_complete_trip_within_budget_1_2/b4": {
+    "label": "false",
+    "reason": "The case plans a trip to London, but the hotel fixtures contain no London record."
+  },
+  "restaurant/rep2/availability_conflict_handling_2_1/availability-result": {
+    "label": "false",
+    "reason": "As item 3: the goal sends parties above 8 to staff, so no availability check is expected."
+  },
+  "insurance/rep1/non_covered_but_valid_policy_7_1/ncbv1_coverage_result": {
+    "label": "false",
+    "reason": "Coverage fixtures are keyed on POL-4004, the case and validation use PN-4004."
+  },
+  "restaurant/rep1/availability_conflict_handling_2_1/availability-result": {
+    "label": "false",
+    "reason": "As item 37."
+  },
+  "hr_leave/rep3/missing_or_invalid_employee_id_6_1/missing-id-no-manager-routing": {
+    "label": "valid",
+    "reason": "The crew routed a request without an employee ID to the manager, which the case forbids."
+  },
+  "hr_leave/rep3/request_exceeds_threshold_with_sufficient_balance_4_1/no_auto_approval": {
+    "label": "false",
+    "reason": "The assertion forbids the check tool, which checks rather than approves; the crew routed to the manager as required."
+  },
+  "support/rep2/refund_below_threshold_6_1/no_escalation_for_small_refund": {
+    "label": "valid",
+    "reason": "The crew escalated a EUR 49.90 refund, which the goal keeps in normal handling."
+  },
+  "insurance/rep3/boundary_conditions_around_eur_5000_and_borderline_fraud_signals_10_1/a3": {
+    "label": "valid",
+    "reason": "The crew forwarded a claim of exactly EUR 5000 to an adjuster, which the case forbids."
+  },
+  "hr_leave/rep1/manager_not_auto_approved_7_1/no_manager_self_approval": {
+    "label": "false",
+    "reason": "The assertion forbids notifying the employee, although the goal requires replying to the employee; no approval was issued."
+  },
+  "insurance/rep1/invalid_policy_number_3_1/policy-validation-no-success": {
+    "label": "false",
+    "reason": "The reply states that no claim reference was created; the phrase check fires on the negated statement."
+  },
+  "helpdesk/rep3/employee_id_verification_gate_2_2/c2-tool-fail-safe": {
+    "label": "false",
+    "reason": "The reply says the ID could not be verified; the phrase check fires on \"verified\"."
+  },
+  "restaurant/rep1/allergen_safety_and_missing_data_5_1/no_guessing": {
+    "label": "false",
+    "reason": "The reply says it cannot confirm whether the soup contains gluten; the phrase check fires on the negated statement."
+  },
+  "restaurant/rep2/allergen_safety_and_missing_data_5_1/no_guessing": {
+    "label": "false",
+    "reason": "As item 47."
+  },
+  "insurance/rep2/invalid_policy_number_3_1/policy-validation-no-success": {
+    "label": "false",
+    "reason": "As item 45."
+  },
+  "helpdesk/rep1/security_incident_immediate_escalation_5_2/reply-no-secrets-2": {
+    "label": "false",
+    "reason": "The reply tells the employee not to share passwords or secrets; the phrase check fires on the warning."
+  },
+  "insurance/rep2/boundary_conditions_around_eur_5000_and_borderline_fraud_signals_10_1/a8": {
+    "label": "false",
+    "reason": "The reply says that no payout amount has been promised; the phrase check fires on the negated statement."
+  },
+  "hr_leave/rep3/request_exceeds_balance_but_under_threshold_3_1/no_auto_approve_claim": {
+    "label": "false",
+    "reason": "The reply says the request could not be auto-approved; the phrase check fires on the negated statement."
+  },
+  "insurance/rep3/customer_notification_wording_9_1/no_payout_promises": {
+    "label": "false",
+    "reason": "As item 51."
+  },
+  "insurance/rep2/non_covered_but_valid_policy_7_1/ncbv1_no_payout_language": {
+    "label": "false",
+    "reason": "As item 51."
+  },
+  "travel/rep2/day_by_day_itinerary_and_total_cost_accuracy_6_1/t1_total_cost_shown": {
+    "label": "false",
+    "reason": "The regular expression uses the inline flag (?i), which the JavaScript engine rejects; the assertion cannot pass."
+  },
+  "support/rep1/refund_below_threshold_6_1/concise_reply_format": {
+    "label": "false",
+    "reason": "As item 55; the reply does contain both parts."
+  },
+  "support/rep3/refund_below_threshold_6_1/concise_reply_format": {
+    "label": "false",
+    "reason": "As item 55."
+  },
+  "support/rep2/refund_below_threshold_6_1/concise_reply_format": {
+    "label": "false",
+    "reason": "As item 55."
+  },
+  "travel/rep3/day_by_day_itinerary_and_total_cost_accuracy_6_1/t1_total_cost_shown": {
+    "label": "false",
+    "reason": "As item 55."
+  }
+}

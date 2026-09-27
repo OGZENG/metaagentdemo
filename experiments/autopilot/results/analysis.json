@@ -1,0 +1,2573 @@
+{
+  "selection": [
+    {
+      "goal": "support",
+      "file": "search-evidence_guided-1.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-evidence_guided-2.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-evidence_guided-3.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-evidence_guided-4.json",
+      "strategy": "evidence_guided_control",
+      "cost_first": {
+        "id": "r2-c1-bind_tool",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0.5,
+        "missingTest": false,
+        "dTokensPct": 9.06833583363509
+      },
+      "pass_first": {
+        "id": "r2-c1-bind_tool",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0.5,
+        "missingTest": false,
+        "dTokensPct": 9.06833583363509
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-evidence_guided_v2-1.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-evidence_guided_v2-2.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-evidence_guided_v2-3.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-greedy-1.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": "r2-c1-bind_tool",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 67.1305157519011
+      },
+      "pass_first": {
+        "id": "r2-c1-bind_tool",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 67.1305157519011
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-greedy-2.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-greedy-3.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": "r2-c1-bind_tool",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 14.706947390202263
+      },
+      "pass_first": {
+        "id": "r2-c1-bind_tool",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 14.706947390202263
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-random-1.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": "r2-c3-bind_tool",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0.5,
+        "missingTest": false,
+        "dTokensPct": 18.65397547979928
+      },
+      "pass_first": {
+        "id": "r2-c3-bind_tool",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0.5,
+        "missingTest": false,
+        "dTokensPct": 18.65397547979928
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-random-2.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-random-3.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": "r2-c1-bind_tool",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 7.68196161605712
+      },
+      "pass_first": {
+        "id": "r2-c1-bind_tool",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 7.68196161605712
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-regenerate-1.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": "r1-c2-regenerate",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 29.915679478557756
+      },
+      "pass_first": {
+        "id": "r1-c2-regenerate",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 29.915679478557756
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-regenerate-2.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": "r1-c1-regenerate",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 4.888521028399984
+      },
+      "pass_first": {
+        "id": "r1-c1-regenerate",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 4.888521028399984
+      }
+    },
+    {
+      "goal": "support",
+      "file": "search-regenerate-3.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": "r1-c3-regenerate",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 75.92985360302104
+      },
+      "pass_first": {
+        "id": "r1-c3-regenerate",
+        "outcome": "new",
+        "dDev": 0.3333333333333333,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 75.92985360302104
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-evidence_guided-1.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      },
+      "pass_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-evidence_guided-2.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": "r2-c1-remove_task",
+        "outcome": "new",
+        "dDev": -0.16666666666666674,
+        "dTest": 0.15000000000000002,
+        "missingTest": false,
+        "dTokensPct": -10.586708203530637
+      },
+      "pass_first": {
+        "id": "r1-c2-rewrite_prompt",
+        "outcome": "new",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 1.266874350986491
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-evidence_guided-3.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": "r2-c2-rewrite_prompt",
+        "outcome": "new",
+        "dDev": 0.16666666666666663,
+        "dTest": 0.15000000000000002,
+        "missingTest": false,
+        "dTokensPct": 3.1308411214953313
+      },
+      "pass_first": {
+        "id": "r2-c2-rewrite_prompt",
+        "outcome": "new",
+        "dDev": 0.16666666666666663,
+        "dTest": 0.15000000000000002,
+        "missingTest": false,
+        "dTokensPct": 3.1308411214953313
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-evidence_guided-4.json",
+      "strategy": "evidence_guided_control",
+      "cost_first": {
+        "id": "r1-c1-remove_task",
+        "outcome": "new",
+        "dDev": -0.16666666666666674,
+        "dTest": -0.09999999999999998,
+        "missingTest": false,
+        "dTokensPct": -7.253374870197304
+      },
+      "pass_first": {
+        "id": "r1-c2-rewrite_prompt",
+        "outcome": "new",
+        "dDev": 0.16666666666666663,
+        "dTest": -0.09999999999999998,
+        "missingTest": false,
+        "dTokensPct": 1.3136033229491195
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-evidence_guided_v2-1.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      },
+      "pass_first": {
+        "id": "r1-c2-rewrite_prompt",
+        "outcome": "new",
+        "dDev": 0.16666666666666663,
+        "dTest": 0.15000000000000002,
+        "missingTest": false,
+        "dTokensPct": 1.2305295950155726
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-evidence_guided_v2-2.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": "r2-c2-remove_task",
+        "outcome": "new",
+        "dDev": -0.16666666666666674,
+        "dTest": -0.09999999999999998,
+        "missingTest": false,
+        "dTokensPct": -7.4299065420560755
+      },
+      "pass_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-evidence_guided_v2-3.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      },
+      "pass_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-greedy-1.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": "r2-c3-remove_task",
+        "outcome": "new",
+        "dDev": -0.16666666666666674,
+        "dTest": -0.35,
+        "missingTest": false,
+        "dTokensPct": -7.258566978193148
+      },
+      "pass_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-greedy-2.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": "r1-c3-unbind_tool",
+        "outcome": "new",
+        "dDev": -0.16666666666666674,
+        "dTest": -0.09999999999999998,
+        "missingTest": false,
+        "dTokensPct": -6.749740394600201
+      },
+      "pass_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-greedy-3.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": "r1-c3-unbind_tool",
+        "outcome": "new",
+        "dDev": -0.16666666666666674,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": -6.479750778816196
+      },
+      "pass_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-random-1.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": "r1-c2-unbind_tool",
+        "outcome": "new",
+        "dDev": -0.16666666666666674,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": -6.57320872274143
+      },
+      "pass_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-random-2.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": "r1-c2-remove_task",
+        "outcome": "new",
+        "dDev": -0.16666666666666674,
+        "dTest": -0.19999999999999996,
+        "missingTest": false,
+        "dTokensPct": -7.118380062305296
+      },
+      "pass_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-random-3.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": "r1-c1-remove_task",
+        "outcome": "new",
+        "dDev": 0,
+        "dTest": -0.09999999999999998,
+        "missingTest": false,
+        "dTokensPct": -6.765316718587744
+      },
+      "pass_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-regenerate-1.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      },
+      "pass_first": {
+        "id": "r1-c2-regenerate",
+        "outcome": "new",
+        "dDev": 0.16666666666666663,
+        "dTest": -0.09999999999999998,
+        "missingTest": false,
+        "dTokensPct": 3.385254413291783
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-regenerate-2.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      },
+      "pass_first": {
+        "id": "r1-c2-regenerate",
+        "outcome": "new",
+        "dDev": 0.16666666666666663,
+        "dTest": -0.09999999999999998,
+        "missingTest": false,
+        "dTokensPct": 12.601246105918996
+      }
+    },
+    {
+      "goal": "helpdesk",
+      "file": "search-regenerate-3.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": "baseline",
+        "outcome": "base",
+        "dDev": 0,
+        "dTest": 0,
+        "missingTest": false,
+        "dTokensPct": 0
+      },
+      "pass_first": {
+        "id": "r2-c3-regenerate",
+        "outcome": "new",
+        "dDev": 0.16666666666666663,
+        "dTest": -0.09999999999999998,
+        "missingTest": false,
+        "dTokensPct": 187.78296988577364
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-evidence_guided-1.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-evidence_guided-2.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-evidence_guided-3.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-evidence_guided-4.json",
+      "strategy": "evidence_guided_control",
+      "cost_first": {
+        "id": "r1-c1-add_validator",
+        "outcome": "new",
+        "dDev": 0.06666666666666665,
+        "dTest": -0.6666666666666666,
+        "missingTest": false,
+        "dTokensPct": 11.497208668512915
+      },
+      "pass_first": {
+        "id": "r1-c1-add_validator",
+        "outcome": "new",
+        "dDev": 0.06666666666666665,
+        "dTest": -0.6666666666666666,
+        "missingTest": false,
+        "dTokensPct": 11.497208668512915
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-evidence_guided_v2-1.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-evidence_guided_v2-2.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-evidence_guided_v2-3.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-greedy-1.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-greedy-2.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-greedy-3.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-random-1.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-random-2.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": "r2-c2-unbind_tool",
+        "outcome": "new",
+        "dDev": 0.06666666666666665,
+        "dTest": -0.6666666666666666,
+        "missingTest": false,
+        "dTokensPct": -8.195964657787158
+      },
+      "pass_first": {
+        "id": "r2-c2-unbind_tool",
+        "outcome": "new",
+        "dDev": 0.06666666666666665,
+        "dTest": -0.6666666666666666,
+        "missingTest": false,
+        "dTokensPct": -8.195964657787158
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-random-3.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": "r2-c3-bind_tool",
+        "outcome": "new",
+        "dDev": 0.06666666666666665,
+        "dTest": -0.6666666666666666,
+        "missingTest": false,
+        "dTokensPct": 10.141105103521042
+      },
+      "pass_first": {
+        "id": "r2-c3-bind_tool",
+        "outcome": "new",
+        "dDev": 0.06666666666666665,
+        "dTest": -0.6666666666666666,
+        "missingTest": false,
+        "dTokensPct": 10.141105103521042
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-regenerate-1.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-regenerate-2.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "travel",
+      "file": "search-regenerate-3.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-evidence_guided-1.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-evidence_guided-2.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-evidence_guided-3.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-evidence_guided-4.json",
+      "strategy": "evidence_guided_control",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-evidence_guided_v2-1.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-evidence_guided_v2-2.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-evidence_guided_v2-3.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-greedy-1.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-greedy-2.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-greedy-3.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-random-1.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-random-2.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-random-3.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-regenerate-1.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-regenerate-2.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "hr_leave",
+      "file": "search-regenerate-3.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-evidence_guided-1.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-evidence_guided-2.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-evidence_guided-3.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-evidence_guided-4.json",
+      "strategy": "evidence_guided_control",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-evidence_guided_v2-1.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-evidence_guided_v2-2.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-evidence_guided_v2-3.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-greedy-1.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-greedy-2.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-greedy-3.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-random-1.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-random-2.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-random-3.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-regenerate-1.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-regenerate-2.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "restaurant",
+      "file": "search-regenerate-3.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-evidence_guided-1.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-evidence_guided-2.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-evidence_guided-3.json",
+      "strategy": "evidence_guided",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-evidence_guided-4.json",
+      "strategy": "evidence_guided_control",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-evidence_guided_v2-1.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-evidence_guided_v2-2.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-evidence_guided_v2-3.json",
+      "strategy": "evidence_guided_v2",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-greedy-1.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-greedy-2.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-greedy-3.json",
+      "strategy": "greedy",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-random-1.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-random-2.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-random-3.json",
+      "strategy": "random",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-regenerate-1.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-regenerate-2.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    },
+    {
+      "goal": "insurance",
+      "file": "search-regenerate-3.json",
+      "strategy": "regenerate",
+      "cost_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      },
+      "pass_first": {
+        "id": null,
+        "outcome": "none",
+        "dDev": null,
+        "dTest": null,
+        "missingTest": false,
+        "dTokensPct": null
+      }
+    }
+  ],
+  "missingHeldOut": [],
+  "recorded": {
+    "evidence_guided": {
+      "candidates": 91,
+      "better": 10,
+      "searches": 18,
+      "improved": 10
+    },
+    "evidence_guided_control": {
+      "candidates": 32,
+      "better": 7,
+      "searches": 6,
+      "improved": 6
+    },
+    "evidence_guided_v2": {
+      "candidates": 65,
+      "better": 10,
+      "searches": 18,
+      "improved": 9
+    },
+    "greedy": {
+      "candidates": 108,
+      "better": 8,
+      "searches": 18,
+      "improved": 6
+    },
+    "random": {
+      "candidates": 108,
+      "better": 11,
+      "searches": 18,
+      "improved": 8
+    },
+    "regenerate": {
+      "candidates": 108,
+      "better": 25,
+      "searches": 18,
+      "improved": 17
+    }
+  },
+  "tests": [
+    {
+      "left": "greedy",
+      "right": "random",
+      "betterLeft": "8/108",
+      "betterRight": "11/108",
+      "pBetter": 0.6319750871578623,
+      "improvedLeft": "6/18",
+      "improvedRight": "8/18",
+      "pImproved": 0.7332224210475327,
+      "pBetterHolm": 1,
+      "pImprovedHolm": 1
+    },
+    {
+      "left": "evidence_guided",
+      "right": "random",
+      "betterLeft": "10/91",
+      "betterRight": "11/108",
+      "pBetter": 1,
+      "improvedLeft": "10/18",
+      "improvedRight": "8/18",
+      "pImproved": 0.7395185502082655,
+      "pImprovedHolm": 1,
+      "pBetterHolm": 1
+    },
+    {
+      "left": "evidence_guided_control",
+      "right": "random",
+      "betterLeft": "7/32",
+      "betterRight": "11/108",
+      "pBetter": 0.12801022393397854,
+      "improvedLeft": "6/6",
+      "improvedRight": "8/18",
+      "pImproved": 0.02387143748699798,
+      "pImprovedHolm": 0.3342001248179717,
+      "pBetterHolm": 1
+    },
+    {
+      "left": "evidence_guided_v2",
+      "right": "random",
+      "betterLeft": "10/65",
+      "betterRight": "11/108",
+      "pBetter": 0.3419606280657079,
+      "improvedLeft": "9/18",
+      "improvedRight": "8/18",
+      "pImproved": 0.9999999999999898,
+      "pBetterHolm": 1,
+      "pImprovedHolm": 1
+    },
+    {
+      "left": "regenerate",
+      "right": "random",
+      "betterLeft": "25/108",
+      "betterRight": "11/108",
+      "pBetter": 0.016756026023823308,
+      "improvedLeft": "17/18",
+      "improvedRight": "8/18",
+      "pImproved": 0.002727898723449337,
+      "pImprovedHolm": 0.04910217702208807,
+      "pBetterHolm": 0.26809641638117293
+    },
+    {
+      "left": "evidence_guided_control",
+      "right": "evidence_guided",
+      "betterLeft": "7/32",
+      "betterRight": "10/91",
+      "pBetter": 0.14220168323893834,
+      "improvedLeft": "6/6",
+      "improvedRight": "10/18",
+      "pImproved": 0.06636155606407335,
+      "pImprovedHolm": 0.7299771167048068,
+      "pBetterHolm": 1
+    },
+    {
+      "left": "evidence_guided_v2",
+      "right": "evidence_guided_control",
+      "betterLeft": "10/65",
+      "betterRight": "7/32",
+      "pBetter": 0.5707002979587125,
+      "improvedLeft": "9/18",
+      "improvedRight": "6/6",
+      "pImproved": 0.051851466611191416,
+      "pImprovedHolm": 0.622217599334297,
+      "pBetterHolm": 1
+    },
+    {
+      "left": "greedy",
+      "right": "regenerate",
+      "betterLeft": "8/108",
+      "betterRight": "25/108",
+      "pBetter": 0.002104239396401432,
+      "improvedLeft": "6/18",
+      "improvedRight": "17/18",
+      "pImproved": 0.000296625880608079,
+      "pImprovedHolm": 0.00593251761216158,
+      "pBetterHolm": 0.039980548531627205
+    },
+    {
+      "left": "evidence_guided",
+      "right": "regenerate",
+      "betterLeft": "10/91",
+      "betterRight": "25/108",
+      "pBetter": 0.026271673592064667,
+      "improvedLeft": "10/18",
+      "improvedRight": "17/18",
+      "pImproved": 0.01776577149213363,
+      "pImprovedHolm": 0.26809641638117293,
+      "pBetterHolm": 0.34153175669684066
+    },
+    {
+      "left": "evidence_guided_v2",
+      "right": "regenerate",
+      "betterLeft": "10/65",
+      "betterRight": "25/108",
+      "pBetter": 0.24613489902332558,
+      "improvedLeft": "9/18",
+      "improvedRight": "17/18",
+      "pImproved": 0.007230255839821817,
+      "pImprovedHolm": 0.12291434927697088,
+      "pBetterHolm": 1
+    }
+  ],
+  "robustness": [
+    {
+      "weight": 0.4,
+      "threshold": 60,
+      "share": {
+        "random": 0.2037037037037037,
+        "greedy": 0.17592592592592593,
+        "evidence_guided": 0.16483516483516483,
+        "evidence_guided_control": 0.25,
+        "evidence_guided_v2": 0.2153846153846154,
+        "regenerate": 0.26851851851851855
+      },
+      "order": [
+        "regenerate",
+        "evidence_guided_control",
+        "evidence_guided_v2",
+        "random",
+        "greedy",
+        "evidence_guided"
+      ],
+      "periodOrder": [
+        "random",
+        "greedy",
+        "evidence_guided"
+      ],
+      "minP": 0.5839519223038275
+    },
+    {
+      "weight": 0.5,
+      "threshold": 60,
+      "share": {
+        "random": 0.16666666666666666,
+        "greedy": 0.1388888888888889,
+        "evidence_guided": 0.16483516483516483,
+        "evidence_guided_control": 0.25,
+        "evidence_guided_v2": 0.18461538461538463,
+        "regenerate": 0.26851851851851855
+      },
+      "order": [
+        "regenerate",
+        "evidence_guided_control",
+        "evidence_guided_v2",
+        "random",
+        "evidence_guided",
+        "greedy"
+      ],
+      "periodOrder": [
+        "random",
+        "evidence_guided",
+        "greedy"
+      ],
+      "minP": 0.5940941160522505
+    },
+    {
+      "weight": 0.6,
+      "threshold": 60,
+      "share": {
+        "random": 0.1388888888888889,
+        "greedy": 0.14814814814814814,
+        "evidence_guided": 0.14285714285714285,
+        "evidence_guided_control": 0.25,
+        "evidence_guided_v2": 0.2153846153846154,
+        "regenerate": 0.24074074074074073
+      },
+      "order": [
+        "evidence_guided_control",
+        "regenerate",
+        "evidence_guided_v2",
+        "greedy",
+        "evidence_guided",
+        "random"
+      ],
+      "periodOrder": [
+        "greedy",
+        "evidence_guided",
+        "random"
+      ],
+      "minP": 0.7976574428139961
+    },
+    {
+      "weight": 0.7,
+      "threshold": 60,
+      "share": {
+        "random": 0.12962962962962962,
+        "greedy": 0.12037037037037036,
+        "evidence_guided": 0.13186813186813187,
+        "evidence_guided_control": 0.25,
+        "evidence_guided_v2": 0.23076923076923078,
+        "regenerate": 0.2222222222222222
+      },
+      "order": [
+        "evidence_guided_control",
+        "evidence_guided_v2",
+        "regenerate",
+        "evidence_guided",
+        "random",
+        "greedy"
+      ],
+      "periodOrder": [
+        "evidence_guided",
+        "random",
+        "greedy"
+      ],
+      "minP": 0.832853619060672
+    },
+    {
+      "weight": 0.8,
+      "threshold": 60,
+      "share": {
+        "random": 0.14814814814814814,
+        "greedy": 0.1388888888888889,
+        "evidence_guided": 0.13186813186813187,
+        "evidence_guided_control": 0.1875,
+        "evidence_guided_v2": 0.18461538461538463,
+        "regenerate": 0.24074074074074073
+      },
+      "order": [
+        "regenerate",
+        "evidence_guided_control",
+        "evidence_guided_v2",
+        "random",
+        "greedy",
+        "evidence_guided"
+      ],
+      "periodOrder": [
+        "random",
+        "greedy",
+        "evidence_guided"
+      ],
+      "minP": 0.8388993111982493
+    },
+    {
+      "weight": 0.4,
+      "threshold": 70,
+      "share": {
+        "random": 0.18518518518518517,
+        "greedy": 0.12037037037037036,
+        "evidence_guided": 0.17582417582417584,
+        "evidence_guided_control": 0.34375,
+        "evidence_guided_v2": 0.2153846153846154,
+        "regenerate": 0.25
+      },
+      "order": [
+        "evidence_guided_control",
+        "regenerate",
+        "evidence_guided_v2",
+        "random",
+        "evidence_guided",
+        "greedy"
+      ],
+      "periodOrder": [
+        "random",
+        "evidence_guided",
+        "greedy"
+      ],
+      "minP": 0.21862540521447535
+    },
+    {
+      "weight": 0.5,
+      "threshold": 70,
+      "share": {
+        "random": 0.1388888888888889,
+        "greedy": 0.06481481481481481,
+        "evidence_guided": 0.15384615384615385,
+        "evidence_guided_control": 0.28125,
+        "evidence_guided_v2": 0.15384615384615385,
+        "regenerate": 0.23148148148148148
+      },
+      "order": [
+        "evidence_guided_control",
+        "regenerate",
+        "evidence_guided",
+        "evidence_guided_v2",
+        "random",
+        "greedy"
+      ],
+      "periodOrder": [
+        "evidence_guided",
+        "random",
+        "greedy"
+      ],
+      "minP": 0.062145524464772804
+    },
+    {
+      "weight": 0.6,
+      "threshold": 70,
+      "share": {
+        "random": 0.10185185185185185,
+        "greedy": 0.07407407407407407,
+        "evidence_guided": 0.10989010989010989,
+        "evidence_guided_control": 0.21875,
+        "evidence_guided_v2": 0.15384615384615385,
+        "regenerate": 0.23148148148148148
+      },
+      "order": [
+        "regenerate",
+        "evidence_guided_control",
+        "evidence_guided_v2",
+        "evidence_guided",
+        "random",
+        "greedy"
+      ],
+      "periodOrder": [
+        "evidence_guided",
+        "random",
+        "greedy"
+      ],
+      "minP": 0.45986835830257605
+    },
+    {
+      "weight": 0.7,
+      "threshold": 70,
+      "share": {
+        "random": 0.10185185185185185,
+        "greedy": 0.1111111111111111,
+        "evidence_guided": 0.12087912087912088,
+        "evidence_guided_control": 0.1875,
+        "evidence_guided_v2": 0.13846153846153847,
+        "regenerate": 0.23148148148148148
+      },
+      "order": [
+        "regenerate",
+        "evidence_guided_control",
+        "evidence_guided_v2",
+        "evidence_guided",
+        "greedy",
+        "random"
+      ],
+      "periodOrder": [
+        "evidence_guided",
+        "greedy",
+        "random"
+      ],
+      "minP": 0.5590433680241246
+    },
+    {
+      "weight": 0.8,
+      "threshold": 70,
+      "share": {
+        "random": 0.09259259259259259,
+        "greedy": 0.07407407407407407,
+        "evidence_guided": 0.07692307692307693,
+        "evidence_guided_control": 0.15625,
+        "evidence_guided_v2": 0.1076923076923077,
+        "regenerate": 0.23148148148148148
+      },
+      "order": [
+        "regenerate",
+        "evidence_guided_control",
+        "evidence_guided_v2",
+        "random",
+        "evidence_guided",
+        "greedy"
+      ],
+      "periodOrder": [
+        "random",
+        "evidence_guided",
+        "greedy"
+      ],
+      "minP": 0.5229634569286458
+    },
+    {
+      "weight": 0.4,
+      "threshold": 80,
+      "share": {
+        "random": 0.12037037037037036,
+        "greedy": 0.06481481481481481,
+        "evidence_guided": 0.07692307692307693,
+        "evidence_guided_control": 0.125,
+        "evidence_guided_v2": 0.12307692307692308,
+        "regenerate": 0.17592592592592593
+      },
+      "order": [
+        "regenerate",
+        "evidence_guided_control",
+        "evidence_guided_v2",
+        "random",
+        "evidence_guided",
+        "greedy"
+      ],
+      "periodOrder": [
+        "random",
+        "evidence_guided",
+        "greedy"
+      ],
+      "minP": 0.2400209125622339
+    },
+    {
+      "weight": 0.5,
+      "threshold": 80,
+      "share": {
+        "random": 0.08333333333333333,
+        "greedy": 0.037037037037037035,
+        "evidence_guided": 0.03296703296703297,
+        "evidence_guided_control": 0.125,
+        "evidence_guided_v2": 0.07692307692307693,
+        "regenerate": 0.16666666666666666
+      },
+      "order": [
+        "regenerate",
+        "evidence_guided_control",
+        "random",
+        "evidence_guided_v2",
+        "greedy",
+        "evidence_guided"
+      ],
+      "periodOrder": [
+        "random",
+        "greedy",
+        "evidence_guided"
+      ],
+      "minP": 0.23095272883155743
+    },
+    {
+      "weight": 0.6,
+      "threshold": 80,
+      "share": {
+        "random": 0.06481481481481481,
+        "greedy": 0.027777777777777776,
+        "evidence_guided": 0.054945054945054944,
+        "evidence_guided_control": 0.125,
+        "evidence_guided_v2": 0.09230769230769231,
+        "regenerate": 0.18518518518518517
+      },
+      "order": [
+        "regenerate",
+        "evidence_guided_control",
+        "evidence_guided_v2",
+        "random",
+        "evidence_guided",
+        "greedy"
+      ],
+      "periodOrder": [
+        "random",
+        "evidence_guided",
+        "greedy"
+      ],
+      "minP": 0.3320862801042235
+    },
+    {
+      "weight": 0.7,
+      "threshold": 80,
+      "share": {
+        "random": 0.08333333333333333,
+        "greedy": 0.046296296296296294,
+        "evidence_guided": 0.0989010989010989,
+        "evidence_guided_control": 0.1875,
+        "evidence_guided_v2": 0.15384615384615385,
+        "regenerate": 0.19444444444444445
+      },
+      "order": [
+        "regenerate",
+        "evidence_guided_control",
+        "evidence_guided_v2",
+        "evidence_guided",
+        "random",
+        "greedy"
+      ],
+      "periodOrder": [
+        "evidence_guided",
+        "random",
+        "greedy"
+      ],
+      "minP": 0.17212303073688712
+    },
+    {
+      "weight": 0.8,
+      "threshold": 80,
+      "share": {
+        "random": 0.08333333333333333,
+        "greedy": 0.046296296296296294,
+        "evidence_guided": 0.0989010989010989,
+        "evidence_guided_control": 0.125,
+        "evidence_guided_v2": 0.15384615384615385,
+        "regenerate": 0.2222222222222222
+      },
+      "order": [
+        "regenerate",
+        "evidence_guided_v2",
+        "evidence_guided_control",
+        "evidence_guided",
+        "random",
+        "greedy"
+      ],
+      "periodOrder": [
+        "evidence_guided",
+        "random",
+        "greedy"
+      ],
+      "minP": 0.17212303073688712
+    }
+  ]
+}

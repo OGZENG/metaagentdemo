@@ -1,112 +1,112 @@
 {
-  "evaluations": 2497,
-  "trials": 422,
-  "failedByCriticalAlone": 1312,
+  "evaluations": 3128,
+  "trials": 530,
+  "failedByCriticalAlone": 1613,
   "rows": [
     {
       "weight": 0.4,
       "threshold": 60,
-      "passRate": 0.3836603924709652,
-      "changed": 242,
-      "changedPct": 9.691629955947137
+      "passRate": 0.3906649616368286,
+      "changed": 299,
+      "changedPct": 9.558823529411764
     },
     {
       "weight": 0.5,
       "threshold": 60,
-      "passRate": 0.3780536643972767,
-      "changed": 228,
-      "changedPct": 9.130957148578293
+      "passRate": 0.3845907928388747,
+      "changed": 280,
+      "changedPct": 8.951406649616368
     },
     {
       "weight": 0.6,
       "threshold": 60,
-      "passRate": 0.37284741690028034,
-      "changed": 215,
-      "changedPct": 8.610332398878654
+      "passRate": 0.37755754475703324,
+      "changed": 258,
+      "changedPct": 8.248081841432226
     },
     {
       "weight": 0.7,
       "threshold": 60,
-      "passRate": 0.3648378053664397,
-      "changed": 195,
-      "changedPct": 7.809371245494594
+      "passRate": 0.3702046035805627,
+      "changed": 235,
+      "changedPct": 7.512787723785166
     },
     {
       "weight": 0.8,
       "threshold": 60,
-      "passRate": 0.33480176211453744,
-      "changed": 120,
-      "changedPct": 4.805766920304365
+      "passRate": 0.34398976982097185,
+      "changed": 153,
+      "changedPct": 4.891304347826087
     },
     {
       "weight": 0.4,
       "threshold": 70,
-      "passRate": 0.342010412494994,
-      "changed": 150,
-      "changedPct": 6.0072086503804565
+      "passRate": 0.3452685421994885,
+      "changed": 177,
+      "changedPct": 5.658567774936062
     },
     {
       "weight": 0.5,
       "threshold": 70,
-      "passRate": 0.3239887865438526,
-      "changed": 103,
-      "changedPct": 4.124949939927913
+      "passRate": 0.3289641943734015,
+      "changed": 118,
+      "changedPct": 3.7723785166240407
     },
     {
       "weight": 0.6,
       "threshold": 70,
-      "passRate": 0.2867440929114938,
+      "passRate": 0.295076726342711,
       "changed": 0,
       "changedPct": 0
     },
     {
       "weight": 0.7,
       "threshold": 70,
-      "passRate": 0.27072486984381255,
-      "changed": 44,
-      "changedPct": 1.762114537444934
+      "passRate": 0.28164961636828645,
+      "changed": 58,
+      "changedPct": 1.854219948849105
     },
     {
       "weight": 0.8,
       "threshold": 70,
-      "passRate": 0.2563075690828995,
-      "changed": 98,
-      "changedPct": 3.9247096515818978
+      "passRate": 0.2653452685421995,
+      "changed": 129,
+      "changedPct": 4.124040920716113
     },
     {
       "weight": 0.4,
       "threshold": 80,
-      "passRate": 0.250300360432519,
-      "changed": 91,
-      "changedPct": 3.644373247897477
+      "passRate": 0.25607416879795397,
+      "changed": 122,
+      "changedPct": 3.9002557544757033
     },
     {
       "weight": 0.5,
       "threshold": 80,
-      "passRate": 0.2290748898678414,
-      "changed": 144,
-      "changedPct": 5.766920304365239
+      "passRate": 0.23593350383631714,
+      "changed": 185,
+      "changedPct": 5.914322250639386
     },
     {
       "weight": 0.6,
       "threshold": 80,
-      "passRate": 0.21826191429715658,
-      "changed": 171,
-      "changedPct": 6.848217861433721
+      "passRate": 0.2215473145780051,
+      "changed": 230,
+      "changedPct": 7.352941176470589
     },
     {
       "weight": 0.7,
       "threshold": 80,
-      "passRate": 0.19823788546255505,
-      "changed": 221,
-      "changedPct": 8.850620744893872
+      "passRate": 0.20236572890025575,
+      "changed": 290,
+      "changedPct": 9.271099744245523
     },
     {
       "weight": 0.8,
       "threshold": 80,
-      "passRate": 0.17020424509411294,
-      "changed": 291,
-      "changedPct": 11.653984781738085
+      "passRate": 0.17742966751918157,
+      "changed": 370,
+      "changedPct": 11.828644501278772
     }
   ]
 }

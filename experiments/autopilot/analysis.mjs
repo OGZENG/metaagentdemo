@@ -294,7 +294,7 @@ if (texDir) {
         `${header}\\begin{tabular}{lccccc}\n    \\toprule\n    Rule and strategy & new/base/none & Worse dev & $\\Delta$ dev pass & $\\Delta$ test pass & $\\Delta$ tokens [\\%] \\\\\n    \\midrule\n${rows.join('\n').replace(/\\multicolumn\{7\}/g, '\\multicolumn{6}')}\n    \\bottomrule\n\\end{tabular}%\n`
     )
     const testRows = tests.map(
-        (t) => `        ${LABEL[t.left]} vs.\\ ${LABEL[t.right]} & ${t.betterLeft} vs.\\ ${t.betterRight} & ${fmt(t.pBetter, 2)} & ${t.improvedLeft} vs.\\ ${t.improvedRight} & ${fmt(t.pImproved, 2)} \\\\`
+        (t) => `        ${LABEL[t.left]} vs.\\ ${LABEL[t.right]} & ${t.betterLeft} vs.\\ ${t.betterRight} & ${fmt(t.pBetter, 2)} (${fmt(t.pBetterHolm, 2)}) & ${t.improvedLeft} vs.\\ ${t.improvedRight} & ${fmt(t.pImproved, 2)} (${fmt(t.pImprovedHolm, 2)}) \\\\`
     )
     writeFileSync(
         join(texDir, 'e2_tests.tex'),
@@ -316,6 +316,15 @@ if (texDir) {
         SelSearches: selection.filter((row) => row.strategy !== 'regenerate').length,
         TestMinP: fmt(Math.min(...tests.map((t) => Math.min(t.pBetter, t.pImproved))), 2),
         TestMinPHolm: fmt(Math.min(...tests.map((t) => Math.min(t.pBetterHolm, t.pImprovedHolm))), 2),
+        // Comparisons among the operator-based strategies only.
+        TestMinPHolmOps: fmt(
+            Math.min(
+                ...tests
+                    .filter((t) => t.left !== 'regenerate' && t.right !== 'regenerate')
+                    .map((t) => Math.min(t.pBetterHolm, t.pImprovedHolm))
+            ),
+            2
+        ),
         RobustSettings: robustness.length,
         RobustMinP: fmt(minP, 2),
         RobustOrders: new Set(robustness.map((r) => r.periodOrder.join('>'))).size

@@ -13,6 +13,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ROOT, predict } from './lib/api.mjs'
 import { compileTrial } from './lib/runner.mjs'
+import { isCorrect } from './lib/e3answers.mjs'
 import { extractStudioOutput, summarizePrediction } from '../../packages/ui/src/views/metaagent/studioUtils.js'
 
 const repsIndex = process.argv.indexOf('--reps')
@@ -35,21 +36,6 @@ const QUESTIONS = [
     'If today is Wednesday, what weekday will it be in 100 days?',
     'A rectangle has perimeter 36 cm and its length is twice its width. What is its area?'
 ]
-
-// Reference answers, checked against the end of the aggregator's reply (where it states the final answer).
-const ANSWERS = [
-    /\b205\b/,
-    /\b9\s*(h\b|hours?)/i,
-    /not\s+(a\s+)?prime|isn.t\s+(a\s+)?prime|composite|17\s*[×x*·]\s*23/i,
-    /\blower\b|\bless\b/i,
-    /\bcarol\b/i,
-    /2[,.\s]?842/,
-    /3\s*\/\s*28|0\.107/,
-    /\b20\s*(m\/s|metres|meters)/i,
-    /\bfriday\b/i,
-    /\b72\b/
-]
-const isCorrect = (index, output) => ANSWERS[index].test(String(output || '').slice(-300))
 
 const solver = (id, name, strategy) => ({
     agent: { id: `${id}_agent`, name, role: 'specialist', goal: `Solve the question using a ${strategy} strategy.`, backstory: '', tools: [], guardrails: [], modelTier: 'default' },
