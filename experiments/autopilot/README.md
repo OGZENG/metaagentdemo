@@ -51,4 +51,4 @@ re-measurements. `results/parallel/parallel-checked.json` contains the E3 runs w
 (`parallel.json` is an earlier run that recorded latency only). `assertion-audit-sample.json` and
 `assertion-audit-labels.json` hold the audited failed assertions with their labels and reasons.
 `online/deployment-support.json` is the record of the deployment used in the online case study
-(credential ids removed). `results/*.log` are the console logs of the runs.
+(credential ids removed). The console logs of the runs (`results/*.log`) are git-ignored.
