@@ -33,15 +33,17 @@ if (!goalEntry) {
     console.error(`Unknown goal "${goalId}". Known: ${goals.map((entry) => entry.id).join(', ')}`)
     process.exit(1)
 }
-// --world validated: the repeated experiment (E4) on the validated test world,
-// with its own results folder and the settings of VALIDATED_SETTINGS.
+// --world validated: the repeated experiment (E4) on the validated test world;
+// --world repaired: E5, additionally with a repaired environment and more
+// held-out cases. Both use their own results folder and VALIDATED_SETTINGS.
 const world = flag('world', 'original')
-if (!['original', 'validated'].includes(world)) {
-    console.error('--world must be original or validated')
+const WORLDS = { original: 'results', validated: 'results-validated', repaired: 'results-repaired' }
+if (!WORLDS[world]) {
+    console.error(`--world must be one of ${Object.keys(WORLDS).join(', ')}`)
     process.exit(1)
 }
-const SETTINGS = world === 'validated' ? VALIDATED_SETTINGS : DEFAULT_SETTINGS
-const resultsRoot = world === 'validated' ? 'results-validated' : 'results'
+const SETTINGS = world === 'original' ? DEFAULT_SETTINGS : VALIDATED_SETTINGS
+const resultsRoot = WORLDS[world]
 const dir = join(ROOT, resultsRoot, goalId)
 mkdirSync(dir, { recursive: true })
 const designFile = join(dir, 'design.json')
@@ -69,6 +71,36 @@ const commands = {
         console.log(
             `validate: ${count(source.design.scenarios)} -> ${count(data.design.scenarios)} assertions, ` +
                 `${data.changes.length} change(s) (${data.changes.filter((change) => change.source === 'review').length} by review)`
+        )
+    },
+
+    /**
+     * Repaired test world (E5), from the frozen original design: more held-out
+     * cases, then environment repair over all cases, then assertion validation.
+     */
+    async prepare() {
+        if (world !== 'repaired') throw new Error('prepare writes the repaired world; use --world repaired')
+        const source = readJson(join(ROOT, 'results', goalId, 'design.json'))
+        const extra = Number(flag('heldout', 8))
+        const startedAt = Date.now()
+        const extended = await studio('testworld/extend', { goal: source.goal, design: source.design, count: extra, selectedChatModel })
+        const repaired = await studio('testworld/repair', { goal: source.goal, design: extended.design, selectedChatModel, judgeTemperature: 0 })
+        const validated = await studio('testworld/validate', { goal: source.goal, design: repaired.design, selectedChatModel, judgeTemperature: 0 })
+        const split = (design, name) => design.scenarios.filter((scenario) => (scenario.split || 'dev') === name).length
+        writeJson(designFile, {
+            ...source,
+            preparedFrom: `results/${goalId}/design.json`,
+            preparationMs: Date.now() - startedAt,
+            heldOutAdded: extended.added,
+            design: validated.design,
+            environmentChanges: repaired.changes,
+            testWorldChanges: validated.changes
+        })
+        const count = (action) => repaired.changes.filter((change) => change.action === action).length
+        console.log(
+            `prepare: ${split(validated.design, 'dev')} dev + ${split(validated.design, 'test')} held-out cases (+${extended.added}), ` +
+                `fixtures added ${count('add_fixture')}, rejected ${count('reject')}, skipped ${count('skip')}, ` +
+                `${validated.changes.length} assertion change(s)`
         )
     },
 

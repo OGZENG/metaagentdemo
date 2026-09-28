@@ -13,6 +13,8 @@ router.post('/studio/crew/regenerate', agentflowv2GeneratorController.regenerate
 router.post('/studio/compile', agentflowv2GeneratorController.compileStudioWorkflow)
 router.post('/studio/evaluate', agentflowv2GeneratorController.evaluateStudioOutput)
 router.post('/studio/testworld/validate', agentflowv2GeneratorController.validateStudioTestWorld)
+router.post('/studio/testworld/repair', agentflowv2GeneratorController.repairStudioEnvironment)
+router.post('/studio/testworld/extend', agentflowv2GeneratorController.extendStudioHeldOut)
 router.post('/studio/diagnose', agentflowv2GeneratorController.diagnoseStudioRun)
 router.post('/studio/candidates', agentflowv2GeneratorController.proposeStudioCandidates)
 router.post('/studio/operator/apply', agentflowv2GeneratorController.applyStudioOperator)

@@ -20,7 +20,9 @@ import {
     purgeStudioTools,
     regenerateStudioCrew,
     regenerateStudioScenarios,
-    validateStudioTestWorld
+    validateStudioTestWorld,
+    repairStudioEnvironment,
+    extendStudioHeldOut
 } from './studioService'
 
 // Define the Zod schema for Agentflowv2 data structure
@@ -272,5 +274,7 @@ export default {
     proposeStudioCandidates,
     applyStudioOperator,
     purgeStudioTools,
-    validateStudioTestWorld
+    validateStudioTestWorld,
+    repairStudioEnvironment,
+    extendStudioHeldOut
 }

@@ -30,11 +30,18 @@ import {
     type RecordedToolCall
 } from './assertions'
 import {
+    answeredByCase,
+    pruneRepairFixture,
+    ENVIRONMENT_REPAIR_PROMPT,
+    EnvironmentRepairType,
     repairAssertions,
+    repairPayload,
     REVIEW_EXEMPT_TYPES,
     reviewPayload,
     TEST_WORLD_REVIEW_PROMPT,
     TestWorldReviewType,
+    unansweredTools,
+    type EnvironmentChange,
     type TestWorldChange
 } from './testWorldValidator'
 import {
@@ -497,9 +504,11 @@ export const designStudioWorkflow = async (goal: string, selectedChatModel: Reco
     const world = await buildStudioWorld(goal, contract, selectedChatModel)
     const { ir, validation } = await buildStudioCrew(goal, contract, world.tools, selectedChatModel)
     const draft: StudioDesign = StudioDesignType.parse({ ...contract, tools: world.tools, scenarios: world.scenarios, crew: ir })
-    const { design, changes } = await validateStudioTestWorld(goal, draft, selectedChatModel)
+    const environment = await repairStudioEnvironment(goal, draft, selectedChatModel)
+    const { design, changes } = await validateStudioTestWorld(goal, environment.design, selectedChatModel)
     return {
         design,
+        environmentChanges: environment.changes,
         testWorldChanges: changes,
         validation: { ...validation, warnings: [...validation.warnings, ...world.warnings] },
         crewSummary: summarizeCrewIR(ir)
@@ -559,6 +568,162 @@ export const validateStudioTestWorld = async (
         })
     )
     return { design: StudioDesignType.parse({ ...design, scenarios }), changes }
+}
+
+/**
+ * Environment repair (testWorldValidator.ts): for every case, each required tool
+ * that no fixture answers with the values the case states gets one fixture
+ * proposed at the judge temperature, copied from the case and accepted only if
+ * the case can reach it. Proposals are made per case in parallel and applied in
+ * case order, so a later case sees the fixtures added for an earlier one.
+ */
+export const repairStudioEnvironment = async (
+    goal: string,
+    designInput: unknown,
+    selectedChatModel: Record<string, any>,
+    judgeTemperature: number | null = DEFAULT_JUDGE_TEMPERATURE
+): Promise<{ design: StudioDesign; changes: EnvironmentChange[] }> => {
+    const design = StudioDesignType.parse(designInput)
+    const repairer = withTemperature(selectedChatModel, judgeTemperature)
+    const pending = design.scenarios
+        .map((scenario) => ({ scenario, tools: unansweredTools(scenario, design) }))
+        .filter((item) => item.tools.length)
+    const proposals = await Promise.all(
+        pending.map(async ({ scenario, tools }) => {
+            try {
+                return {
+                    scenario,
+                    tools,
+                    repair: await invokeStudioModel(
+                        repairer,
+                        EnvironmentRepairType,
+                        ENVIRONMENT_REPAIR_PROMPT,
+                        repairPayload(goal, design, scenario, tools)
+                    )
+                }
+            } catch (error) {
+                logger.warn(`Environment repair skipped for ${scenario.id}: ${getErrorMessage(error)}`)
+                return { scenario, tools, repair: null }
+            }
+        })
+    )
+    const tools = design.tools.map((tool) => ({ ...tool, fixtures: [...tool.fixtures] }))
+    const current = { tools }
+    const changes: EnvironmentChange[] = []
+    const apply = (scenario: (typeof design.scenarios)[number], wanted: string[], repair: z.infer<typeof EnvironmentRepairType> | null) => {
+        const rejected: string[] = []
+        for (const skipped of repair?.skipped || []) {
+            changes.push({ caseId: scenario.id, tool: skipped.tool, action: 'skip', match: [], reason: skipped.reason })
+        }
+        for (const proposal of repair?.fixtures || []) {
+            if (!wanted.includes(proposal.tool)) continue
+            // An earlier case may already have added what this one needs.
+            if (answeredByCase(proposal.tool, scenario.input, current)) continue
+            const outcome = pruneRepairFixture(proposal, scenario.input, current)
+            if ('problem' in outcome) {
+                changes.push({ caseId: scenario.id, tool: proposal.tool, action: 'reject', match: proposal.match, reason: outcome.problem })
+                rejected.push(`${proposal.tool}: ${outcome.problem}`)
+                continue
+            }
+            const { fixture, pruned } = outcome
+            current.tools
+                .find((item) => item.name === fixture.tool)
+                ?.fixtures.push({ match: fixture.match, result: fixture.error ? [] : fixture.result, error: fixture.error || '' })
+            changes.push({
+                caseId: scenario.id,
+                tool: fixture.tool,
+                action: 'add_fixture',
+                match: fixture.match,
+                reason: [
+                    fixture.error ? `injected failure: ${fixture.error}` : 'answers the values stated in the case',
+                    pruned.length ? `pruned ${pruned.join(', ')}` : ''
+                ]
+                    .filter(Boolean)
+                    .join('; ')
+            })
+        }
+        return rejected
+    }
+    for (const { scenario, tools: wanted, repair } of proposals) {
+        const rejected = apply(scenario, wanted, repair)
+        const stillOpen = wanted.filter(
+            (tool) => !answeredByCase(tool, scenario.input, current) && rejected.some((line) => line.startsWith(`${tool}:`))
+        )
+        if (!stillOpen.length) continue
+        // One retry with the reasons, for proposals that keyed on values the case does not state.
+        try {
+            const retry = await invokeStudioModel(
+                repairer,
+                EnvironmentRepairType,
+                `${ENVIRONMENT_REPAIR_PROMPT}\nYour previous fixtures for this case were rejected:\n${rejected.join(
+                    '\n'
+                )}\nUse only values that occur verbatim in the case input.`,
+                repairPayload(goal, { ...design, tools: current.tools }, scenario, stillOpen)
+            )
+            apply(scenario, stillOpen, retry)
+        } catch (error) {
+            logger.warn(`Environment repair retry skipped for ${scenario.id}: ${getErrorMessage(error)}`)
+        }
+    }
+    return { design: StudioDesignType.parse({ ...design, tools: current.tools }), changes }
+}
+
+/**
+ * More held-out cases for an existing design. With one to three held-out cases
+ * per goal, one case moved a held-out pass rate by a third or more. The new
+ * cases are written against the current environment by the same prompt as the
+ * original suite, spread round-robin over the coverage categories, and marked as
+ * held out; they must then pass environment repair and validation like the rest.
+ */
+export const extendStudioHeldOut = async (goal: string, designInput: unknown, count: number, selectedChatModel: Record<string, any>) => {
+    const design = StudioDesignType.parse(designInput)
+    const categories = design.coveragePlan.length
+        ? design.coveragePlan
+        : [...new Set(design.scenarios.map((scenario) => scenario.category))].map((category) => ({ category, reason: '', risk: 'medium' }))
+    const wanted = Math.max(0, Math.min(20, Number(count) || 0))
+    const perCategory = categories.map((item, index) => ({
+        item,
+        count: Math.floor(wanted / categories.length) + (index < wanted % categories.length ? 1 : 0)
+    }))
+    const existing = design.scenarios.map((scenario) => scenario.input)
+    const batches = await Promise.all(
+        perCategory
+            .filter((entry) => entry.count > 0)
+            .map(async ({ item, count: n }) => {
+                try {
+                    const suite = await invokeStudioModel(
+                        selectedChatModel,
+                        z.object({ scenarios: z.array(AcceptanceScenarioType).min(n).max(30) }),
+                        `${SCENARIO_PROMPT}\nThe suite already contains the cases listed in existingCaseInputs. Write new cases that differ from all of them in the request, the identifiers used or the situation tested.`,
+                        JSON.stringify(
+                            {
+                                goal,
+                                contract: { ...design, tools: undefined, scenarios: undefined, crew: undefined, coveragePlan: undefined },
+                                category: item.category,
+                                whyThisCategoryMatters: (item as any).reason || '',
+                                riskLevel: (item as any).risk || 'medium',
+                                wantedCases: n,
+                                existingCaseInputs: existing,
+                                toolEnvironment: design.tools
+                            },
+                            null,
+                            2
+                        )
+                    )
+                    return suite.scenarios.slice(0, n).map((scenario, index) => ({
+                        ...scenario,
+                        category: scenario.category || item.category,
+                        split: 'test' as const,
+                        id: `heldout_${slug(item.category)}_${index + 1}`
+                    }))
+                } catch (error) {
+                    logger.warn(`Held-out extension skipped for ${item.category}: ${getErrorMessage(error)}`)
+                    return []
+                }
+            })
+    )
+    const added = batches.flat()
+    return { design: StudioDesignType.parse({ ...design, scenarios: [...design.scenarios, ...added] }), added: added.length }
 }
 
 export const regenerateStudioScenarios = async (goal: string, designInput: unknown, selectedChatModel: Record<string, any>) => {

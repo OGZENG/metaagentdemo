@@ -183,3 +183,176 @@ export const reviewPayload = (
         null,
         2
     )
+
+/* ------------------------------------------------------------------ *
+ * Environment repair
+ * ------------------------------------------------------------------ */
+
+/**
+ * The second audit found most remaining false alarms in the environment, not in
+ * the assertions: a case names policy PN-1001 while the coverage fixture is keyed
+ * on POL-1001, a leave policy is only found under the internal code
+ * `leave_standard`. A correct workflow calls the tool with what the case states,
+ * gets "not found", and fails. Fixtures are repaired per case: a required tool
+ * that no fixture answers for the values stated in the case gets one fixture
+ * whose match values are copied from the case, written by the model at the judge
+ * temperature and accepted only if it passes `checkRepairFixture`.
+ */
+export type EnvironmentChange = {
+    caseId: string
+    tool: string
+    action: 'add_fixture' | 'skip' | 'reject'
+    match: { key: string; value: string }[]
+    reason: string
+}
+
+/** Tools a case depends on: its required tools and the tools its call and success assertions name. */
+export const requiredToolsOf = (scenario: { requiredTools?: string[]; assertions: Assertion[] }) =>
+    [
+        ...new Set([
+            ...(scenario.requiredTools || []),
+            ...scenario.assertions.filter((a) => (a.type === 'tool_called' || a.type === 'tool_succeeded') && a.tool).map((a) => a.tool)
+        ])
+    ].filter(Boolean)
+
+/**
+ * What a correct workflow can know in one case: the input, plus the results of
+ * every successful fixture it can reach with what it already knows. Iterated to
+ * a fixed point, so a claim reference returned by one tool can key the next.
+ */
+export const caseKnowledge = (input: string, design: Pick<StudioDesign, 'tools'>) => {
+    let text = normalize(input)
+    const used = new Set<string>()
+    for (let round = 0; round < 4; round += 1) {
+        let grew = false
+        for (const tool of design.tools) {
+            tool.fixtures.forEach((fixture, index) => {
+                const key = `${tool.name}#${index}`
+                if (used.has(key) || fixture.error || !fixture.match.length) return
+                if (!fixture.match.every((pair) => text.includes(normalize(pair.value)))) return
+                used.add(key)
+                text = `${text} \n ${normalize(fixture.result.map((pair) => pair.value).join(' \n '))}`
+                grew = true
+            })
+        }
+        if (!grew) break
+    }
+    return text
+}
+
+/**
+ * A fixture answers a case if it has no match keys, or if every match value is
+ * something the workflow can know in this case. Error fixtures count too: a case
+ * may deliberately probe an outage.
+ */
+export const answeredByCase = (toolName: string, input: string, design: Pick<StudioDesign, 'tools'>) => {
+    const tool = design.tools.find((item) => normalize(item.name) === normalize(toolName))
+    if (!tool) return true // an undeclared tool is not an environment problem
+    const known = caseKnowledge(input, design)
+    return tool.fixtures.some((fixture) => !fixture.match.length || fixture.match.every((pair) => known.includes(normalize(pair.value))))
+}
+
+export const unansweredTools = (
+    scenario: { input: string; requiredTools?: string[]; assertions: Assertion[] },
+    design: Pick<StudioDesign, 'tools'>
+) => requiredToolsOf(scenario).filter((tool) => !answeredByCase(tool, scenario.input, design))
+
+type RepairProposal = { tool: string; match: { key: string; value: string }[]; result: { key: string; value: string }[]; error?: string }
+
+/**
+ * A proposed fixture is kept only with match values the case can supply. The
+ * model tends to key a fixture on every parameter, including values the case
+ * writes differently ("7:30 PM" vs. "19:30"); such pairs are pruned rather than
+ * the whole fixture rejected, as long as one distinctive pair remains.
+ * Returns the pruned fixture or the reason for rejecting it.
+ */
+export const pruneRepairFixture = (
+    proposal: RepairProposal,
+    input: string,
+    design: Pick<StudioDesign, 'tools'>
+): { fixture: RepairProposal; pruned: string[] } | { problem: string } => {
+    const tool = design.tools.find((item) => normalize(item.name) === normalize(proposal.tool))
+    if (!tool) return { problem: `unknown tool ${proposal.tool}` }
+    if (!proposal.match.length) return { problem: 'a repair fixture needs match keys; a catch-all would answer every other case too' }
+    if (!proposal.error && !proposal.result.length) return { problem: 'a successful fixture must return data' }
+    if (tool.fixtures.length >= 40) return { problem: `${tool.name} already has the maximum number of fixtures` }
+    const params = new Set(tool.params.map((param) => normalize(param.name)))
+    const known = caseKnowledge(input, design)
+    const pruned: string[] = []
+    const match = proposal.match.filter((pair) => {
+        const value = normalize(pair.value)
+        const ok = params.has(normalize(pair.key)) && value.length > 0 && known.includes(value)
+        if (!ok) pruned.push(`${pair.key}=${pair.value}`)
+        return ok
+    })
+    // One distinctive value must remain: a lone "2" or "yes" would answer far more than this case.
+    if (!match.some((pair) => normalize(pair.value).length >= 3)) {
+        return { problem: `no distinctive match value that the case states remains (dropped ${pruned.join(', ') || 'none'})` }
+    }
+    return { fixture: { ...proposal, match }, pruned }
+}
+
+/** Compatibility wrapper: null if the fixture is acceptable as proposed, otherwise the reason. */
+export const checkRepairFixture = (proposal: RepairProposal, input: string, design: Pick<StudioDesign, 'tools'>): string | null => {
+    const outcome = pruneRepairFixture(proposal, input, design)
+    if ('problem' in outcome) return outcome.problem
+    return outcome.pruned.length ? `match value(s) ${outcome.pruned.join(', ')} do not occur in the case` : null
+}
+
+export const ENVIRONMENT_REPAIR_PROMPT = [
+    'You repair the simulated tool environment of ONE acceptance case of an agent workflow test suite.',
+    'For each listed tool, no fixture answers the calls a correct workflow would make for this case, because every fixture is keyed on values the case does not state. A correct workflow therefore receives "not found" and fails the case.',
+    'For each listed tool decide:',
+    '- If the case expects the tool to return data or a specific failure, add ONE fixture for it.',
+    '- If the case deliberately expects "no record", "not found" or that the tool is not used, skip it and say why.',
+    'An added fixture:',
+    '- has as FEW match keys as possible, normally one: the most distinctive identifier of the request (an id, a policy or order number, a date). Do not key on every parameter; the environment matches an argument by containment, so fewer keys match more of the ways a workflow phrases a call.',
+    '- uses match values copied VERBATIM from the case input or from a result another fixture returns for this case. Never an internal code or a value the request writes differently (the request says "7:30 PM", so do not key on "19:30").',
+    '- returns a result consistent with the expected behavior of the case and with the style and values of the existing fixtures of that tool, or sets `error` if the case expects an injected failure.',
+    'Return fixtures (tool, match, result, error) and skipped (tool, reason).'
+].join('\n')
+
+export const EnvironmentRepairType = z.object({
+    fixtures: z
+        .array(
+            z.object({
+                tool: z.string().trim().min(1),
+                match: z.array(z.object({ key: z.string(), value: z.coerce.string() })).default([]),
+                result: z.array(z.object({ key: z.string(), value: z.coerce.string() })).default([]),
+                error: z.string().default('')
+            })
+        )
+        .default([]),
+    skipped: z.array(z.object({ tool: z.string(), reason: z.string().default('') })).default([])
+})
+
+export const repairPayload = (
+    goal: string,
+    design: Pick<StudioDesign, 'successCriteria' | 'constraints' | 'tools'>,
+    scenario: { input: string; expectedBehavior: string[]; mustNot: string[]; assertions: Assertion[] },
+    tools: string[]
+) =>
+    JSON.stringify(
+        {
+            goal,
+            successCriteria: design.successCriteria,
+            constraints: design.constraints,
+            case: { input: scenario.input, expectedBehavior: scenario.expectedBehavior, mustNot: scenario.mustNot },
+            assertionsOnTheseTools: scenario.assertions
+                .filter((assertion) => tools.includes(assertion.tool))
+                .map(({ type, description, tool, withArgs }) => ({ type, description, tool, withArgs })),
+            toolsToRepair: design.tools
+                .filter((tool) => tools.includes(tool.name))
+                .map((tool) => ({
+                    name: tool.name,
+                    description: tool.description,
+                    params: tool.params.map((param) => param.name),
+                    existingFixtures: tool.fixtures.slice(0, 8).map((fixture) => ({
+                        match: fixture.match,
+                        ...(fixture.error ? { error: fixture.error } : { result: fixture.result })
+                    }))
+                }))
+        },
+        null,
+        2
+    )

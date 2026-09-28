@@ -129,6 +129,33 @@ const validateStudioTestWorld = async (req: Request, res: Response, next: NextFu
     }
 }
 
+const repairStudioEnvironment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { goal, design, selectedChatModel, judgeTemperature } = req.body
+        if (!goal || !design || !selectedChatModel) throw new Error('Goal, design and selectedChatModel are required')
+        return res.json(
+            await agentflowv2Service.repairStudioEnvironment(
+                goal,
+                design,
+                selectedChatModel,
+                judgeTemperature === undefined ? 0 : judgeTemperature
+            )
+        )
+    } catch (error) {
+        next(error)
+    }
+}
+
+const extendStudioHeldOut = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { goal, design, count, selectedChatModel } = req.body
+        if (!goal || !design || !selectedChatModel) throw new Error('Goal, design and selectedChatModel are required')
+        return res.json(await agentflowv2Service.extendStudioHeldOut(goal, design, count, selectedChatModel))
+    } catch (error) {
+        next(error)
+    }
+}
+
 const diagnoseStudioRun = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { goal, design, trials, selectedChatModel } = req.body
@@ -188,6 +215,8 @@ export default {
     compileStudioWorkflow,
     evaluateStudioOutput,
     validateStudioTestWorld,
+    repairStudioEnvironment,
+    extendStudioHeldOut,
     diagnoseStudioRun,
     proposeStudioCandidates,
     applyStudioOperator,

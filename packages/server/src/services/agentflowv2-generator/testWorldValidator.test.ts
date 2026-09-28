@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals'
 import { AssertionType, ToolSpecType } from './studioSchemas'
-import { repairAssertions } from './testWorldValidator'
+import { caseKnowledge, checkRepairFixture, pruneRepairFixture, repairAssertions, unansweredTools } from './testWorldValidator'
 import { applyFactVerdicts, evaluateAssertions, factChecksFor } from './assertions'
 
 const assertion = (patch: Record<string, any>) =>
@@ -82,6 +82,57 @@ describe('repairAssertions', () => {
             design
         )
         expect(assertions.map((item) => item.id)).toEqual(['good'])
+    })
+})
+
+describe('environment repair checks', () => {
+    const scenario = (input: string, tool: string) => ({
+        input,
+        requiredTools: [tool],
+        assertions: [assertion({ type: 'tool_called', tool })]
+    })
+
+    it('finds a required tool that no fixture answers with the values of the case', () => {
+        expect(unansweredTools(scenario('Coverage for policy PN-1001, please.', 'check_policy_coverage'), design)).toEqual([
+            'check_policy_coverage'
+        ])
+        expect(unansweredTools(scenario('Validate PN-1001.', 'validate_policy_number'), design)).toEqual([])
+    })
+
+    it('accepts a repair fixture keyed on values from the case only', () => {
+        const input = 'Coverage for policy PN-1001, please.'
+        const ok = {
+            tool: 'check_policy_coverage',
+            match: [{ key: 'policy_number', value: 'PN-1001' }],
+            result: [{ key: 'covered', value: 'yes' }]
+        }
+        expect(checkRepairFixture(ok, input, design)).toBeNull()
+        expect(checkRepairFixture({ ...ok, match: [{ key: 'policy_number', value: 'POL-1001' }] }, input, design)).toMatch(
+            /no distinctive match value/
+        )
+        expect(checkRepairFixture({ ...ok, match: [] }, input, design)).toMatch(/catch-all/)
+        expect(checkRepairFixture({ ...ok, match: [{ key: 'policy', value: 'PN-1001' }] }, input, design)).toMatch(/no distinctive/)
+    })
+
+    it('prunes match values the case does not state, keeping a distinctive one', () => {
+        const outcome = pruneRepairFixture(
+            {
+                tool: 'check_policy_coverage',
+                match: [
+                    { key: 'policy_number', value: 'PN-1001' },
+                    { key: 'policy_number', value: '19:30' }
+                ],
+                result: [{ key: 'covered', value: 'yes' }]
+            },
+            'Coverage for policy PN-1001, please.',
+            design
+        )
+        expect('fixture' in outcome && outcome.fixture.match).toEqual([{ key: 'policy_number', value: 'PN-1001' }])
+    })
+
+    it('treats values returned by reachable fixtures as known', () => {
+        // validate_policy_number answers PN-1001 and returns "active"
+        expect(caseKnowledge('Validate PN-1001.', design)).toContain('active')
     })
 })
 
