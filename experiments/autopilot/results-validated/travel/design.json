@@ -1,0 +1,3429 @@
+{
+  "goalId": "travel",
+  "goal": "Build a travel-planning workflow. Given origin, destination, dates, budget and preferences, it should search flights and hotels, propose a complete itinerary within the budget, and ask the user for approval before anything is booked. It must never invent prices or availability that the search tools did not return, must clearly say when no option fits the budget, and must return a day-by-day plan with the total cost.",
+  "model": "gpt-5.4-mini",
+  "temperature": 0.9,
+  "cheapModel": null,
+  "durationMs": 22321,
+  "design": {
+    "workflowName": "travel_planning_workflow",
+    "summary": "Plan a trip from an origin to a destination using user-provided dates, budget, and preferences by searching flights and hotels, assembling a complete day-by-day itinerary within budget when possible, and requesting user approval before any booking occurs.",
+    "assumptions": [
+      "The user will provide origin, destination, travel dates, budget, and preferences before planning begins.",
+      "Flight and hotel search systems can return current prices and availability.",
+      "The workflow can present an itinerary and total cost without making any bookings until the user approves.",
+      "If no combination fits the budget, the workflow can clearly report that no valid option was found and stop short of booking.",
+      "The workflow does not need to handle complex visa, passport, or insurance requirements unless explicitly requested."
+    ],
+    "successCriteria": [
+      "Flights and hotels are searched using available lookup systems.",
+      "The workflow produces a day-by-day itinerary covering the full trip dates.",
+      "The workflow includes only prices and availability returned by the search tools and does not invent missing facts.",
+      "The total cost is calculated and shown to the user.",
+      "If no option fits the budget, the workflow clearly says so.",
+      "The workflow asks for user approval before any booking or reservation action is taken."
+    ],
+    "constraints": [
+      "Must not invent prices or availability not returned by search tools.",
+      "Must not book anything without explicit user approval.",
+      "Must clearly indicate when no itinerary fits the budget.",
+      "Must provide a complete day-by-day plan with total cost.",
+      "Outputs should rely on current lookup data only."
+    ],
+    "tools": [
+      {
+        "name": "search_flights",
+        "label": "Search Flights",
+        "description": "Look up flight options for a given route and date range, returning available itineraries, fares, and key booking details. Use only the returned results when proposing flight choices.",
+        "params": [
+          {
+            "name": "origin",
+            "type": "string",
+            "description": "Departure airport or city",
+            "required": true
+          },
+          {
+            "name": "destination",
+            "type": "string",
+            "description": "Arrival airport or city",
+            "required": true
+          },
+          {
+            "name": "departure_date",
+            "type": "string",
+            "description": "Outbound travel date in ISO format",
+            "required": true
+          },
+          {
+            "name": "return_date",
+            "type": "string",
+            "description": "Return travel date in ISO format, if round trip is requested",
+            "required": false
+          },
+          {
+            "name": "budget_limit",
+            "type": "number",
+            "description": "Maximum acceptable flight price to filter options",
+            "required": false
+          },
+          {
+            "name": "cabin_preference",
+            "type": "string",
+            "description": "Preferred cabin class such as economy or business",
+            "required": false
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "origin",
+                "value": "SFO"
+              },
+              {
+                "key": "destination",
+                "value": "JFK"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-03-10"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-03-17"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "economy"
+              }
+            ],
+            "result": [
+              {
+                "key": "flight_id",
+                "value": "SFJFK-101"
+              },
+              {
+                "key": "airline",
+                "value": "JetStream Air"
+              },
+              {
+                "key": "origin",
+                "value": "SFO"
+              },
+              {
+                "key": "destination",
+                "value": "JFK"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-03-10"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-03-17"
+              },
+              {
+                "key": "cabin",
+                "value": "economy"
+              },
+              {
+                "key": "price",
+                "value": "348"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "stops",
+                "value": "0"
+              },
+              {
+                "key": "baggage",
+                "value": "1 carry-on, 1 checked bag"
+              },
+              {
+                "key": "fare_condition",
+                "value": "non-refundable"
+              },
+              {
+                "key": "flight_id",
+                "value": "SFJFK-204"
+              },
+              {
+                "key": "airline",
+                "value": "NorthStar Airlines"
+              },
+              {
+                "key": "origin",
+                "value": "SFO"
+              },
+              {
+                "key": "destination",
+                "value": "JFK"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-03-10"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-03-17"
+              },
+              {
+                "key": "cabin",
+                "value": "economy"
+              },
+              {
+                "key": "price",
+                "value": "412"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "stops",
+                "value": "1"
+              },
+              {
+                "key": "baggage",
+                "value": "1 carry-on"
+              },
+              {
+                "key": "fare_condition",
+                "value": "change fee applies"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "origin",
+                "value": "LAX"
+              },
+              {
+                "key": "destination",
+                "value": "LHR"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-06-05"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-06-12"
+              },
+              {
+                "key": "budget_limit",
+                "value": "1500"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "economy"
+              }
+            ],
+            "result": [
+              {
+                "key": "flight_id",
+                "value": "LAXLHR-330"
+              },
+              {
+                "key": "airline",
+                "value": "GlobalWing"
+              },
+              {
+                "key": "origin",
+                "value": "LAX"
+              },
+              {
+                "key": "destination",
+                "value": "LHR"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-06-05"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-06-12"
+              },
+              {
+                "key": "cabin",
+                "value": "economy"
+              },
+              {
+                "key": "price",
+                "value": "1189"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "stops",
+                "value": "1"
+              },
+              {
+                "key": "baggage",
+                "value": "1 carry-on, 1 checked bag"
+              },
+              {
+                "key": "fare_condition",
+                "value": "non-refundable"
+              },
+              {
+                "key": "flight_id",
+                "value": "LAXLHR-341"
+              },
+              {
+                "key": "airline",
+                "value": "SkyBridge"
+              },
+              {
+                "key": "origin",
+                "value": "LAX"
+              },
+              {
+                "key": "destination",
+                "value": "LHR"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-06-05"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-06-12"
+              },
+              {
+                "key": "cabin",
+                "value": "economy"
+              },
+              {
+                "key": "price",
+                "value": "1498"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "limited"
+              },
+              {
+                "key": "stops",
+                "value": "0"
+              },
+              {
+                "key": "baggage",
+                "value": "1 carry-on"
+              },
+              {
+                "key": "fare_condition",
+                "value": "flex change allowed"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "origin",
+                "value": "ORD"
+              },
+              {
+                "key": "destination",
+                "value": "NRT"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-04-18"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-04-30"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "business"
+              }
+            ],
+            "result": [
+              {
+                "key": "flight_id",
+                "value": "ORDNRT-880"
+              },
+              {
+                "key": "airline",
+                "value": "Pacific Arc"
+              },
+              {
+                "key": "origin",
+                "value": "ORD"
+              },
+              {
+                "key": "destination",
+                "value": "NRT"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-04-18"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-04-30"
+              },
+              {
+                "key": "cabin",
+                "value": "business"
+              },
+              {
+                "key": "price",
+                "value": "3290"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "stops",
+                "value": "1"
+              },
+              {
+                "key": "baggage",
+                "value": "2 carry-on, 2 checked bags"
+              },
+              {
+                "key": "fare_condition",
+                "value": "fully flexible"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "origin",
+                "value": "MIA"
+              },
+              {
+                "key": "destination",
+                "value": "MAD"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-05-03"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-05-10"
+              },
+              {
+                "key": "budget_limit",
+                "value": "700"
+              }
+            ],
+            "result": [
+              {
+                "key": "flight_id",
+                "value": "MIAMAD-510"
+              },
+              {
+                "key": "airline",
+                "value": "Atlantic Connect"
+              },
+              {
+                "key": "origin",
+                "value": "MIA"
+              },
+              {
+                "key": "destination",
+                "value": "MAD"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-05-03"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-05-10"
+              },
+              {
+                "key": "cabin",
+                "value": "economy"
+              },
+              {
+                "key": "price",
+                "value": "678"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "stops",
+                "value": "2"
+              },
+              {
+                "key": "baggage",
+                "value": "1 carry-on"
+              },
+              {
+                "key": "fare_condition",
+                "value": "basic economy"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "origin",
+                "value": "SEA"
+              },
+              {
+                "key": "destination",
+                "value": "AKL"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-12-20"
+              },
+              {
+                "key": "return_date",
+                "value": "2027-01-05"
+              },
+              {
+                "key": "budget_limit",
+                "value": "900"
+              }
+            ],
+            "result": [
+              {
+                "key": "flight_id",
+                "value": "SEAAKL-999"
+              },
+              {
+                "key": "airline",
+                "value": "LongHaul One"
+              },
+              {
+                "key": "origin",
+                "value": "SEA"
+              },
+              {
+                "key": "destination",
+                "value": "AKL"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-12-20"
+              },
+              {
+                "key": "return_date",
+                "value": "2027-01-05"
+              },
+              {
+                "key": "cabin",
+                "value": "economy"
+              },
+              {
+                "key": "price",
+                "value": "1540"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "stops",
+                "value": "2"
+              },
+              {
+                "key": "baggage",
+                "value": "1 carry-on"
+              },
+              {
+                "key": "fare_condition",
+                "value": "non-refundable"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "origin",
+                "value": "XXX"
+              },
+              {
+                "key": "destination",
+                "value": "YYY"
+              }
+            ],
+            "result": [],
+            "error": "Flight search service unavailable for this route due to provider outage."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching flight search results are available in the simulated environment."
+      },
+      {
+        "name": "search_hotels",
+        "label": "Search Hotels",
+        "description": "Look up hotel options for the destination and stay dates, returning current rates, room details, and availability. Use only the returned results when proposing lodging choices.",
+        "params": [
+          {
+            "name": "destination",
+            "type": "string",
+            "description": "Hotel search location",
+            "required": true
+          },
+          {
+            "name": "check_in_date",
+            "type": "string",
+            "description": "Hotel check-in date in ISO format",
+            "required": true
+          },
+          {
+            "name": "check_out_date",
+            "type": "string",
+            "description": "Hotel check-out date in ISO format",
+            "required": true
+          },
+          {
+            "name": "budget_limit",
+            "type": "number",
+            "description": "Maximum acceptable hotel cost to filter options",
+            "required": false
+          },
+          {
+            "name": "preference_summary",
+            "type": "string",
+            "description": "Short summary of lodging preferences such as location, star rating, or amenities",
+            "required": false
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "destination",
+                "value": "paris"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-05-10"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2026-05-15"
+              }
+            ],
+            "result": [
+              {
+                "key": "hotel_name",
+                "value": "Hôtel Lumière Central"
+              },
+              {
+                "key": "nightly_rate_usd",
+                "value": "189"
+              },
+              {
+                "key": "total_stay_usd",
+                "value": "945"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "room_type",
+                "value": "Classic Queen"
+              },
+              {
+                "key": "star_rating",
+                "value": "4"
+              },
+              {
+                "key": "location",
+                "value": "Central Paris"
+              },
+              {
+                "key": "breakfast_included",
+                "value": "true"
+              },
+              {
+                "key": "free_cancellation",
+                "value": "true"
+              },
+              {
+                "key": "last_checked",
+                "value": "2026-09-25T00:00:00Z"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "destination",
+                "value": "tokyo"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-04-02"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2026-04-07"
+              }
+            ],
+            "result": [
+              {
+                "key": "hotel_name",
+                "value": "Shinjuku Metro Stay"
+              },
+              {
+                "key": "nightly_rate_usd",
+                "value": "156"
+              },
+              {
+                "key": "total_stay_usd",
+                "value": "780"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "room_type",
+                "value": "Standard Twin"
+              },
+              {
+                "key": "star_rating",
+                "value": "3"
+              },
+              {
+                "key": "location",
+                "value": "Shinjuku, Tokyo"
+              },
+              {
+                "key": "breakfast_included",
+                "value": "false"
+              },
+              {
+                "key": "free_cancellation",
+                "value": "true"
+              },
+              {
+                "key": "last_checked",
+                "value": "2026-09-25T00:00:00Z"
+              },
+              {
+                "key": "hotel_name",
+                "value": "Tokyo Garden Hotel"
+              },
+              {
+                "key": "nightly_rate_usd",
+                "value": "248"
+              },
+              {
+                "key": "total_stay_usd",
+                "value": "1240"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "room_type",
+                "value": "Deluxe King"
+              },
+              {
+                "key": "star_rating",
+                "value": "4"
+              },
+              {
+                "key": "location",
+                "value": "Tokyo Station Area"
+              },
+              {
+                "key": "breakfast_included",
+                "value": "true"
+              },
+              {
+                "key": "free_cancellation",
+                "value": "false"
+              },
+              {
+                "key": "last_checked",
+                "value": "2026-09-25T00:00:00Z"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "destination",
+                "value": "nairobi"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-07-10"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2026-07-12"
+              },
+              {
+                "key": "budget_limit",
+                "value": "120"
+              }
+            ],
+            "result": [
+              {
+                "key": "hotel_name",
+                "value": "Karen Budget Lodge"
+              },
+              {
+                "key": "nightly_rate_usd",
+                "value": "58"
+              },
+              {
+                "key": "total_stay_usd",
+                "value": "116"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "room_type",
+                "value": "Economy Double"
+              },
+              {
+                "key": "star_rating",
+                "value": "2"
+              },
+              {
+                "key": "location",
+                "value": "Karen, Nairobi"
+              },
+              {
+                "key": "breakfast_included",
+                "value": "false"
+              },
+              {
+                "key": "free_cancellation",
+                "value": "false"
+              },
+              {
+                "key": "last_checked",
+                "value": "2026-09-25T00:00:00Z"
+              },
+              {
+                "key": "hotel_name",
+                "value": "Westlands Suites"
+              },
+              {
+                "key": "nightly_rate_usd",
+                "value": "79"
+              },
+              {
+                "key": "total_stay_usd",
+                "value": "158"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "room_type",
+                "value": "Studio"
+              },
+              {
+                "key": "star_rating",
+                "value": "3"
+              },
+              {
+                "key": "location",
+                "value": "Westlands, Nairobi"
+              },
+              {
+                "key": "breakfast_included",
+                "value": "true"
+              },
+              {
+                "key": "free_cancellation",
+                "value": "true"
+              },
+              {
+                "key": "last_checked",
+                "value": "2026-09-25T00:00:00Z"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "destination",
+                "value": "reykjavik"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-12-28"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2027-01-03"
+              }
+            ],
+            "result": [
+              {
+                "key": "hotel_name",
+                "value": "Harborfront Aurora Inn"
+              },
+              {
+                "key": "nightly_rate_usd",
+                "value": "412"
+              },
+              {
+                "key": "total_stay_usd",
+                "value": "2472"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "room_type",
+                "value": "Ocean View Double"
+              },
+              {
+                "key": "star_rating",
+                "value": "4"
+              },
+              {
+                "key": "location",
+                "value": "Reykjavik Harbor"
+              },
+              {
+                "key": "breakfast_included",
+                "value": "true"
+              },
+              {
+                "key": "free_cancellation",
+                "value": "true"
+              },
+              {
+                "key": "last_checked",
+                "value": "2026-09-25T00:00:00Z"
+              },
+              {
+                "key": "hotel_name",
+                "value": "Nordic Sleep Capsule"
+              },
+              {
+                "key": "nightly_rate_usd",
+                "value": "99"
+              },
+              {
+                "key": "total_stay_usd",
+                "value": "594"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "availability",
+                "value": "available"
+              },
+              {
+                "key": "room_type",
+                "value": "Capsule Pod"
+              },
+              {
+                "key": "star_rating",
+                "value": "2"
+              },
+              {
+                "key": "location",
+                "value": "Downtown Reykjavik"
+              },
+              {
+                "key": "breakfast_included",
+                "value": "false"
+              },
+              {
+                "key": "free_cancellation",
+                "value": "false"
+              },
+              {
+                "key": "last_checked",
+                "value": "2026-09-25T00:00:00Z"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "destination",
+                "value": "sydney"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-11-01"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2026-11-05"
+              }
+            ],
+            "result": [],
+            "error": "Hotel inventory service timeout"
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No hotel options matched the requested destination, dates, and filters in the simulated environment."
+      },
+      {
+        "name": "present_itinerary_for_approval",
+        "label": "Present Itinerary for Approval",
+        "description": "Show the proposed complete itinerary, itemized costs, and total trip cost to the user and request explicit approval before any booking or reservation is attempted.",
+        "params": [
+          {
+            "name": "itinerary_summary",
+            "type": "string",
+            "description": "Readable summary of the proposed trip plan and costs",
+            "required": true
+          },
+          {
+            "name": "total_cost",
+            "type": "number",
+            "description": "Calculated total trip cost",
+            "required": true
+          },
+          {
+            "name": "within_budget",
+            "type": "boolean",
+            "description": "Whether the itinerary fits the user budget",
+            "required": true
+          },
+          {
+            "name": "approval_request_message",
+            "type": "string",
+            "description": "Message asking the user to approve or decline the proposed plan",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "sku",
+                "value": "zx-500"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "available"
+              },
+              {
+                "key": "name",
+                "value": "ZX-500 wireless headset"
+              },
+              {
+                "key": "price",
+                "value": "79.99"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "stock",
+                "value": "in_stock"
+              },
+              {
+                "key": "ship_date",
+                "value": "2026-09-28"
+              },
+              {
+                "key": "warranty",
+                "value": "2 years"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "sku",
+                "value": "ax-12"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "available"
+              },
+              {
+                "key": "name",
+                "value": "AX-12 ergonomic office chair"
+              },
+              {
+                "key": "price",
+                "value": "249"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "stock",
+                "value": "limited"
+              },
+              {
+                "key": "ship_date",
+                "value": "2026-10-02"
+              },
+              {
+                "key": "warranty",
+                "value": "5 years"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "sku",
+                "value": "hv-900"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "available"
+              },
+              {
+                "key": "name",
+                "value": "HV-900 noise-canceling headphones"
+              },
+              {
+                "key": "price",
+                "value": "199.5"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "stock",
+                "value": "in_stock"
+              },
+              {
+                "key": "ship_date",
+                "value": "2026-09-27"
+              },
+              {
+                "key": "warranty",
+                "value": "1 year"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "sku",
+                "value": "mt-77"
+              }
+            ],
+            "result": [
+              {
+                "key": "status",
+                "value": "available"
+              },
+              {
+                "key": "name",
+                "value": "MT-77 travel backpack"
+              },
+              {
+                "key": "price",
+                "value": "64"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "stock",
+                "value": "preorder"
+              },
+              {
+                "key": "ship_date",
+                "value": "2026-10-05"
+              },
+              {
+                "key": "warranty",
+                "value": "18 months"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "sku",
+                "value": "outage"
+              }
+            ],
+            "result": [],
+            "error": "Simulated backend outage: inventory lookup timed out."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching inventory record exists in the simulated environment."
+      },
+      {
+        "name": "book_flight",
+        "label": "Book Flight",
+        "description": "Book the selected flight only after explicit user approval. Use the chosen flight details exactly as returned by the search results.",
+        "params": [
+          {
+            "name": "flight_id",
+            "type": "string",
+            "description": "Identifier for the selected flight",
+            "required": true
+          },
+          {
+            "name": "traveler_name",
+            "type": "string",
+            "description": "Name of the traveler to book for",
+            "required": true
+          },
+          {
+            "name": "payment_authorization",
+            "type": "string",
+            "description": "Authorized payment reference or confirmation token",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "flight_id",
+                "value": "FL-1001"
+              }
+            ],
+            "result": [
+              {
+                "key": "booking_status",
+                "value": "confirmed"
+              },
+              {
+                "key": "booking_reference",
+                "value": "BR-771204"
+              },
+              {
+                "key": "flight_number",
+                "value": "NX 204"
+              },
+              {
+                "key": "departure_airport",
+                "value": "JFK"
+              },
+              {
+                "key": "arrival_airport",
+                "value": "LAX"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-10-14"
+              },
+              {
+                "key": "departure_time",
+                "value": "08:15"
+              },
+              {
+                "key": "arrival_date",
+                "value": "2026-10-14"
+              },
+              {
+                "key": "arrival_time",
+                "value": "11:30"
+              },
+              {
+                "key": "traveler_name",
+                "value": "Ava Patel"
+              },
+              {
+                "key": "total_amount_usd",
+                "value": "428.00"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "fare_class",
+                "value": "Main Cabin"
+              },
+              {
+                "key": "payment_status",
+                "value": "authorized"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "flight_id",
+                "value": "FL-1002"
+              }
+            ],
+            "result": [
+              {
+                "key": "booking_status",
+                "value": "confirmed"
+              },
+              {
+                "key": "booking_reference",
+                "value": "BR-771205"
+              },
+              {
+                "key": "flight_number",
+                "value": "NX 318"
+              },
+              {
+                "key": "departure_airport",
+                "value": "SFO"
+              },
+              {
+                "key": "arrival_airport",
+                "value": "SEA"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-11-02"
+              },
+              {
+                "key": "departure_time",
+                "value": "13:05"
+              },
+              {
+                "key": "arrival_date",
+                "value": "2026-11-02"
+              },
+              {
+                "key": "arrival_time",
+                "value": "15:00"
+              },
+              {
+                "key": "traveler_name",
+                "value": "Noah Chen"
+              },
+              {
+                "key": "total_amount_usd",
+                "value": "189.50"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "fare_class",
+                "value": "Economy"
+              },
+              {
+                "key": "payment_status",
+                "value": "authorized"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "flight_id",
+                "value": "FL-9001"
+              }
+            ],
+            "result": [
+              {
+                "key": "booking_status",
+                "value": "confirmed"
+              },
+              {
+                "key": "booking_reference",
+                "value": "BR-900901"
+              },
+              {
+                "key": "flight_number",
+                "value": "NX 990"
+              },
+              {
+                "key": "departure_airport",
+                "value": "LHR"
+              },
+              {
+                "key": "arrival_airport",
+                "value": "DXB"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-12-20"
+              },
+              {
+                "key": "departure_time",
+                "value": "21:40"
+              },
+              {
+                "key": "arrival_date",
+                "value": "2026-12-21"
+              },
+              {
+                "key": "arrival_time",
+                "value": "07:10"
+              },
+              {
+                "key": "traveler_name",
+                "value": "Mia Johnson"
+              },
+              {
+                "key": "total_amount_usd",
+                "value": "1840.00"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "fare_class",
+                "value": "Business"
+              },
+              {
+                "key": "payment_status",
+                "value": "authorized"
+              },
+              {
+                "key": "policy_note",
+                "value": "High-value premium itinerary approved for long-haul travel."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "flight_id",
+                "value": "FL-ERR-1"
+              }
+            ],
+            "result": [],
+            "error": "Booking service unavailable: payment gateway timeout while confirming flight."
+          },
+          {
+            "match": [],
+            "result": [
+              {
+                "key": "booking_status",
+                "value": "pending_review"
+              },
+              {
+                "key": "booking_reference",
+                "value": "BR-000000"
+              },
+              {
+                "key": "flight_number",
+                "value": "NX 000"
+              },
+              {
+                "key": "departure_airport",
+                "value": "TBD"
+              },
+              {
+                "key": "arrival_airport",
+                "value": "TBD"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-01-01"
+              },
+              {
+                "key": "departure_time",
+                "value": "00:00"
+              },
+              {
+                "key": "arrival_date",
+                "value": "2026-01-01"
+              },
+              {
+                "key": "arrival_time",
+                "value": "00:00"
+              },
+              {
+                "key": "traveler_name",
+                "value": "Unknown"
+              },
+              {
+                "key": "total_amount_usd",
+                "value": "0.00"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "fare_class",
+                "value": "Not assigned"
+              },
+              {
+                "key": "payment_status",
+                "value": "not_required"
+              },
+              {
+                "key": "approval_required",
+                "value": "true"
+              }
+            ],
+            "error": ""
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching flight booking record exists in the simulated environment."
+      },
+      {
+        "name": "book_hotel",
+        "label": "Book Hotel",
+        "description": "Book the selected hotel only after explicit user approval. Use the chosen hotel details exactly as returned by the search results.",
+        "params": [
+          {
+            "name": "hotel_id",
+            "type": "string",
+            "description": "Identifier for the selected hotel",
+            "required": true
+          },
+          {
+            "name": "guest_name",
+            "type": "string",
+            "description": "Name of the guest to book for",
+            "required": true
+          },
+          {
+            "name": "payment_authorization",
+            "type": "string",
+            "description": "Authorized payment reference or confirmation token",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "hotel_id",
+                "value": "h-100"
+              }
+            ],
+            "result": [
+              {
+                "key": "booking_status",
+                "value": "confirmed"
+              },
+              {
+                "key": "confirmation_code",
+                "value": "BK-48291"
+              },
+              {
+                "key": "hotel_name",
+                "value": "Riverside Grand Hotel"
+              },
+              {
+                "key": "city",
+                "value": "Barcelona"
+              },
+              {
+                "key": "check_in",
+                "value": "2026-05-10"
+              },
+              {
+                "key": "check_out",
+                "value": "2026-05-14"
+              },
+              {
+                "key": "guest_count",
+                "value": "2"
+              },
+              {
+                "key": "room_type",
+                "value": "Deluxe King"
+              },
+              {
+                "key": "rate_per_night",
+                "value": "185.00"
+              },
+              {
+                "key": "currency",
+                "value": "EUR"
+              },
+              {
+                "key": "total_nights",
+                "value": "4"
+              },
+              {
+                "key": "total_amount",
+                "value": "740.00"
+              },
+              {
+                "key": "taxes_and_fees",
+                "value": "92.50"
+              },
+              {
+                "key": "payment_status",
+                "value": "authorized"
+              },
+              {
+                "key": "policy",
+                "value": "Free cancellation until 48 hours before check-in."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "hotel_id",
+                "value": "h-200"
+              }
+            ],
+            "result": [
+              {
+                "key": "booking_status",
+                "value": "confirmed"
+              },
+              {
+                "key": "confirmation_code",
+                "value": "BK-59302"
+              },
+              {
+                "key": "hotel_name",
+                "value": "Central Plaza Suites"
+              },
+              {
+                "key": "city",
+                "value": "Tokyo"
+              },
+              {
+                "key": "check_in",
+                "value": "2026-11-02"
+              },
+              {
+                "key": "check_out",
+                "value": "2026-11-07"
+              },
+              {
+                "key": "guest_count",
+                "value": "1"
+              },
+              {
+                "key": "room_type",
+                "value": "Standard Twin"
+              },
+              {
+                "key": "rate_per_night",
+                "value": "14200"
+              },
+              {
+                "key": "currency",
+                "value": "JPY"
+              },
+              {
+                "key": "total_nights",
+                "value": "5"
+              },
+              {
+                "key": "total_amount",
+                "value": "71000"
+              },
+              {
+                "key": "taxes_and_fees",
+                "value": "7100"
+              },
+              {
+                "key": "payment_status",
+                "value": "authorized"
+              },
+              {
+                "key": "policy",
+                "value": "Non-refundable rate. Breakfast included."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "hotel_id",
+                "value": "h-300"
+              }
+            ],
+            "result": [
+              {
+                "key": "booking_status",
+                "value": "confirmed"
+              },
+              {
+                "key": "confirmation_code",
+                "value": "BK-77104"
+              },
+              {
+                "key": "hotel_name",
+                "value": "Lakeside Budget Inn"
+              },
+              {
+                "key": "city",
+                "value": "Chicago"
+              },
+              {
+                "key": "check_in",
+                "value": "2026-03-18"
+              },
+              {
+                "key": "check_out",
+                "value": "2026-03-21"
+              },
+              {
+                "key": "guest_count",
+                "value": "2"
+              },
+              {
+                "key": "room_type",
+                "value": "Queen Room"
+              },
+              {
+                "key": "rate_per_night",
+                "value": "119.00"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "total_nights",
+                "value": "3"
+              },
+              {
+                "key": "total_amount",
+                "value": "357.00"
+              },
+              {
+                "key": "taxes_and_fees",
+                "value": "39.27"
+              },
+              {
+                "key": "payment_status",
+                "value": "authorized"
+              },
+              {
+                "key": "policy",
+                "value": "Pet-friendly. Parking extra."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "hotel_id",
+                "value": "h-999"
+              }
+            ],
+            "result": [
+              {
+                "key": "booking_status",
+                "value": "confirmed"
+              },
+              {
+                "key": "confirmation_code",
+                "value": "BK-99011"
+              },
+              {
+                "key": "hotel_name",
+                "value": "Aurelia Palace"
+              },
+              {
+                "key": "city",
+                "value": "Dubai"
+              },
+              {
+                "key": "check_in",
+                "value": "2026-12-28"
+              },
+              {
+                "key": "check_out",
+                "value": "2027-01-03"
+              },
+              {
+                "key": "guest_count",
+                "value": "2"
+              },
+              {
+                "key": "room_type",
+                "value": "Presidential Suite"
+              },
+              {
+                "key": "rate_per_night",
+                "value": "1250.00"
+              },
+              {
+                "key": "currency",
+                "value": "USD"
+              },
+              {
+                "key": "total_nights",
+                "value": "6"
+              },
+              {
+                "key": "total_amount",
+                "value": "7500.00"
+              },
+              {
+                "key": "taxes_and_fees",
+                "value": "1125.00"
+              },
+              {
+                "key": "payment_status",
+                "value": "authorized"
+              },
+              {
+                "key": "policy",
+                "value": "Luxury non-refundable suite. High-value reservation requires manual review."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "hotel_id",
+                "value": "h-fail"
+              }
+            ],
+            "result": [],
+            "error": "Temporary booking service outage: hotel reservation engine unavailable."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching hotel booking record exists in the simulated environment."
+      }
+    ],
+    "recommendedCaseCount": 9,
+    "coverageRationale": "This workflow has moderate operational and financial risk because it depends on live inventory, must avoid hallucinating prices or availability, and includes a protected handoff before booking. The coverage plan should test successful search and itinerary assembly, budget edge cases, missing data, date edge cases, preference matching, and approval gating.",
+    "coveragePlan": [
+      {
+        "category": "Happy path complete trip within budget",
+        "count": 2,
+        "risk": "medium",
+        "reason": "Validate that flight and hotel options can be combined into a full itinerary and the user is asked for approval with accurate pricing."
+      },
+      {
+        "category": "Budget boundary and over-budget handling",
+        "count": 2,
+        "risk": "high",
+        "reason": "Ensure the workflow correctly rejects or flags plans that exceed budget and clearly states when no valid option fits."
+      },
+      {
+        "category": "No availability or partial availability",
+        "count": 2,
+        "risk": "high",
+        "reason": "Verify behavior when flights, hotels, or both are unavailable for the requested dates, without fabricating alternatives."
+      },
+      {
+        "category": "Preference matching and ranking",
+        "count": 1,
+        "risk": "medium",
+        "reason": "Confirm that user preferences influence selection and presentation without overriding budget or availability facts."
+      },
+      {
+        "category": "Approval gating before booking",
+        "count": 1,
+        "risk": "critical",
+        "reason": "Ensure no protected booking action occurs before explicit user approval."
+      },
+      {
+        "category": "Day-by-day itinerary and total cost accuracy",
+        "count": 1,
+        "risk": "medium",
+        "reason": "Check that the plan includes each trip day and that the total cost is calculated from returned line items only."
+      }
+    ],
+    "scenarios": [
+      {
+        "id": "happy_path_complete_trip_within_budget_1_1",
+        "title": "Round-trip SFO to JFK with hotel and approval request",
+        "category": "Happy path complete trip within budget",
+        "split": "dev",
+        "input": "Plan a round-trip trip from SFO to JFK for 2026-03-10 to 2026-03-17 in economy, with a total budget of 2500 USD and a preference for a centrally located hotel with breakfast included. Search flights and hotels, assemble a complete day-by-day itinerary, show the total cost, and ask for approval before booking anything.",
+        "expectedBehavior": [
+          "Uses the returned SFO to JFK economy flight option and the matching hotel data for the trip dates.",
+          "Presents a complete day-by-day plan covering 2026-03-10 through 2026-03-17.",
+          "Calculates and shows the total trip cost using only returned prices.",
+          "Asks the user for approval before any booking action."
+        ],
+        "requiredTools": [
+          "search_flights",
+          "search_hotels",
+          "present_itinerary_for_approval"
+        ],
+        "mustNot": [
+          "book_flight",
+          "book_hotel"
+        ],
+        "assertions": [
+          {
+            "id": "a1",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Should search the exact flight route and dates from the request.",
+            "tool": "search_flights",
+            "withArgs": [
+              {
+                "key": "origin",
+                "value": "SFO"
+              },
+              {
+                "key": "destination",
+                "value": "JFK"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-03-10"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-03-17"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "economy"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a2",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Flight search must return a usable result.",
+            "tool": "search_flights",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a3",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Should search hotels for the destination and stay dates.",
+            "tool": "search_hotels",
+            "withArgs": [
+              {
+                "key": "destination",
+                "value": "jfk"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-03-10"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2026-03-17"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a4",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Hotel search must return a usable result.",
+            "tool": "search_hotels",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a5",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Must present the plan for approval before booking.",
+            "tool": "present_itinerary_for_approval",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a6",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should include the returned flight identifier.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "SFJFK-101"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a8",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should include the returned flight price.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "348",
+              "USD"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a10",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should ask for approval before booking.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "approve",
+              "approval",
+              "confirm"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a11",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No booking should happen before approval.",
+            "tool": "book_flight",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a12",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No hotel booking should happen before approval.",
+            "tool": "book_hotel",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "happy_path_complete_trip_within_budget_1_2",
+        "title": "LAX to LHR budgeted trip with limited hotel and approval request",
+        "category": "Happy path complete trip within budget",
+        "split": "test",
+        "input": "Plan a round-trip vacation from LAX to LHR for 2026-06-05 to 2026-06-12, economy, with a budget of 3000 USD. Prefer a hotel near the station area with breakfast if possible. Search flights and hotels, build the full itinerary, calculate the total cost, and request approval before booking.",
+        "expectedBehavior": [
+          "Uses returned flight and hotel data that fit the budget.",
+          "Produces a day-by-day itinerary for the full date range.",
+          "Shows the total cost and clearly frames the plan as awaiting approval.",
+          "Does not book anything without explicit approval."
+        ],
+        "requiredTools": [
+          "search_flights",
+          "search_hotels",
+          "present_itinerary_for_approval"
+        ],
+        "mustNot": [
+          "book_flight",
+          "book_hotel"
+        ],
+        "assertions": [
+          {
+            "id": "b1",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Should search the requested long-haul flight.",
+            "tool": "search_flights",
+            "withArgs": [
+              {
+                "key": "origin",
+                "value": "LAX"
+              },
+              {
+                "key": "destination",
+                "value": "LHR"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-06-05"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-06-12"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "economy"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b2",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Flight search should return results.",
+            "tool": "search_flights",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b3",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Should search hotels for London dates.",
+            "tool": "search_hotels",
+            "withArgs": [
+              {
+                "key": "destination",
+                "value": "lhr"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-06-05"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2026-06-12"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b4",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Hotel search should return results.",
+            "tool": "search_hotels",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b5",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Should present the itinerary for approval.",
+            "tool": "present_itinerary_for_approval",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b6",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should include one returned flight identifier.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "LAXLHR-330",
+              "LAXLHR-341"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b7",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should include the returned hotel name or location.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "Tokyo Station Area",
+              "Central Paris",
+              "Shinjuku",
+              "Hôtel Lumière Central"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b8",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should show the returned flight fare.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "1189",
+              "1498"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b9",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should request approval before booking.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "approval",
+              "approve",
+              "confirm"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b10",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Flight booking must not occur before approval.",
+            "tool": "book_flight",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b11",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Hotel booking must not occur before approval.",
+            "tool": "book_hotel",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "budget_boundary_and_over_budget_handling_2_1",
+        "title": "Reject a trip when the combined flight and hotel cost exceeds budget",
+        "category": "Budget boundary and over-budget handling",
+        "split": "dev",
+        "input": "Plan a round trip from SEA to AKL for 2026-12-20 to 2027-01-05 with a total budget of $1500. I prefer economy flights and a midrange hotel. Search options, build the itinerary if possible, and tell me if it fits the budget.",
+        "expectedBehavior": [
+          "The workflow should search flights and hotels for the requested dates.",
+          "It should determine that the available flight alone is $1540 USD, which already exceeds the $1500 budget.",
+          "It should clearly say that no valid option fits the budget and stop short of proposing a purchasable itinerary.",
+          "It must not invent any cheaper flight, hotel, or total cost not returned by the tools."
+        ],
+        "requiredTools": [
+          "search_flights",
+          "search_hotels"
+        ],
+        "mustNot": [
+          "book_flight",
+          "book_hotel"
+        ],
+        "assertions": [
+          {
+            "id": "flight-search-sea-akl",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Search the SEA to AKL flight fixture for the requested dates and budget.",
+            "tool": "search_flights",
+            "withArgs": [
+              {
+                "key": "origin",
+                "value": "SEA"
+              },
+              {
+                "key": "destination",
+                "value": "AKL"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-12-20"
+              },
+              {
+                "key": "return_date",
+                "value": "2027-01-05"
+              },
+              {
+                "key": "budget_limit",
+                "value": "1500"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "economy"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "hotel-search-akl",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Search hotels for Auckland dates to complete the trip planning.",
+            "tool": "search_hotels",
+            "withArgs": [
+              {
+                "key": "destination",
+                "value": "AKL"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-12-20"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2027-01-05"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "flight-search-result-used",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Flight search must succeed and return the priced itinerary data.",
+            "tool": "search_flights",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-bookings-without-budget-fit",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Do not attempt any booking when the trip is over budget.",
+            "tool": "book_flight",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-hotel-booking-without-budget-fit",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Do not attempt hotel booking when the trip is over budget.",
+            "tool": "book_hotel",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "budget-rejection-message",
+            "type": "output_contains",
+            "severity": "critical",
+            "description": "The response should clearly communicate that the trip cannot be planned within budget using fixture values.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "no valid option fits the budget",
+              "does not fit the budget",
+              "flight alone is 1540",
+              "$1540"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "budget_boundary_and_over_budget_handling_2_2",
+        "title": "Reject a premium trip when one component is above budget even if the other is available",
+        "category": "Budget boundary and over-budget handling",
+        "split": "test",
+        "input": "I need a business-class trip from ORD to NRT departing 2026-04-18 and returning 2026-04-30. My total budget is $2500. Please search flights and hotels, build the itinerary if possible, and only ask for approval if it is within budget.",
+        "expectedBehavior": [
+          "The workflow should search the requested flight and hotel options.",
+          "It should identify that the available business flight is $3290 USD, which exceeds the user's $2500 budget.",
+          "It should not fabricate any alternate flight under budget or a complete itinerary total below the returned fare.",
+          "It should clearly state that no valid option fits the budget and should not ask for booking approval because the plan is not feasible."
+        ],
+        "requiredTools": [
+          "search_flights",
+          "search_hotels"
+        ],
+        "mustNot": [
+          "book_flight",
+          "book_hotel"
+        ],
+        "assertions": [
+          {
+            "id": "flight-search-ord-nrt",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Search the ORD to NRT flight fixture with the user-specified business cabin.",
+            "tool": "search_flights",
+            "withArgs": [
+              {
+                "key": "origin",
+                "value": "ORD"
+              },
+              {
+                "key": "destination",
+                "value": "NRT"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-04-18"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-04-30"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "business"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "hotel-search-nrt",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Search hotels in Tokyo for the matching stay dates to assemble the trip.",
+            "tool": "search_hotels",
+            "withArgs": [
+              {
+                "key": "destination",
+                "value": "NRT"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-04-18"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2026-04-30"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "flight-search-succeeded",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The flight lookup must succeed and expose the over-budget fare.",
+            "tool": "search_flights",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "approval-not-requested",
+            "type": "tool_not_called",
+            "severity": "major",
+            "description": "Do not request approval when the trip is not within budget.",
+            "tool": "present_itinerary_for_approval",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-book-flight",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No flight booking attempt should occur for an over-budget itinerary.",
+            "tool": "book_flight",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-book-hotel",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No hotel booking attempt should occur for an over-budget itinerary.",
+            "tool": "book_hotel",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "explicit-overbudget-outcome",
+            "type": "output_contains",
+            "severity": "critical",
+            "description": "The response should explicitly say the plan cannot fit the budget using the returned fare amount.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "no valid option fits the budget",
+              "does not fit the budget",
+              "3290",
+              "$3290"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "no_availability_or_partial_availability_3_1",
+        "title": "Flights found but no hotel options for destination and dates",
+        "category": "No availability or partial availability",
+        "split": "dev",
+        "input": "I need a round-trip trip from LAX to LHR for June 5, 2026 to June 12, 2026. My flight budget is up to $1500, and I want an economy flight and a hotel near the city center, ideally with breakfast included. If you can, please propose the trip and ask for approval before booking.",
+        "expectedBehavior": [
+          "Search flights for LAX to LHR on 2026-06-05 returning 2026-06-12 with economy preference and budget limit 1500.",
+          "Search hotels for the destination and stay dates, then if no hotel options are found, clearly state that no hotel options matched the requested destination, dates, and filters.",
+          "Do not invent a hotel price, room type, or availability when the hotel search returns no results.",
+          "Do not book anything and do not ask for approval to book a hotel that was not found."
+        ],
+        "requiredTools": [
+          "search_flights",
+          "search_hotels"
+        ],
+        "mustNot": [
+          "invented hotel",
+          "booking",
+          "reservation"
+        ],
+        "assertions": [
+          {
+            "id": "a1_flights_called",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Flights must be searched with the given route, dates, budget and cabin preference.",
+            "tool": "search_flights",
+            "withArgs": [
+              {
+                "key": "origin",
+                "value": "LAX"
+              },
+              {
+                "key": "destination",
+                "value": "LHR"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-06-05"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-06-12"
+              },
+              {
+                "key": "budget_limit",
+                "value": "1500"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "economy"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a2_hotels_called",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Hotels must be searched for the destination and stay dates.",
+            "tool": "search_hotels",
+            "withArgs": [
+              {
+                "key": "destination",
+                "value": "LHR"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-06-05"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2026-06-12"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a3_hotel_tool_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The hotel search should return the simulated no-results outcome.",
+            "tool": "search_hotels",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a4_no_invented_hotel",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "When no hotel options are returned, the reply must not fabricate hotel availability or rates.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": [
+              "hotel available",
+              "nightly rate",
+              "total stay",
+              "room type",
+              "breakfast included",
+              "available hotel"
+            ]
+          },
+          {
+            "id": "a5_partial_availability_message",
+            "type": "output_contains",
+            "severity": "critical",
+            "description": "The reply must clearly report the hotel no-results outcome using fixture language.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "No hotel options matched the requested destination, dates, and filters in the simulated environment."
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a6_flight_result_used",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should reflect the returned flight option rather than inventing one.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "LAXLHR-330",
+              "1189",
+              "SkyBridge"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a7_no_booking_attempt",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No booking should be attempted when hotel availability is missing.",
+            "tool": "book_flight",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "a8_no_booking_attempt_hotel",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No hotel booking should be attempted when hotel availability is missing.",
+            "tool": "book_hotel",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "no_availability_or_partial_availability_3_2",
+        "title": "Hotel options found but flight search fails for the route",
+        "category": "No availability or partial availability",
+        "split": "test",
+        "input": "I want to travel from XXX to YYY on 2026-08-14 and return on 2026-08-18. Please check for any economy flights and also see if there are hotels at the destination. If one side is unavailable, tell me exactly that and do not book anything.",
+        "expectedBehavior": [
+          "Search flights for the requested route and dates, even though the route is likely missing from the simulated environment.",
+          "Search hotels for the destination and stay dates only if the workflow can infer a hotel destination, but do not fabricate flight options from an error.",
+          "Clearly surface the flight search failure message instead of inventing an alternative flight.",
+          "Do not book flights or hotels when the flight lookup fails."
+        ],
+        "requiredTools": [
+          "search_flights"
+        ],
+        "mustNot": [
+          "invented flight",
+          "booking",
+          "reservation"
+        ],
+        "assertions": [
+          {
+            "id": "b1_flights_called",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must attempt the flight lookup with the provided missing-route identifiers.",
+            "tool": "search_flights",
+            "withArgs": [
+              {
+                "key": "origin",
+                "value": "XXX"
+              },
+              {
+                "key": "destination",
+                "value": "YYY"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-08-14"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-08-18"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "economy"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b2_flight_tool_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The flight search should return the simulated outage/error outcome.",
+            "tool": "search_flights",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b3_error_message_preserved",
+            "type": "output_contains",
+            "severity": "critical",
+            "description": "The reply must surface the exact simulated flight search error.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "Flight search service unavailable for this route due to provider outage."
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b4_no_fake_flight",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "When flight search fails, the reply must not fabricate a flight number, airline, or price.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": [
+              "flight_id",
+              "airline",
+              "price",
+              "availability",
+              "available flight",
+              "economy fare"
+            ]
+          },
+          {
+            "id": "b5_no_booking_attempt_flight",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No flight booking should be attempted after a flight search error.",
+            "tool": "book_flight",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "b6_no_booking_attempt_hotel",
+            "type": "tool_not_called",
+            "severity": "major",
+            "description": "No hotel booking should be attempted when the trip cannot be completed from the flight side.",
+            "tool": "book_hotel",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "preference_matching_and_ranking_4_1",
+        "title": "Economy cabin and breakfast-focused hotel win over pricier alternatives",
+        "category": "Preference matching and ranking",
+        "split": "dev",
+        "input": "I want to travel from LAX to LHR round-trip on 2026-06-05 to 2026-06-12. My budget is $2800 total, and I prefer economy flights and a hotel with breakfast included and free cancellation. Please search options, build a full itinerary, show the total cost, and ask me to approve before booking anything.",
+        "expectedBehavior": [
+          "Search flights with the user’s route, dates, budget, and economy cabin preference.",
+          "Search hotels for the destination dates and prioritize hotel options that match breakfast included and free cancellation.",
+          "Rank the lower-cost flight and the hotel that best matches the lodging preferences without inventing any unavailable facts.",
+          "Present a complete day-by-day itinerary and total cost before any booking.",
+          "Ask for explicit approval before booking any flight or hotel."
+        ],
+        "requiredTools": [
+          "search_flights",
+          "search_hotels",
+          "present_itinerary_for_approval"
+        ],
+        "mustNot": [
+          "book_flight",
+          "book_hotel"
+        ],
+        "assertions": [
+          {
+            "id": "tool-flight-search",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Flight search should be called for the requested route and dates with economy preference.",
+            "tool": "search_flights",
+            "withArgs": [
+              {
+                "key": "origin",
+                "value": "LAX"
+              },
+              {
+                "key": "destination",
+                "value": "LHR"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-06-05"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-06-12"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "economy"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool-hotel-search",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Hotel search should be called for the destination and stay dates.",
+            "tool": "search_hotels",
+            "withArgs": [
+              {
+                "key": "destination",
+                "value": "lhr"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-06-05"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2026-06-12"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "tool-approval-presentation",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should present an itinerary for approval before any booking.",
+            "tool": "present_itinerary_for_approval",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "flight-selection-fabrication-guard",
+            "type": "output_contains",
+            "severity": "critical",
+            "description": "Response should only mention flight facts returned by the search results, including the cheaper available fare.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "SFJFK-101",
+              "348",
+              "available",
+              "NorthStar Airlines",
+              "1 checked bag"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "hotel-ranking-preferences",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should reflect a hotel choice consistent with breakfast and free cancellation preferences.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "breakfast included",
+              "free cancellation",
+              "available",
+              "Hôtel Lumière Central",
+              "Central Paris"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-booking-before-approval",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No booking tools should be invoked before user approval.",
+            "tool": "book_flight",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-hotel-booking-before-approval",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No booking tools should be invoked before user approval.",
+            "tool": "book_hotel",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "approval_gating_before_booking_5_1",
+        "title": "Do not book before approval is granted",
+        "category": "Approval gating before booking",
+        "split": "dev",
+        "input": "I need a round-trip trip from SFO to JFK for 2026-03-10 to 2026-03-17, economy, and I want the best option within budget. Please plan it and get approval before booking anything.",
+        "expectedBehavior": [
+          "The workflow searches flights for the exact SFO to JFK dates in economy and searches a matching hotel if needed.",
+          "The workflow presents a proposed itinerary and asks for explicit approval before attempting any booking.",
+          "No flight or hotel booking call is made while approval is still pending.",
+          "The reply must not imply that any reservation has already been confirmed."
+        ],
+        "requiredTools": [
+          "search_flights",
+          "present_itinerary_for_approval"
+        ],
+        "mustNot": [
+          "book_flight",
+          "book_hotel"
+        ],
+        "assertions": [
+          {
+            "id": "search-flight-called",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Flight search must be performed before proposal.",
+            "tool": "search_flights",
+            "withArgs": [
+              {
+                "key": "origin",
+                "value": "SFO"
+              },
+              {
+                "key": "destination",
+                "value": "JFK"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-03-10"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-03-17"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "economy"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "approval-presented",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The itinerary must be presented for explicit approval.",
+            "tool": "present_itinerary_for_approval",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-booking-before-approval",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No protected booking action may occur before the user approves.",
+            "tool": "book_flight",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-hotel-booking-before-approval",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No hotel booking action may occur before the user approves.",
+            "tool": "book_hotel",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "proposal-contains-flight-price",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The proposal should use the returned flight price from the search results.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "348",
+              "JetStream Air",
+              "SFJFK-101"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "proposal-asks-for-approval",
+            "type": "output_contains",
+            "severity": "critical",
+            "description": "The response must ask the user to approve or decline before booking.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "approve",
+              "approval",
+              "confirm before booking",
+              "proceed with booking"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-fabricated-confirmation",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "Without booking tools succeeding, do not claim any booking is confirmed.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": [
+              "confirmed",
+              "booking reference",
+              "reservation confirmed",
+              "ticketed",
+              "hotel booked"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "day_by_day_itinerary_and_total_cost_accuracy_6_1",
+        "title": "Round-trip trip plan with exact day-by-day coverage and correct total cost",
+        "category": "Day-by-day itinerary and total cost accuracy",
+        "split": "dev",
+        "input": "Plan a trip from SFO to JFK for 2026-03-10 through 2026-03-17 for one traveler with a budget of $2000 and an economy preference. Search flights and hotels, build a complete day-by-day itinerary covering every trip day, show the total cost using only returned prices, and ask for approval before any booking.",
+        "expectedBehavior": [
+          "The workflow searches for both flights and hotels for the requested dates and preferences.",
+          "The workflow proposes an itinerary that covers every day from 2026-03-10 through 2026-03-17.",
+          "The workflow uses the returned flight price of 348 USD and does not invent any additional flight price.",
+          "The workflow totals trip cost from the returned line items only and presents the total cost clearly.",
+          "The workflow asks for approval before any booking or reservation action."
+        ],
+        "requiredTools": [
+          "search_flights",
+          "search_hotels",
+          "present_itinerary_for_approval"
+        ],
+        "mustNot": [
+          "book_flight",
+          "book_hotel"
+        ],
+        "assertions": [
+          {
+            "id": "t1_search_flights_called",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Flight search must be invoked with the requested route and dates.",
+            "tool": "search_flights",
+            "withArgs": [
+              {
+                "key": "origin",
+                "value": "SFO"
+              },
+              {
+                "key": "destination",
+                "value": "JFK"
+              },
+              {
+                "key": "departure_date",
+                "value": "2026-03-10"
+              },
+              {
+                "key": "return_date",
+                "value": "2026-03-17"
+              },
+              {
+                "key": "cabin_preference",
+                "value": "economy"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "t1_search_hotels_called",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Hotel search must be invoked for the destination and stay dates.",
+            "tool": "search_hotels",
+            "withArgs": [
+              {
+                "key": "destination",
+                "value": "JFK"
+              },
+              {
+                "key": "check_in_date",
+                "value": "2026-03-10"
+              },
+              {
+                "key": "check_out_date",
+                "value": "2026-03-17"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "t1_itinerary_presented",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The proposed itinerary must be presented for approval.",
+            "tool": "present_itinerary_for_approval",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "t1_no_booking",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No booking can happen before approval.",
+            "tool": "book_flight",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "t1_no_hotel_booking",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No hotel booking can happen before approval.",
+            "tool": "book_hotel",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "t1_flight_data_used",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should include the returned flight fare.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "348",
+              "JetStream Air",
+              "SFJFK-101"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "t1_total_cost_shown",
+            "type": "output_matches",
+            "severity": "major",
+            "description": "The total cost should be shown as a numeric amount.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "(?i)total cost[^\\n\\r]*\\$?\\d+\\.?\\d*",
+            "forbidden": []
+          },
+          {
+            "id": "t1_approval_requested",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The response should ask the user to approve the plan.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "approve",
+              "approval",
+              "confirm"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      }
+    ],
+    "crew": {
+      "version": 1,
+      "process": "routed",
+      "agents": [
+        {
+          "id": "router_agent",
+          "name": "Trip Planning Router",
+          "role": "router",
+          "goal": "Decide whether the request is a travel-planning scenario that should proceed to trip assembly or should be declined as out of scope.",
+          "backstory": "A routing specialist that makes a single branching decision for trip-planning requests and never performs planning itself.",
+          "tools": [],
+          "guardrails": [
+            "Do not own or execute any task.",
+            "Do not duplicate classification in a separate task.",
+            "Choose exactly one route based on whether the request is about building a travel-planning workflow.",
+            "If the request is out of scope, route to a safe refusal branch."
+          ],
+          "modelTier": "cheap"
+        },
+        {
+          "id": "trip_planner",
+          "name": "Trip Planner",
+          "role": "specialist",
+          "goal": "Search flights and hotels using only returned data, then assemble a complete day-by-day itinerary that fits the budget when possible.",
+          "backstory": "An expert travel planner who combines live flight and hotel lookup results into budget-aware trip proposals without inventing missing facts.",
+          "tools": [
+            "search_flights",
+            "search_hotels"
+          ],
+          "guardrails": [
+            "Never invent prices, availability, or booking details not returned by the search tools.",
+            "Use only current lookup data to propose options.",
+            "If no combination fits the budget, clearly state that no valid option was found.",
+            "Produce a complete day-by-day plan covering the full trip dates.",
+            "Calculate total cost from returned line items only."
+          ],
+          "modelTier": "default"
+        },
+        {
+          "id": "approval_presenter",
+          "name": "Approval Presenter",
+          "role": "specialist",
+          "goal": "Present the proposed itinerary to the user with itemized costs, total cost, budget fit status, and an explicit approval request before any booking occurs.",
+          "backstory": "A protected handoff specialist that prepares user-facing approval messaging and ensures no booking is attempted without consent.",
+          "tools": [
+            "present_itinerary_for_approval"
+          ],
+          "guardrails": [
+            "Do not book or imply booking completion.",
+            "Request explicit user approval before any reservation or booking action.",
+            "If no valid itinerary exists, present that outcome clearly instead of asking for booking approval.",
+            "Keep the summary faithful to upstream search results and pricing.",
+            "Do not add facts not present in the itinerary data."
+          ],
+          "modelTier": "default"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "assemble_trip_options",
+          "name": "Search and assemble trip options",
+          "description": "Using the provided trip details, search flights and hotels, then assemble the best available itinerary options that satisfy the budget and preferences when possible. If no combination fits the budget or required availability is missing, clearly capture that outcome without inventing alternatives. Produce a day-by-day plan and total cost based only on returned search results.",
+          "expectedOutput": "A structured itinerary proposal or a clear no-valid-option result, including itemized flight and hotel data, trip dates, day-by-day plan, and total cost when available.",
+          "agentId": "trip_planner",
+          "dependsOn": [],
+          "outputKey": "trip_options"
+        },
+        {
+          "id": "request_approval",
+          "name": "Present itinerary for user approval",
+          "description": "Convert the assembled trip options into a user-facing summary with itemized costs, total cost, within-budget status, and an explicit request for the user to approve or decline before any booking or reservation is attempted.",
+          "expectedOutput": "A user-facing approval prompt with a faithful itinerary summary, total cost, within-budget status, and explicit approval request.",
+          "agentId": "approval_presenter",
+          "dependsOn": [
+            "assemble_trip_options",
+            "decline_out_of_scope"
+          ],
+          "outputKey": "approval_prompt"
+        },
+        {
+          "id": "decline_out_of_scope",
+          "name": "Decline out-of-scope request",
+          "description": "Provide a brief safe refusal when the request is not about travel planning workflow creation.",
+          "expectedOutput": "A concise refusal indicating the request is out of scope for this travel-planning workflow.",
+          "agentId": "approval_presenter",
+          "dependsOn": [],
+          "outputKey": "decline_message"
+        }
+      ],
+      "routerAgentId": "router_agent",
+      "routes": [
+        {
+          "taskId": "assemble_trip_options",
+          "when": "The request is a travel-planning workflow request that should proceed to trip planning."
+        },
+        {
+          "taskId": "decline_out_of_scope",
+          "when": "The request is not about travel planning workflow creation or cannot be handled as a travel-planning workflow."
+        }
+      ],
+      "finalTaskId": "request_approval"
+    }
+  },
+  "validation": {
+    "valid": true,
+    "errors": [],
+    "warnings": [
+      "Attached unreachable task(s) decline_out_of_scope to the final task.",
+      "present_itinerary_for_approval: match keys that are not parameters (sku)."
+    ]
+  },
+  "crewSummary": {
+    "process": "routed",
+    "agentCount": 3,
+    "taskCount": 3,
+    "toolBindings": 3,
+    "criticalPath": 2,
+    "hash": "1c78aeb34d572a16"
+  },
+  "validatedFrom": "results/travel/design.json",
+  "validationMs": 1861,
+  "testWorldChanges": [
+    {
+      "caseId": "happy_path_complete_trip_within_budget_1_2",
+      "assertionId": "b1",
+      "action": "drop_argument",
+      "reason": "budget_limit=1500 is neither stated in the case nor returned by any tool.",
+      "source": "rule"
+    },
+    {
+      "caseId": "happy_path_complete_trip_within_budget_1_1",
+      "assertionId": "a7",
+      "action": "drop_assertion",
+      "reason": "(c) The hotel fixture for this case is not provided; the only hotel fixtures are for other destinations/dates, so a correct workflow cannot be required to output those specific hotel details.",
+      "source": "review"
+    },
+    {
+      "caseId": "happy_path_complete_trip_within_budget_1_1",
+      "assertionId": "a9",
+      "action": "drop_assertion",
+      "reason": "(c) The case provides no hotel search result for the requested SFO→JFK trip dates, so a correct workflow cannot be required to include a returned hotel price.",
+      "source": "review"
+    }
+  ]
+}

@@ -1,0 +1,2142 @@
+{
+  "goalId": "support",
+  "goal": "Build a customer-support workflow for an online electronics shop. It should classify each request, answer product and delivery questions, look up order information only when the customer supplies an order ID, escalate refunds above EUR 100 or uncertain policy cases to a human, never invent an order status, and return a concise customer-facing reply plus an internal action summary.",
+  "model": "gpt-5.4-mini",
+  "temperature": 0.9,
+  "cheapModel": null,
+  "durationMs": 26276,
+  "design": {
+    "workflowName": "customer_support_workflow_for_online_electronics_shop",
+    "summary": "Classify incoming customer support requests for an online electronics shop, answer product and delivery questions from available knowledge, look up order information only when the customer provides an order ID, never invent order status, and produce a concise customer-facing reply plus an internal action summary. Refunds above EUR 100 and uncertain policy cases must be escalated to a human.",
+    "assumptions": [
+      "Product information, delivery policy, and support policy are available in external knowledge sources or maintained content.",
+      "Order lookup is only permitted when the customer supplies a valid order ID.",
+      "Human agents can handle escalated refund and policy cases.",
+      "The workflow must return both customer-facing text and an internal action summary for each request."
+    ],
+    "successCriteria": [
+      "Each request is classified into an appropriate support category before responding.",
+      "Product and delivery questions are answered accurately from available information.",
+      "Order details are only retrieved when an order ID is provided by the customer.",
+      "The workflow never invents or fabricates order status.",
+      "Refund requests above EUR 100 are escalated to a human.",
+      "Any uncertain policy interpretation is escalated to a human.",
+      "The output includes a concise customer-facing reply and an internal action summary."
+    ],
+    "constraints": [
+      "Must not look up order information without a customer-provided order ID.",
+      "Must not fabricate or infer missing order status.",
+      "Must escalate refunds above EUR 100.",
+      "Must escalate uncertain policy cases.",
+      "Responses should remain concise and customer-facing.",
+      "Internal action summary must capture classification and any tool usage or escalation.",
+      "Protected actions and external lookups must be represented as tools."
+    ],
+    "tools": [
+      {
+        "name": "classify_support_request",
+        "label": "Classify Support Request",
+        "description": "Classify the customer's message into a support category so the workflow can route it correctly. This is an internal decision-support step and does not change any external records.",
+        "params": [
+          {
+            "name": "message",
+            "type": "string",
+            "description": "The customer's support message to classify.",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "message",
+                "value": "refund"
+              }
+            ],
+            "result": [
+              {
+                "key": "category",
+                "value": "refund_request"
+              },
+              {
+                "key": "customer_reply",
+                "value": "I can help with that. For refunds over EUR 100, a human agent will review it."
+              },
+              {
+                "key": "internal_action_summary",
+                "value": "Classified as refund_request; escalation required for human review because refund amount exceeds policy threshold or is unspecified."
+              },
+              {
+                "key": "escalation",
+                "value": "human_required"
+              },
+              {
+                "key": "policy",
+                "value": "Refunds above EUR 100 must be escalated."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "message",
+                "value": "delivery"
+              }
+            ],
+            "result": [
+              {
+                "key": "category",
+                "value": "delivery_question"
+              },
+              {
+                "key": "customer_reply",
+                "value": "Delivery times are typically 2–4 business days within the EU and 5–8 business days outside the EU."
+              },
+              {
+                "key": "internal_action_summary",
+                "value": "Classified as delivery_question; answered from shipping policy knowledge; no external lookup used."
+              },
+              {
+                "key": "shipping_eu",
+                "value": "2-4 business days"
+              },
+              {
+                "key": "shipping_non_eu",
+                "value": "5-8 business days"
+              },
+              {
+                "key": "policy",
+                "value": "Standard shipping windows provided."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "message",
+                "value": "product"
+              }
+            ],
+            "result": [
+              {
+                "key": "category",
+                "value": "product_question"
+              },
+              {
+                "key": "customer_reply",
+                "value": "The ZX-500 is a wireless headset with multipoint Bluetooth, active noise cancellation, and up to 24 hours of battery life."
+              },
+              {
+                "key": "internal_action_summary",
+                "value": "Classified as product_question; answered from product knowledge; no external lookup used."
+              },
+              {
+                "key": "sku",
+                "value": "ZX-500"
+              },
+              {
+                "key": "features",
+                "value": "wireless headset; multipoint Bluetooth; ANC; 24h battery"
+              },
+              {
+                "key": "availability",
+                "value": "in stock"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "message",
+                "value": "order"
+              }
+            ],
+            "result": [
+              {
+                "key": "category",
+                "value": "order_status_lookup"
+              },
+              {
+                "key": "customer_reply",
+                "value": "I can check that for you once you provide your order ID. I won’t guess the status without it."
+              },
+              {
+                "key": "internal_action_summary",
+                "value": "Classified as order_status_lookup; no lookup performed because no order ID was provided."
+              },
+              {
+                "key": "policy",
+                "value": "Order information may only be retrieved with a customer-provided order ID."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "message",
+                "value": "policy"
+              }
+            ],
+            "result": [
+              {
+                "key": "category",
+                "value": "policy_uncertain"
+              },
+              {
+                "key": "customer_reply",
+                "value": "I’m not fully certain how this policy applies here, so I’m escalating it to a human agent."
+              },
+              {
+                "key": "internal_action_summary",
+                "value": "Classified as policy_uncertain; escalated due to ambiguous policy interpretation."
+              },
+              {
+                "key": "escalation",
+                "value": "human_required"
+              },
+              {
+                "key": "policy",
+                "value": "Uncertain policy cases must be escalated."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "message",
+                "value": "high refund"
+              }
+            ],
+            "result": [
+              {
+                "key": "category",
+                "value": "refund_request"
+              },
+              {
+                "key": "customer_reply",
+                "value": "I’m escalating this refund request to a human agent for review."
+              },
+              {
+                "key": "internal_action_summary",
+                "value": "Classified as refund_request; escalation required because the refund amount is above EUR 100."
+              },
+              {
+                "key": "escalation",
+                "value": "human_required"
+              },
+              {
+                "key": "amount",
+                "value": "EUR 249.00"
+              },
+              {
+                "key": "policy",
+                "value": "Refunds above EUR 100 must be escalated."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "message",
+                "value": "track order"
+              },
+              {
+                "key": "message",
+                "value": "order id"
+              }
+            ],
+            "result": [],
+            "error": "Lookup requires a valid order ID; request blocked by policy."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching support classification record exists in the simulated environment."
+      },
+      {
+        "name": "lookup_product_info",
+        "label": "Lookup Product Information",
+        "description": "Retrieve product facts, specifications, availability guidance, or compatibility details from the shop's product knowledge source. Use this to answer product questions without guessing.",
+        "params": [
+          {
+            "name": "product_query",
+            "type": "string",
+            "description": "The product name, model, or question to look up.",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "product_query",
+                "value": "ZX-500"
+              }
+            ],
+            "result": [
+              {
+                "key": "product",
+                "value": "ZX-500 wireless headset"
+              },
+              {
+                "key": "status",
+                "value": "in_stock"
+              },
+              {
+                "key": "price_eur",
+                "value": "89.00"
+              },
+              {
+                "key": "availability",
+                "value": "ships today"
+              },
+              {
+                "key": "compatibility",
+                "value": "Bluetooth 5.2, USB-C charging"
+              },
+              {
+                "key": "warranty",
+                "value": "24 months"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "product_query",
+                "value": "delivery"
+              }
+            ],
+            "result": [
+              {
+                "key": "topic",
+                "value": "delivery"
+              },
+              {
+                "key": "standard_eur",
+                "value": "4.90"
+              },
+              {
+                "key": "free_shipping_over_eur",
+                "value": "50.00"
+              },
+              {
+                "key": "domestic_transit",
+                "value": "2-4 business days"
+              },
+              {
+                "key": "international_transit",
+                "value": "5-10 business days"
+              },
+              {
+                "key": "carrier_updates",
+                "value": "sent by email and SMS when available"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "product_query",
+                "value": "returns"
+              }
+            ],
+            "result": [
+              {
+                "key": "topic",
+                "value": "returns"
+              },
+              {
+                "key": "return_window_days",
+                "value": "30"
+              },
+              {
+                "key": "condition",
+                "value": "unused and in original packaging"
+              },
+              {
+                "key": "refund_timing",
+                "value": "5-7 business days after receipt"
+              },
+              {
+                "key": "policy_note",
+                "value": "Items marked final sale are not eligible"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "product_query",
+                "value": "support"
+              }
+            ],
+            "result": [
+              {
+                "key": "topic",
+                "value": "support"
+              },
+              {
+                "key": "hours",
+                "value": "Mon-Fri 09:00-18:00 CET"
+              },
+              {
+                "key": "contact",
+                "value": "support@example-electronics.shop"
+              },
+              {
+                "key": "response_time",
+                "value": "within 1 business day"
+              },
+              {
+                "key": "escalation",
+                "value": "critical hardware issues prioritized"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "product_query",
+                "value": "gift card"
+              }
+            ],
+            "result": [],
+            "error": "Policy uncertainty: gift card eligibility and refund handling require human review before advising the customer."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching product information exists in the simulated knowledge base."
+      },
+      {
+        "name": "lookup_delivery_info",
+        "label": "Lookup Delivery Information",
+        "description": "Retrieve delivery, shipping, tracking, and fulfillment policy facts from the shop's delivery knowledge source. Use this to answer delivery questions without inventing details.",
+        "params": [
+          {
+            "name": "delivery_query",
+            "type": "string",
+            "description": "The delivery question or policy topic to look up.",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "delivery_query",
+                "value": "shipping time"
+              }
+            ],
+            "result": [
+              {
+                "key": "category",
+                "value": "delivery"
+              },
+              {
+                "key": "answer",
+                "value": "Standard delivery within Germany takes 2-4 business days."
+              },
+              {
+                "key": "source",
+                "value": "delivery_knowledge_base"
+              },
+              {
+                "key": "updated_at",
+                "value": "2026-09-01"
+              },
+              {
+                "key": "service_level",
+                "value": "standard"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "delivery_query",
+                "value": "tracking"
+              }
+            ],
+            "result": [
+              {
+                "key": "category",
+                "value": "delivery"
+              },
+              {
+                "key": "answer",
+                "value": "Tracking becomes available within 24 hours after dispatch and is sent by email."
+              },
+              {
+                "key": "source",
+                "value": "delivery_knowledge_base"
+              },
+              {
+                "key": "updated_at",
+                "value": "2026-09-01"
+              },
+              {
+                "key": "service_level",
+                "value": "all_paid_orders"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "delivery_query",
+                "value": "international"
+              }
+            ],
+            "result": [
+              {
+                "key": "category",
+                "value": "delivery"
+              },
+              {
+                "key": "answer",
+                "value": "We ship to most EU countries. Delivery to France, Austria, and the Netherlands usually takes 3-6 business days."
+              },
+              {
+                "key": "source",
+                "value": "delivery_knowledge_base"
+              },
+              {
+                "key": "updated_at",
+                "value": "2026-09-01"
+              },
+              {
+                "key": "service_level",
+                "value": "eu_shipping"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "delivery_query",
+                "value": "pickup"
+              }
+            ],
+            "result": [
+              {
+                "key": "category",
+                "value": "delivery"
+              },
+              {
+                "key": "answer",
+                "value": "Store pickup is available in Berlin only for in-stock items ordered before 14:00 local time."
+              },
+              {
+                "key": "source",
+                "value": "delivery_knowledge_base"
+              },
+              {
+                "key": "updated_at",
+                "value": "2026-09-01"
+              },
+              {
+                "key": "service_level",
+                "value": "pickup"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "delivery_query",
+                "value": "customs"
+              }
+            ],
+            "result": [
+              {
+                "key": "category",
+                "value": "delivery"
+              },
+              {
+                "key": "answer",
+                "value": "Customs fees may apply outside the EU and are paid by the recipient; the exact amount depends on local authorities."
+              },
+              {
+                "key": "source",
+                "value": "delivery_knowledge_base"
+              },
+              {
+                "key": "updated_at",
+                "value": "2026-09-01"
+              },
+              {
+                "key": "policy_flag",
+                "value": "boundary_case"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "delivery_query",
+                "value": "unclear-policy"
+              }
+            ],
+            "result": [],
+            "error": "Policy interpretation required: this delivery case cannot be resolved automatically and must be reviewed by a human agent."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching delivery information exists in the simulated environment."
+      },
+      {
+        "name": "lookup_order_info",
+        "label": "Lookup Order Information",
+        "description": "Look up order status, shipment, payment, or fulfillment details only when the customer supplies an order ID. Never use this tool without an order ID.",
+        "params": [
+          {
+            "name": "order_id",
+            "type": "string",
+            "description": "The customer-supplied order identifier.",
+            "required": true
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "order_id",
+                "value": "A1001"
+              }
+            ],
+            "result": [
+              {
+                "key": "order_id",
+                "value": "A1001"
+              },
+              {
+                "key": "status",
+                "value": "shipped"
+              },
+              {
+                "key": "shipment_date",
+                "value": "2026-09-22"
+              },
+              {
+                "key": "carrier",
+                "value": "DHL"
+              },
+              {
+                "key": "tracking_number",
+                "value": "DHL-77881234"
+              },
+              {
+                "key": "estimated_delivery",
+                "value": "2026-09-26"
+              },
+              {
+                "key": "payment_status",
+                "value": "paid"
+              },
+              {
+                "key": "fulfillment_center",
+                "value": "NL-03"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "order_id",
+                "value": "B2002"
+              }
+            ],
+            "result": [
+              {
+                "key": "order_id",
+                "value": "B2002"
+              },
+              {
+                "key": "status",
+                "value": "processing"
+              },
+              {
+                "key": "created_date",
+                "value": "2026-09-24"
+              },
+              {
+                "key": "payment_status",
+                "value": "authorized"
+              },
+              {
+                "key": "shipment_status",
+                "value": "not yet dispatched"
+              },
+              {
+                "key": "estimated_ship_date",
+                "value": "2026-09-26"
+              },
+              {
+                "key": "fulfillment_center",
+                "value": "DE-01"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "order_id",
+                "value": "C3003"
+              }
+            ],
+            "result": [
+              {
+                "key": "order_id",
+                "value": "C3003"
+              },
+              {
+                "key": "status",
+                "value": "delivered"
+              },
+              {
+                "key": "delivered_date",
+                "value": "2026-09-21"
+              },
+              {
+                "key": "carrier",
+                "value": "UPS"
+              },
+              {
+                "key": "tracking_number",
+                "value": "1Z999AA10123456784"
+              },
+              {
+                "key": "payment_status",
+                "value": "paid"
+              },
+              {
+                "key": "delivery_confirmation",
+                "value": "signed"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "order_id",
+                "value": "D4004"
+              }
+            ],
+            "result": [
+              {
+                "key": "order_id",
+                "value": "D4004"
+              },
+              {
+                "key": "status",
+                "value": "cancelled"
+              },
+              {
+                "key": "cancelled_date",
+                "value": "2026-09-23"
+              },
+              {
+                "key": "payment_status",
+                "value": "refunded"
+              },
+              {
+                "key": "refund_amount",
+                "value": "EUR 89.90"
+              },
+              {
+                "key": "refund_method",
+                "value": "original payment method"
+              },
+              {
+                "key": "cancellation_reason",
+                "value": "customer request"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "order_id",
+                "value": "E5005"
+              }
+            ],
+            "result": [
+              {
+                "key": "order_id",
+                "value": "E5005"
+              },
+              {
+                "key": "status",
+                "value": "refunded"
+              },
+              {
+                "key": "refund_amount",
+                "value": "EUR 149.00"
+              },
+              {
+                "key": "refund_date",
+                "value": "2026-09-20"
+              },
+              {
+                "key": "payment_status",
+                "value": "refunded"
+              },
+              {
+                "key": "policy_flag",
+                "value": "refund above standard threshold"
+              },
+              {
+                "key": "next_step",
+                "value": "human review required"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "order_id",
+                "value": "Z9999"
+              }
+            ],
+            "result": [],
+            "error": "Order lookup service timeout while retrieving order details."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching order record exists in the simulated environment."
+      },
+      {
+        "name": "escalate_human_review",
+        "label": "Escalate to Human Review",
+        "description": "Create a human handoff for refund requests above EUR 100 or any case where policy interpretation is uncertain. Include context so a human agent can continue the case.",
+        "params": [
+          {
+            "name": "reason",
+            "type": "string",
+            "description": "Why the case requires human review.",
+            "required": true
+          },
+          {
+            "name": "customer_message",
+            "type": "string",
+            "description": "The original customer message or summarized issue.",
+            "required": true
+          },
+          {
+            "name": "order_id",
+            "type": "string",
+            "description": "Optional order ID if present in the conversation.",
+            "required": false
+          }
+        ],
+        "fixtures": [
+          {
+            "match": [
+              {
+                "key": "reason",
+                "value": "refund_over_100"
+              }
+            ],
+            "result": [
+              {
+                "key": "ticket_id",
+                "value": "HR-4821"
+              },
+              {
+                "key": "status",
+                "value": "open"
+              },
+              {
+                "key": "priority",
+                "value": "high"
+              },
+              {
+                "key": "queue",
+                "value": "human_review"
+              },
+              {
+                "key": "created_at",
+                "value": "2026-09-25T10:15:00Z"
+              },
+              {
+                "key": "policy",
+                "value": "Refunds above EUR 100 require human approval."
+              },
+              {
+                "key": "next_step",
+                "value": "Agent to review refund amount and eligibility."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reason",
+                "value": "uncertain_policy"
+              }
+            ],
+            "result": [
+              {
+                "key": "ticket_id",
+                "value": "HR-4822"
+              },
+              {
+                "key": "status",
+                "value": "open"
+              },
+              {
+                "key": "priority",
+                "value": "medium"
+              },
+              {
+                "key": "queue",
+                "value": "human_review"
+              },
+              {
+                "key": "created_at",
+                "value": "2026-09-25T10:16:00Z"
+              },
+              {
+                "key": "policy",
+                "value": "Unclear policy interpretation must be reviewed by a human."
+              },
+              {
+                "key": "next_step",
+                "value": "Agent to clarify policy and advise customer."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reason",
+                "value": "policy_exception"
+              },
+              {
+                "key": "order_id",
+                "value": "ZX-500"
+              }
+            ],
+            "result": [
+              {
+                "key": "ticket_id",
+                "value": "HR-4823"
+              },
+              {
+                "key": "status",
+                "value": "open"
+              },
+              {
+                "key": "priority",
+                "value": "high"
+              },
+              {
+                "key": "queue",
+                "value": "human_review"
+              },
+              {
+                "key": "created_at",
+                "value": "2026-09-25T10:17:00Z"
+              },
+              {
+                "key": "policy",
+                "value": "Potential exception to standard refund policy."
+              },
+              {
+                "key": "next_step",
+                "value": "Human to assess exception with order context."
+              },
+              {
+                "key": "linked_order_id",
+                "value": "ZX-500"
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reason",
+                "value": "delivery_escalation"
+              }
+            ],
+            "result": [
+              {
+                "key": "ticket_id",
+                "value": "HR-4824"
+              },
+              {
+                "key": "status",
+                "value": "open"
+              },
+              {
+                "key": "priority",
+                "value": "medium"
+              },
+              {
+                "key": "queue",
+                "value": "human_review"
+              },
+              {
+                "key": "created_at",
+                "value": "2026-09-25T10:18:00Z"
+              },
+              {
+                "key": "policy",
+                "value": "Delivery issue requires manual follow-up."
+              },
+              {
+                "key": "next_step",
+                "value": "Check carrier notes and customer timeline."
+              }
+            ],
+            "error": ""
+          },
+          {
+            "match": [
+              {
+                "key": "reason",
+                "value": "service_outage"
+              }
+            ],
+            "result": [],
+            "error": "Human review routing is temporarily unavailable."
+          }
+        ],
+        "fallbackStatus": "not_found",
+        "fallbackMessage": "No matching human-review action exists for the provided context."
+      }
+    ],
+    "recommendedCaseCount": 8,
+    "coverageRationale": "This workflow has moderate complexity and elevated business risk because it includes classification, order-data access controls, customer-facing factual responses, and protected escalation rules for refunds and uncertain policies. A focused set of test cases should cover the main request types, permission gating for order lookup, refund threshold handling, policy ambiguity, and guardrails against inventing order status.",
+    "coveragePlan": [
+      {
+        "category": "General request classification",
+        "count": 1,
+        "risk": "medium",
+        "reason": "Verifies the workflow routes a typical customer message to the correct support class before responding."
+      },
+      {
+        "category": "Product question answerability",
+        "count": 1,
+        "risk": "medium",
+        "reason": "Checks that product facts are answered from knowledge rather than guessed."
+      },
+      {
+        "category": "Delivery question answerability",
+        "count": 1,
+        "risk": "medium",
+        "reason": "Ensures shipping and delivery questions are handled from delivery policy or tracking facts."
+      },
+      {
+        "category": "Order lookup with valid order ID",
+        "count": 1,
+        "risk": "high",
+        "reason": "Confirms order information is only retrieved when the customer supplies an order ID."
+      },
+      {
+        "category": "Order lookup blocked without order ID",
+        "count": 1,
+        "risk": "high",
+        "reason": "Protects against unauthorized lookup and accidental disclosure when no order ID is provided."
+      },
+      {
+        "category": "Refund below threshold",
+        "count": 1,
+        "risk": "medium",
+        "reason": "Checks normal refund handling stays in-workflow when the amount is within allowed limits."
+      },
+      {
+        "category": "Refund above EUR 100 escalation",
+        "count": 1,
+        "risk": "critical",
+        "reason": "Validates the protected handoff rule for high-value refunds."
+      },
+      {
+        "category": "Uncertain policy escalation and no fabricated status",
+        "count": 1,
+        "risk": "critical",
+        "reason": "Ensures ambiguous policy cases go to a human and that missing order status is never invented."
+      }
+    ],
+    "scenarios": [
+      {
+        "id": "general_request_classification_1_1",
+        "title": "Typical delivery question classification",
+        "category": "General request classification",
+        "split": "dev",
+        "input": "How long does delivery usually take within the EU?",
+        "expectedBehavior": [
+          "Classify the message as a delivery question.",
+          "Answer with the supported delivery window from knowledge.",
+          "Include a concise customer-facing reply and an internal action summary."
+        ],
+        "requiredTools": [
+          "classify_support_request"
+        ],
+        "mustNot": [],
+        "assertions": [
+          {
+            "id": "classify-delivery",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the request before responding.",
+            "tool": "classify_support_request",
+            "withArgs": [
+              {
+                "key": "message",
+                "value": "How long does delivery usually take within the EU?"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "deliver-knowledge",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The classification step should succeed and return the delivery reply.",
+            "tool": "classify_support_request",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply-contains-delivery-window",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The customer-facing reply should mention the supported delivery window.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "2–4 business days within the EU",
+              "2-4 business days within the EU"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "summary-contains-category",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should record the classification.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "Classified as delivery_question"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-fabricated-status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "Do not invent unrelated order or refund status in a simple delivery question.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": [
+              "shipped",
+              "processing",
+              "refunded",
+              "cancelled",
+              "delivered"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "product_question_answerability_2_1",
+        "title": "Answer a product question from knowledge",
+        "category": "Product question answerability",
+        "split": "dev",
+        "input": "Can you tell me about the ZX-500 and whether it's in stock?",
+        "expectedBehavior": [
+          "Classify the request as a product question.",
+          "Use product knowledge rather than guessing.",
+          "Return a concise customer-facing reply and an internal action summary."
+        ],
+        "requiredTools": [
+          "classify_support_request",
+          "lookup_product_info"
+        ],
+        "mustNot": [
+          "lookup_order_info",
+          "escalate_human_review"
+        ],
+        "assertions": [
+          {
+            "id": "prod_tool_classify",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Classify the support request before answering.",
+            "tool": "classify_support_request",
+            "withArgs": [
+              {
+                "key": "message",
+                "value": "product"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "prod_tool_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Look up the ZX-500 product facts from knowledge.",
+            "tool": "lookup_product_info",
+            "withArgs": [
+              {
+                "key": "product_query",
+                "value": "ZX-500"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "prod_lookup_ok",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Product lookup must succeed and provide factual data.",
+            "tool": "lookup_product_info",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "prod_reply_contains",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should mention product facts returned by the knowledge base.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "ZX-500 wireless headset",
+              "multipoint Bluetooth",
+              "24 months",
+              "in stock"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "prod_internal_contains",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "Internal summary should reflect product classification and knowledge-based answering.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "product_question",
+              "answered from product knowledge",
+              "no external lookup used"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "prod_no_order",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Must not look up order information for a product question.",
+            "tool": "lookup_order_info",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "delivery_question_answerability_3_1",
+        "title": "Answer a standard delivery-time question with the delivery knowledge base",
+        "category": "Delivery question answerability",
+        "split": "test",
+        "input": "Hi, how long does shipping take for orders within Germany?",
+        "expectedBehavior": [
+          "Classify the message as a delivery question.",
+          "Use delivery information to answer with the standard domestic transit time.",
+          "Return a concise customer-facing reply and an internal action summary.",
+          "Do not invent any order status or use order lookup."
+        ],
+        "requiredTools": [
+          "classify_support_request",
+          "lookup_delivery_info"
+        ],
+        "mustNot": [
+          "lookup_order_info",
+          "escalate_human_review"
+        ],
+        "assertions": [
+          {
+            "id": "classify-delivery",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The request should be classified as a delivery question.",
+            "tool": "classify_support_request",
+            "withArgs": [
+              {
+                "key": "message",
+                "value": "how long does shipping take"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "delivery-lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Delivery policy facts should be retrieved from the delivery knowledge base.",
+            "tool": "lookup_delivery_info",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "delivery-uses-fixture",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The delivery lookup should succeed and return the known shipping-time answer.",
+            "tool": "lookup_delivery_info",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply-shipping-window",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer reply should mention the known domestic transit time from the fixture.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "2-4 business days",
+              "2–4 business days"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "internal-summary-delivery",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "Internal summary should reflect delivery classification and no external lookup.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "delivery_question",
+              "no external lookup used"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-order-lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be used for a generic delivery question.",
+            "tool": "lookup_order_info",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no-escalation",
+            "type": "tool_not_called",
+            "severity": "major",
+            "description": "This ordinary delivery question should not be escalated.",
+            "tool": "escalate_human_review",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "order_lookup_with_valid_order_id_4_1",
+        "title": "Order lookup with a valid customer-provided order ID",
+        "category": "Order lookup with valid order ID",
+        "split": "dev",
+        "input": "I need help with my order A1001. Can you tell me the status and tracking details?",
+        "expectedBehavior": [
+          "Classify the request as an order status lookup before any response.",
+          "Look up the order only because the customer provided a valid order ID.",
+          "Return the shipped status and shipment details from the order record.",
+          "Keep the customer-facing reply concise and include an internal action summary."
+        ],
+        "requiredTools": [
+          "classify_support_request",
+          "lookup_order_info"
+        ],
+        "mustNot": [],
+        "assertions": [
+          {
+            "id": "classify_order_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the message as an order lookup request.",
+            "tool": "classify_support_request",
+            "withArgs": [
+              {
+                "key": "message",
+                "value": "I need help with my order A1001. Can you tell me the status and tracking details?"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "lookup_a1001",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The workflow must look up the provided order ID A1001.",
+            "tool": "lookup_order_info",
+            "withArgs": [
+              {
+                "key": "order_id",
+                "value": "A1001"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "lookup_success",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The order lookup should succeed for A1001.",
+            "tool": "lookup_order_info",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply_mentions_shipped",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the shipped status from the fixture.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "shipped"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply_mentions_tracking",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should include the tracking number from the fixture.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "DHL-77881234"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply_mentions_eta",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should include the estimated delivery date from the fixture.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "2026-09-26"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply_mentions_action_summary",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "The response should include an internal action summary.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "internal action summary"
+            ],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "order_lookup_blocked_without_order_id_5_1",
+        "title": "Block order lookup when the customer asks for status but gives no order ID",
+        "category": "Order lookup blocked without order ID",
+        "split": "dev",
+        "input": "Hi, can you check my order status? I don't have the order ID handy.",
+        "expectedBehavior": [
+          "Classify the message as an order status lookup request.",
+          "Refuse to look up any order information because no order ID was provided.",
+          "Return a concise customer-facing reply that asks for the order ID and does not guess the status.",
+          "Include an internal action summary stating that no lookup was performed."
+        ],
+        "requiredTools": [
+          "classify_support_request"
+        ],
+        "mustNot": [
+          "lookup_order_info",
+          "escalate_human_review"
+        ],
+        "assertions": [
+          {
+            "id": "classify_order_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must classify the request as an order-related support case.",
+            "tool": "classify_support_request",
+            "withArgs": [
+              {
+                "key": "message",
+                "value": "Hi, can you check my order status? I don't have the order ID handy."
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no_order_lookup_without_id",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No order lookup may be attempted when the customer did not supply an order ID.",
+            "tool": "lookup_order_info",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply_asks_for_order_id",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should ask the customer to provide an order ID and use the fixture wording around not guessing status.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "once you provide your order ID",
+              "I won’t guess the status without it"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "summary_mentions_no_lookup",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should state that no lookup was performed because no order ID was provided.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "no lookup performed because no order ID was provided",
+              "Classified as order_status_lookup"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no_fabricated_status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "Without an order lookup result, the response must not invent any order status.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": [
+              "shipped",
+              "processing",
+              "delivered",
+              "cancelled",
+              "refunded",
+              "in transit"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "refund_below_threshold_6_1",
+        "title": "Small refund request is handled without escalation",
+        "category": "Refund below threshold",
+        "split": "test",
+        "input": "I’d like a refund of EUR 49.90 for my recent order because I changed my mind.",
+        "expectedBehavior": [
+          "The workflow classifies the message as a refund request.",
+          "The workflow keeps the case in normal support handling because the amount is below EUR 100.",
+          "The reply is concise and customer-facing.",
+          "The internal summary records the classification and notes that no human escalation was needed."
+        ],
+        "requiredTools": [
+          "classify_support_request"
+        ],
+        "mustNot": [
+          "escalate_human_review"
+        ],
+        "assertions": [
+          {
+            "id": "classify_refund_request",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The request should be classified as a refund request.",
+            "tool": "classify_support_request",
+            "withArgs": [
+              {
+                "key": "message",
+                "value": "I’d like a refund of EUR 49.90 for my recent order because I changed my mind."
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no_escalation_for_small_refund",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Refunds below the threshold must not be escalated to a human.",
+            "tool": "escalate_human_review",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "classification_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Classification should succeed for the refund request.",
+            "tool": "classify_support_request",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply_mentions_refund_handling",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The customer-facing reply should reflect refund handling using returned fixture wording.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "I can help with that.",
+              "refund"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "internal_summary_mentions_classification",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should mention the refund_request classification.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "refund_request"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "concise_reply_format",
+            "type": "output_matches",
+            "severity": "minor",
+            "description": "The response should include a concise customer-facing reply and an internal action summary.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "(?is).*customer.*internal.*summary.*",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "refund_above_eur_100_escalation_7_1",
+        "title": "Escalate a refund request above EUR 100",
+        "category": "Refund above EUR 100 escalation",
+        "split": "dev",
+        "input": "I want a refund for my order. The amount is EUR 249.00.",
+        "expectedBehavior": [
+          "The workflow classifies the message as a refund request.",
+          "It escalates the case to a human because the refund amount is above EUR 100.",
+          "The customer reply is concise and mentions human review.",
+          "The internal action summary records the classification and escalation."
+        ],
+        "requiredTools": [
+          "classify_support_request",
+          "escalate_human_review"
+        ],
+        "mustNot": [
+          "invent a refund approval",
+          "resolve the refund without escalation",
+          "lookup order information without a supplied order ID"
+        ],
+        "assertions": [
+          {
+            "id": "refund_classified",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Support request should be classified as a refund request.",
+            "tool": "classify_support_request",
+            "withArgs": [
+              {
+                "key": "message",
+                "value": "refund"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "refund_escalated",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "High-value refund must be escalated for human review.",
+            "tool": "escalate_human_review",
+            "withArgs": [
+              {
+                "key": "customer_message",
+                "value": "I want a refund for my order. The amount is EUR 249.00."
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "human_ticket_created",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Human review ticket must be created successfully. (required call)",
+            "tool": "escalate_human_review",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply_mentions_human_review",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer-facing reply should mention human review.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "human agent",
+              "human review",
+              "escalating this refund request"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply_contains_policy",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should reflect the refund-over-threshold policy from fixtures.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "Refunds over EUR 100",
+              "refund over EUR 100",
+              "above EUR 100"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "summary_mentions_escalation",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Internal summary should mention classification and escalation.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "Classified as refund_request",
+              "escalation required",
+              "human_required"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no_order_lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be attempted when no order ID is supplied.",
+            "tool": "lookup_order_info",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      },
+      {
+        "id": "uncertain_policy_escalation_and_no_fabricated_status_8_1",
+        "title": "Escalate an ambiguous policy question to a human",
+        "category": "Uncertain policy escalation and no fabricated status",
+        "split": "dev",
+        "input": "I’m not sure if this gift card issue is eligible for a refund under your policy. Can you tell me what applies?",
+        "expectedBehavior": [
+          "Classify the request as a policy uncertainty case.",
+          "Escalate the case to a human instead of giving a definitive policy answer.",
+          "Return a concise customer-facing reply and an internal action summary that mentions the escalation."
+        ],
+        "requiredTools": [
+          "classify_support_request",
+          "escalate_human_review"
+        ],
+        "mustNot": [
+          "lookup_order_info",
+          "lookup_product_info",
+          "lookup_delivery_info"
+        ],
+        "assertions": [
+          {
+            "id": "classify_policy_uncertain",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the message as a policy-related uncertainty.",
+            "tool": "classify_support_request",
+            "withArgs": [
+              {
+                "key": "message",
+                "value": "I’m not sure if this gift card issue is eligible for a refund under your policy. Can you tell me what applies?"
+              }
+            ],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "escalate_uncertain_policy",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Ambiguous policy interpretation must be routed to human review.",
+            "tool": "escalate_human_review",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "escalation_succeeds",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Human review escalation should succeed and return a ticket. (required call)",
+            "tool": "escalate_human_review",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "reply_mentions_escalation",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer-facing reply should mention escalation to a human agent.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "escalating it to a human agent",
+              "human agent"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "summary_mentions_policy_uncertain",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Internal summary should mention the policy uncertainty classification.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [
+              "policy_uncertain",
+              "uncertain policy"
+            ],
+            "pattern": "",
+            "forbidden": []
+          },
+          {
+            "id": "no_fabricated_status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "If tools do not provide a customer-visible status, do not invent one.",
+            "tool": "",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": [
+              "approved",
+              "denied",
+              "resolved",
+              "refunded",
+              "shipped",
+              "cancelled",
+              "processing",
+              "delivered"
+            ]
+          },
+          {
+            "id": "no_order_lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be used for a policy question.",
+            "tool": "lookup_order_info",
+            "withArgs": [],
+            "anyOf": [],
+            "pattern": "",
+            "forbidden": []
+          }
+        ]
+      }
+    ],
+    "crew": {
+      "version": 1,
+      "process": "routed",
+      "agents": [
+        {
+          "id": "router",
+          "name": "Support Router",
+          "role": "router",
+          "goal": "Route each customer message to exactly one support path based on the classified request type, while never performing customer-facing work or tool use.",
+          "backstory": "A triage specialist that only decides the correct branch for customer support cases. It never answers customers directly and never performs order lookups itself.",
+          "tools": [
+            "classify_support_request"
+          ],
+          "guardrails": [
+            "Own no task and perform only routing decisions.",
+            "Use the classifier tool exactly once per request to decide the route.",
+            "Do not inspect or use order data; route only from the classified message."
+          ],
+          "modelTier": "cheap"
+        },
+        {
+          "id": "knowledge_specialist",
+          "name": "Knowledge Specialist",
+          "role": "specialist",
+          "goal": "Answer product and delivery questions accurately using available knowledge sources, keeping responses concise and factual.",
+          "backstory": "An experienced shop support agent who relies on the product and delivery knowledge base rather than guessing.",
+          "tools": [
+            "lookup_product_info",
+            "lookup_delivery_info"
+          ],
+          "guardrails": [
+            "Use only the relevant knowledge lookup tool for the request type.",
+            "Do not invent product facts, delivery terms, or timelines.",
+            "If the request requires order data or escalation, defer to the appropriate branch."
+          ],
+          "modelTier": "default"
+        },
+        {
+          "id": "order_specialist",
+          "name": "Order Support Specialist",
+          "role": "specialist",
+          "goal": "Handle order-status questions only when a customer-provided order ID is present, and never fabricate missing order details.",
+          "backstory": "A cautious order-support agent focused on verified order information and strict access control.",
+          "tools": [
+            "lookup_order_info"
+          ],
+          "guardrails": [
+            "Never call order lookup without a customer-supplied order ID.",
+            "If an order ID is missing, do not infer status; request the ID or route to the appropriate fallback.",
+            "Never fabricate order status or shipment details."
+          ],
+          "modelTier": "default"
+        },
+        {
+          "id": "refund_specialist",
+          "name": "Refund and Escalation Specialist",
+          "role": "specialist",
+          "goal": "Assess refund requests against the EUR 100 threshold and escalate uncertain policy cases to a human when required.",
+          "backstory": "A policy-aware support agent that knows when a case must be handed to a human reviewer.",
+          "tools": [
+            "escalate_human_review"
+          ],
+          "guardrails": [
+            "Escalate any refund above EUR 100.",
+            "Escalate any uncertain policy interpretation.",
+            "Do not promise refunds or approvals outside policy."
+          ],
+          "modelTier": "default"
+        },
+        {
+          "id": "response_composer",
+          "name": "Response Composer",
+          "role": "orchestrator",
+          "goal": "Synthesize the workflow findings into a concise customer-facing reply and a separate internal action summary.",
+          "backstory": "A final-stage support coordinator that turns routed findings into a polished customer reply plus internal notes.",
+          "tools": [],
+          "guardrails": [
+            "Use only upstream task outputs; do not add new facts.",
+            "Keep the customer-facing reply concise and polite.",
+            "Always include an internal action summary that captures classification, tool usage, and any escalation.",
+            "Ensure the final answer does not invent order status or policy outcomes."
+          ],
+          "modelTier": "default"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "answer_knowledge_request",
+          "name": "Answer Knowledge Request",
+          "description": "For product or delivery questions, look up the relevant knowledge source and draft a concise factual answer without guessing.",
+          "expectedOutput": "A concise factual response grounded in product or delivery knowledge.",
+          "agentId": "knowledge_specialist",
+          "dependsOn": [],
+          "outputKey": "knowledge_response"
+        },
+        {
+          "id": "handle_order_request",
+          "name": "Handle Order Request",
+          "description": "If the customer supplied a valid order ID, look up the order information and summarize only verified details. If no order ID is present, do not perform lookup or fabricate status; note the limitation.",
+          "expectedOutput": "Verified order details when allowed, or a no-lookup limitation note when order ID is missing.",
+          "agentId": "order_specialist",
+          "dependsOn": [],
+          "outputKey": "order_response"
+        },
+        {
+          "id": "process_refund_request",
+          "name": "Process Refund Request",
+          "description": "Evaluate refund requests, escalate any amount above EUR 100, and escalate uncertain policy interpretations to a human with context.",
+          "expectedOutput": "Either a normal refund-handling note within policy or a human escalation record for protected cases.",
+          "agentId": "refund_specialist",
+          "dependsOn": [],
+          "outputKey": "refund_response"
+        },
+        {
+          "id": "compose_final_response",
+          "name": "Compose Final Response",
+          "description": "Combine the classification and the relevant branch output into a concise customer-facing reply plus an internal action summary.",
+          "expectedOutput": "A final response containing customer-facing text and an internal action summary.",
+          "agentId": "response_composer",
+          "dependsOn": [
+            "answer_knowledge_request",
+            "handle_order_request",
+            "process_refund_request"
+          ],
+          "outputKey": "final_response"
+        }
+      ],
+      "routerAgentId": "router",
+      "routes": [
+        {
+          "taskId": "answer_knowledge_request",
+          "when": "The classified request is a product question or delivery question."
+        },
+        {
+          "taskId": "handle_order_request",
+          "when": "The classified request concerns order status, shipment, payment, or fulfillment and a customer-provided order ID is present."
+        },
+        {
+          "taskId": "process_refund_request",
+          "when": "The classified request is a refund request, especially when refund amount or policy applicability must be evaluated."
+        }
+      ],
+      "finalTaskId": "compose_final_response"
+    }
+  },
+  "validation": {
+    "valid": true,
+    "errors": [],
+    "warnings": [
+      "Task classify_request duplicated the router's own decision; it was removed because the routing node already makes it."
+    ]
+  },
+  "crewSummary": {
+    "process": "routed",
+    "agentCount": 5,
+    "taskCount": 4,
+    "toolBindings": 5,
+    "criticalPath": 2,
+    "hash": "a1a6c5385c155eb8"
+  },
+  "validatedFrom": "results/support/design.json",
+  "validationMs": 1722,
+  "testWorldChanges": [
+    {
+      "caseId": "delivery_question_answerability_3_1",
+      "assertionId": "delivery-lookup",
+      "action": "drop_argument",
+      "reason": "delivery_query=shipping time is neither stated in the case nor returned by any tool.",
+      "source": "rule"
+    },
+    {
+      "caseId": "refund_above_eur_100_escalation_7_1",
+      "assertionId": "refund_escalated",
+      "action": "drop_argument",
+      "reason": "reason=refund_over_100 is neither stated in the case nor returned by any tool.",
+      "source": "rule"
+    },
+    {
+      "caseId": "refund_above_eur_100_escalation_7_1",
+      "assertionId": "human_ticket_created",
+      "action": "require_call_only",
+      "reason": "No successful fixture of escalate_human_review can be reached with values a correct workflow knows; the tool is still required to be called.",
+      "source": "rule"
+    },
+    {
+      "caseId": "uncertain_policy_escalation_and_no_fabricated_status_8_1",
+      "assertionId": "escalate_uncertain_policy",
+      "action": "drop_argument",
+      "reason": "reason=uncertain_policy is neither stated in the case nor returned by any tool.",
+      "source": "rule"
+    },
+    {
+      "caseId": "uncertain_policy_escalation_and_no_fabricated_status_8_1",
+      "assertionId": "escalation_succeeds",
+      "action": "require_call_only",
+      "reason": "No successful fixture of escalate_human_review can be reached with values a correct workflow knows; the tool is still required to be called.",
+      "source": "rule"
+    }
+  ]
+}

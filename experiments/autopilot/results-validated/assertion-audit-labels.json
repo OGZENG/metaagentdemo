@@ -1,0 +1,202 @@
+{
+  "restaurant/rep1/successful_reservation_flow_1_2/b3": {
+    "label": "false",
+    "reason": "The reservation call was made; the fixture cannot answer it and the guest name is taken from the request wording."
+  },
+  "insurance/rep1/fraud_signal_escalation_6_1/escalation-called": {
+    "label": "false",
+    "reason": "The crew forwarded the claim to an adjuster (twice); the assertion demands a claim id that only an unreachable fixture returns."
+  },
+  "restaurant/rep2/successful_reservation_flow_1_2/b3": {
+    "label": "false",
+    "reason": "As item 0."
+  },
+  "insurance/rep2/reference_generation_8_1/policy-validated": {
+    "label": "false",
+    "reason": "The assertion demands PN-1001 while the case input gives POL-1001."
+  },
+  "insurance/rep3/happy_path_uncovered_claim_2_1/next_steps_sent": {
+    "label": "false",
+    "reason": "The required claim reference is only returned by a fixture the case data cannot reach."
+  },
+  "hr_leave/rep2/employee_notification_and_remaining_balance_8_1/tool_notify": {
+    "label": "false",
+    "reason": "Approval is impossible because the policy lookup needs an undisclosed code; routing to the manager is the safe behavior."
+  },
+  "support/rep3/product_question_answerability_2_1/prod_tool_classify": {
+    "label": "false",
+    "reason": "The assertion requires the classify tool to be called with the argument \"product\"."
+  },
+  "insurance/rep2/fraud_signal_escalation_6_1/fraud-assessment-called": {
+    "label": "false",
+    "reason": "The fraud assessment was called; the assertion demands a claim id only an unreachable fixture returns."
+  },
+  "support/rep2/refund_above_eur_100_escalation_7_1/refund_classified": {
+    "label": "unclear",
+    "reason": "The crew escalated the refund correctly; whether the separate classify tool must also be called is open."
+  },
+  "insurance/rep2/happy_path_covered_claim_1_1/tool-send-next-steps": {
+    "label": "false",
+    "reason": "The next-steps call requires a reference and text from a fixture the case data cannot reach (policy POL-1001 is unknown to validation)."
+  },
+  "travel/rep3/happy_path_complete_trip_within_budget_1_2/b5": {
+    "label": "false",
+    "reason": "The environment has no flight or hotel data for this trip; not presenting an empty itinerary for approval is reasonable."
+  },
+  "insurance/rep2/happy_path_uncovered_claim_2_1/claim_reference_created": {
+    "label": "false",
+    "reason": "The assertion demands POL-1001 while the case input gives PN-1001."
+  },
+  "restaurant/rep3/successful_reservation_flow_1_2/b3": {
+    "label": "false",
+    "reason": "As item 0."
+  },
+  "restaurant/rep3/availability_conflict_handling_2_1/check-availability": {
+    "label": "false",
+    "reason": "The goal sends parties above 8 to staff; the case demands an availability check instead."
+  },
+  "hr_leave/rep1/employee_notification_and_remaining_balance_8_1/tool_notify": {
+    "label": "false",
+    "reason": "As item 5."
+  },
+  "hr_leave/rep1/request_exceeds_threshold_with_sufficient_balance_4_1/reply_mentions_pending": {
+    "label": "false",
+    "reason": "The reply says the request was routed for manager review; the grader missed the paraphrase, and the expected balance of 6 contradicts the returned 18."
+  },
+  "hr_leave/rep3/employee_notification_and_remaining_balance_8_1/msg_contains_balance": {
+    "label": "false",
+    "reason": "The balance tool returns 18, the assertion expects the notification fixture value 12."
+  },
+  "restaurant/rep3/successful_reservation_flow_1_1/a5": {
+    "label": "false",
+    "reason": "The expected summary belongs to a booking on Feb 14; the reservation for Oct 12 fails in the environment."
+  },
+  "support/rep3/order_lookup_blocked_without_order_id_5_1/reply_asks_for_order_id": {
+    "label": "valid",
+    "reason": "The case requires the reply to ask for the order ID; the reply only says it cannot check without one."
+  },
+  "hr_leave/rep3/valid_short_request_within_balance_1_1/notification_content": {
+    "label": "false",
+    "reason": "As item 5."
+  },
+  "travel/rep1/happy_path_complete_trip_within_budget_1_2/b8": {
+    "label": "false",
+    "reason": "The environment returns no flight for this trip, so no fare can be reported."
+  },
+  "travel/rep3/day_by_day_itinerary_and_total_cost_accuracy_6_1/t1_flight_data_used": {
+    "label": "false",
+    "reason": "The assertion expects a fare from a different fixture (348) than the one returned (412)."
+  },
+  "insurance/rep1/reference_generation_8_1/output-has-next-steps": {
+    "label": "false",
+    "reason": "The next steps are only returned by a fixture the case data cannot reach."
+  },
+  "travel/rep2/happy_path_complete_trip_within_budget_1_2/b7": {
+    "label": "false",
+    "reason": "The expected hotel names belong to other destinations."
+  },
+  "hr_leave/rep1/employee_notification_and_remaining_balance_8_1/msg_contains_audit": {
+    "label": "false",
+    "reason": "The assertion demands internal fixture tokens (balance_verified,...) in the employee reply."
+  },
+  "hr_leave/rep3/employee_notification_and_remaining_balance_8_1/msg_contains_audit": {
+    "label": "false",
+    "reason": "As item 24."
+  },
+  "support/rep1/general_request_classification_1_1/reply-contains-delivery-window": {
+    "label": "false",
+    "reason": "The delivery lookup finds no fixture for the query, so the window cannot be reported."
+  },
+  "travel/rep2/happy_path_complete_trip_within_budget_1_2/b8": {
+    "label": "false",
+    "reason": "As item 20."
+  },
+  "travel/rep2/day_by_day_itinerary_and_total_cost_accuracy_6_1/t1_flight_data_used": {
+    "label": "false",
+    "reason": "As item 21."
+  },
+  "restaurant/rep1/confirmation_summary_quality_6_1/summary-contains-actual-note": {
+    "label": "valid",
+    "reason": "The availability result contains the note \"Window table for two; no adjacent booking conflict.\", and the reply omits it although the case asks for relevant notes."
+  },
+  "travel/rep2/happy_path_complete_trip_within_budget_1_2/b2": {
+    "label": "false",
+    "reason": "The environment has no flight data for this route."
+  },
+  "restaurant/rep3/availability_conflict_handling_2_1/availability-result": {
+    "label": "false",
+    "reason": "As item 13."
+  },
+  "restaurant/rep2/large_party_escalation_3_1/large-party-handoff-result": {
+    "label": "false",
+    "reason": "The handoff was called; the environment does not answer it with success."
+  },
+  "travel/rep2/no_availability_or_partial_availability_3_2/b2_flight_tool_succeeds": {
+    "label": "false",
+    "reason": "The assertion requires success although its own description expects the simulated outage."
+  },
+  "travel/rep3/budget_boundary_and_over_budget_handling_2_1/flight-search-result-used": {
+    "label": "false",
+    "reason": "The case expects a flight of 1540 USD, but the flight fixture does not answer the request."
+  },
+  "support/rep2/refund_below_threshold_6_1/classification_succeeds": {
+    "label": "unclear",
+    "reason": "The crew wrongly escalated a small refund (a real defect), but this assertion only checks the separate classify tool."
+  },
+  "travel/rep1/no_availability_or_partial_availability_3_2/b2_flight_tool_succeeds": {
+    "label": "false",
+    "reason": "As item 33."
+  },
+  "hr_leave/rep1/valid_short_request_within_balance_1_1/auto_approve_decision": {
+    "label": "false",
+    "reason": "As item 5."
+  },
+  "restaurant/rep2/availability_conflict_handling_2_1/availability-result": {
+    "label": "false",
+    "reason": "As item 13."
+  },
+  "hr_leave/rep3/valid_short_request_within_balance_1_1/auto_approve_decision": {
+    "label": "false",
+    "reason": "As item 5."
+  },
+  "hr_leave/rep1/policy_non_compliant_request_5_1/pncr1_not_auto_approve_route": {
+    "label": "false",
+    "reason": "The goal requires replying to the employee; the assertion forbids the notification tool although no approval was issued."
+  },
+  "hr_leave/rep2/policy_non_compliant_request_5_1/pncr1_not_auto_approve_route": {
+    "label": "false",
+    "reason": "As item 40."
+  },
+  "travel/rep1/budget_boundary_and_over_budget_handling_2_2/approval-not-requested": {
+    "label": "valid",
+    "reason": "The crew called the approval tool although no itinerary fits the budget, which the case forbids."
+  },
+  "travel/rep3/budget_boundary_and_over_budget_handling_2_2/approval-not-requested": {
+    "label": "valid",
+    "reason": "As item 42."
+  },
+  "hr_leave/rep3/policy_non_compliant_request_5_1/pncr1_not_auto_approve_route": {
+    "label": "false",
+    "reason": "As item 40."
+  },
+  "hr_leave/rep2/policy_non_compliant_request_5_1/pncr1_output_no_fabrication": {
+    "label": "false",
+    "reason": "The reply says the request was not auto-approved; the grader returned no verdict for this negated mention."
+  },
+  "helpdesk/rep2/password_access_request_classification_1_1/pa1-no-secrets": {
+    "label": "false",
+    "reason": "The reply says it cannot provide internal system details; the grader returned no verdict for this negated mention."
+  },
+  "travel/rep3/day_by_day_itinerary_and_total_cost_accuracy_6_1/t1_total_cost_shown": {
+    "label": "false",
+    "reason": "No hotel exists in the environment for this trip, so no total cost can be computed."
+  },
+  "travel/rep2/day_by_day_itinerary_and_total_cost_accuracy_6_1/t1_total_cost_shown": {
+    "label": "false",
+    "reason": "As item 47."
+  },
+  "travel/rep1/day_by_day_itinerary_and_total_cost_accuracy_6_1/t1_total_cost_shown": {
+    "label": "false",
+    "reason": "As item 47."
+  }
+}

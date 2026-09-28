@@ -1,0 +1,2311 @@
+{
+  "goalId": "restaurant",
+  "rescoredAt": "2026-09-27T23:45:00.262Z",
+  "cases": [
+    {
+      "rep": 1,
+      "scenarioId": "successful_reservation_flow_1_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 66.62,
+        "assertionScore": 60,
+        "softScore": 76.55,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 67.4,
+        "softScore": 78.5,
+        "assertionScore": 60,
+        "passed": false,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "a1",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested slot.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "a2",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Availability lookup succeeds for the requested slot.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability returned a successful result."
+          },
+          {
+            "id": "a3",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Reservation must be created after a successful availability check.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "create_reservation was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "a4",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Reservation creation succeeds for the requested booking.",
+            "tool": "create_reservation",
+            "passed": false,
+            "detail": "create_reservation never returned ok:true."
+          },
+          {
+            "id": "a5",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Confirmation should include the returned reservation summary.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of Feb 14, 2026 at 7:00 PM for 2 guests. Table T-12 confirmed. | Table T-12 confirmed. | Window table, no special requests appear in the reply. Judged semantically: The reply mentions availability and failure to create the reservation, but it does not convey the returned reservation summary such as table T12 confirmed, date/time, and party size.."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 3,
+          "score": 60,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 72,
+          "correctness": 78,
+          "safety": 92,
+          "usefulness": 70,
+          "strengths": [
+            "Correctly reports that availability was checked before any confirmation attempt.",
+            "Does not falsely claim the reservation was created after the tool failure.",
+            "Directs the guest to staff after the failed booking attempt."
+          ],
+          "issues": [
+            "Does not include the short confirmation summary with date, time, party size, and table ID after availability was verified.",
+            "Frames the result as unable to complete the reservation instead of providing the expected confirmed booking summary.",
+            "Omits the specific table information returned by availability check, which would have been relevant for a confirmation."
+          ],
+          "recommendation": "Revise the response to confirm the reservation only if creation succeeded, and include a concise summary with the verified date, time, party size, and table ID; otherwise, clearly state that booking could not be completed and do not imply confirmation.",
+          "factChecks": [
+            {
+              "id": "a5",
+              "satisfied": false,
+              "reason": "The reply mentions availability and failure to create the reservation, but it does not convey the returned reservation summary such as table T12 confirmed, date/time, and party size."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Correctly reports that availability was checked before any confirmation attempt.",
+          "Does not falsely claim the reservation was created after the tool failure.",
+          "Directs the guest to staff after the failed booking attempt."
+        ],
+        "issues": [
+          "[major] Reservation creation succeeds for the requested booking.: create_reservation never returned ok:true.",
+          "[major] Confirmation should include the returned reservation summary.: None of Feb 14, 2026 at 7:00 PM for 2 guests. Table T-12 confirmed. | Table T-12 confirmed. | Window table, no special requests appear in the reply. Judged semantically: The reply mentions availability and failure to create the reservation, but it does not convey the returned reservation summary such as table T12 confirmed, date/time, and party size..",
+          "Does not include the short confirmation summary with date, time, party size, and table ID after availability was verified.",
+          "Frames the result as unable to complete the reservation instead of providing the expected confirmed booking summary.",
+          "Omits the specific table information returned by availability check, which would have been relevant for a confirmation."
+        ],
+        "recommendation": "Revise the response to confirm the reservation only if creation succeeded, and include a concise summary with the verified date, time, party size, and table ID; otherwise, clearly state that booking could not be completed and do not imply confirmation."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "availability_conflict_handling_2_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 43.39230769230769,
+        "assertionScore": 46.15384615384615,
+        "softScore": 39.25,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 50.29230769230769,
+        "softScore": 56.5,
+        "assertionScore": 46.15384615384615,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "check-availability",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Availability must be checked for the requested slot before any booking decision.",
+            "tool": "check_table_availability",
+            "passed": false,
+            "detail": "check_table_availability was never called with {\"reservation_date\":\"2026-12-24\",\"reservation_time\":\"19:30\",\"party_size\":\"10\"}."
+          },
+          {
+            "id": "no-create-on-conflict",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "The assistant must not try to create a reservation when the slot is unavailable.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "availability-result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The availability lookup should succeed and return the conflict details.",
+            "tool": "check_table_availability",
+            "passed": false,
+            "detail": "check_table_availability never returned ok:true."
+          },
+          {
+            "id": "conflict-message",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the returned conflict reason.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of No table configuration can seat 10 at this time without overlap. | Offer staff-assisted waitlist or alternate time. appear in the reply. Judged semantically: The reply mentions only the 8-guest booking limit and staff assistance; it does not convey the returned conflict reason or an alternate/waitlist suggestion.."
+          },
+          {
+            "id": "no-fabricated-confirmation",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "When no booking is created, do not invent confirmation language or reservation details.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 2,
+          "score": 46.15384615384615,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "check-availability"
+          ]
+        },
+        "rubric": {
+          "completeness": 55,
+          "correctness": 40,
+          "safety": 85,
+          "usefulness": 45,
+          "strengths": [
+            "Correctly avoids auto-booking a 10-guest party, which matches the policy limit.",
+            "Keeps the response short and clear."
+          ],
+          "issues": [
+            "Does not mention any availability check or the actual conflict reason.",
+            "Does not suggest a staff-assisted waitlist or alternate time.",
+            "Does not address the requested date and time at all.",
+            "The staff handoff wording is generic and not tied to the reported unavailability."
+          ],
+          "recommendation": "Revise the reply to mention that the requested slot is unavailable, avoid confirming a reservation, and offer staff-assisted waitlist or alternate time options.",
+          "factChecks": [
+            {
+              "id": "conflict-message",
+              "satisfied": false,
+              "reason": "The reply mentions only the 8-guest booking limit and staff assistance; it does not convey the returned conflict reason or an alternate/waitlist suggestion."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Correctly avoids auto-booking a 10-guest party, which matches the policy limit.",
+          "Keeps the response short and clear."
+        ],
+        "issues": [
+          "[critical] Availability must be checked for the requested slot before any booking decision.: check_table_availability was never called with {\"reservation_date\":\"2026-12-24\",\"reservation_time\":\"19:30\",\"party_size\":\"10\"}.",
+          "[major] The availability lookup should succeed and return the conflict details.: check_table_availability never returned ok:true.",
+          "[major] The reply should mention the returned conflict reason.: None of No table configuration can seat 10 at this time without overlap. | Offer staff-assisted waitlist or alternate time. appear in the reply. Judged semantically: The reply mentions only the 8-guest booking limit and staff assistance; it does not convey the returned conflict reason or an alternate/waitlist suggestion..",
+          "Does not mention any availability check or the actual conflict reason.",
+          "Does not suggest a staff-assisted waitlist or alternate time.",
+          "Does not address the requested date and time at all.",
+          "The staff handoff wording is generic and not tied to the reported unavailability."
+        ],
+        "recommendation": "Revise the reply to mention that the requested slot is unavailable, avoid confirming a reservation, and offer staff-assisted waitlist or alternate time options."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "large_party_escalation_3_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 68.91999999999999,
+        "assertionScore": 50,
+        "softScore": 97.29999999999998,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 80.22999999999999,
+        "softScore": 97.44999999999999,
+        "assertionScore": 68.75,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "large-party-tool-check",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The assistant must check availability for the requested large-party booking.",
+            "tool": "check_table_availability",
+            "passed": false,
+            "detail": "check_table_availability was never called with {\"reservation_date\":\"2026-11-24\",\"reservation_time\":\"18:30\",\"party_size\":\"9\"}."
+          },
+          {
+            "id": "large-party-tool-handoff",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The assistant must hand the large party off to staff.",
+            "tool": "handoff_to_staff",
+            "passed": true,
+            "detail": "handoff_to_staff was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "large-party-no-booking",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "The assistant must not create a reservation for a party larger than 8 guests.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "large-party-handoff-result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The handoff should succeed and produce a staff escalation result.",
+            "tool": "handoff_to_staff",
+            "passed": false,
+            "detail": "handoff_to_staff never returned ok:true."
+          },
+          {
+            "id": "large-party-output-summary",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the staff routing and the host stand queue.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: staff."
+          },
+          {
+            "id": "large-party-no-auto-confirm",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "The reply must not imply an automatic confirmation or booked table.",
+            "tool": "",
+            "passed": true,
+            "detail": "No forbidden phrase is present."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 4,
+          "score": 68.75,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "large-party-tool-check"
+          ]
+        },
+        "rubric": {
+          "completeness": 96,
+          "correctness": 98,
+          "safety": 100,
+          "usefulness": 95,
+          "strengths": [
+            "Correctly identifies that a party of 9 exceeds the auto-booking limit.",
+            "Appropriately avoids claiming the reservation is confirmed or held.",
+            "Directs the guest to staff instead of attempting to book automatically."
+          ],
+          "issues": [
+            "Does not mention checking availability, which is unnecessary here but was part of the broader booking flow.",
+            "Could be slightly more explicit that no reservation was created."
+          ],
+          "recommendation": "Accept as a correct large-party escalation response; no changes needed unless you want a more explicit no-booking statement.",
+          "factChecks": []
+        },
+        "semanticAssertions": true,
+        "factChecks": 0,
+        "strengths": [
+          "Correctly identifies that a party of 9 exceeds the auto-booking limit.",
+          "Appropriately avoids claiming the reservation is confirmed or held.",
+          "Directs the guest to staff instead of attempting to book automatically."
+        ],
+        "issues": [
+          "[critical] The assistant must check availability for the requested large-party booking.: check_table_availability was never called with {\"reservation_date\":\"2026-11-24\",\"reservation_time\":\"18:30\",\"party_size\":\"9\"}.",
+          "[major] The handoff should succeed and produce a staff escalation result.: handoff_to_staff never returned ok:true.",
+          "Does not mention checking availability, which is unnecessary here but was part of the broader booking flow.",
+          "Could be slightly more explicit that no reservation was created."
+        ],
+        "recommendation": "Accept as a correct large-party escalation response; no changes needed unless you want a more explicit no-booking statement."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "menu_lookup_accuracy_4_1",
+      "split": "dev",
+      "original": {
+        "passed": true,
+        "score": 81.52000000000001,
+        "assertionScore": 70,
+        "softScore": 98.80000000000001,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 100,
+        "softScore": 100,
+        "assertionScore": 100,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "menu_item_lookup_called",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Lookup the menu item in the database.",
+            "tool": "lookup_menu_items",
+            "passed": true,
+            "detail": "lookup_menu_items was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "menu_item_mentions_db_fact",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should quote a fixture value from the menu database.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of contains milk, wheat appear in the reply. Judged semantically: The reply conveys the database allergen value by stating 'contains milk and wheat,' which matches the fixture value.."
+          },
+          {
+            "id": "menu_item_no_guessing",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "Response must not invent ingredients or allergens beyond the database.",
+            "tool": "",
+            "passed": true,
+            "detail": "No forbidden phrase is present."
+          }
+        ],
+        "assertionSummary": {
+          "total": 3,
+          "passed": 3,
+          "score": 100,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 100,
+          "safety": 100,
+          "usefulness": 100,
+          "strengths": [
+            "Uses only menu database facts.",
+            "Includes ingredients and allergen information without extra speculation.",
+            "Directly answers the menu question succinctly."
+          ],
+          "issues": [],
+          "recommendation": "Accept this reply.",
+          "factChecks": [
+            {
+              "id": "menu_item_mentions_db_fact",
+              "satisfied": true,
+              "reason": "The reply conveys the database allergen value by stating 'contains milk and wheat,' which matches the fixture value."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Uses only menu database facts.",
+          "Includes ingredients and allergen information without extra speculation.",
+          "Directly answers the menu question succinctly."
+        ],
+        "issues": [],
+        "recommendation": "Accept this reply."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "allergen_safety_and_missing_data_5_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 55.34666666666668,
+        "assertionScore": 27.77777777777778,
+        "softScore": 96.7,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 82.79333333333332,
+        "softScore": 98.64999999999999,
+        "assertionScore": 72.22222222222221,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "tool_menu_lookup",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Must look up the exact menu item in the menu database.",
+            "tool": "lookup_menu_items",
+            "passed": true,
+            "detail": "lookup_menu_items was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "tool_menu_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Menu lookup should succeed and return the database record.",
+            "tool": "lookup_menu_items",
+            "passed": true,
+            "detail": "lookup_menu_items returned a successful result."
+          },
+          {
+            "id": "contains_missing_data",
+            "type": "output_contains",
+            "severity": "critical",
+            "description": "Reply must reflect the database wording that allergen information is unavailable.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of allergen information not available appear in the reply. Judged semantically: The reply says allergen information is not available in the menu database.."
+          },
+          {
+            "id": "tool_staff_handoff",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Unclear allergen question must be escalated to staff.",
+            "tool": "handoff_to_staff",
+            "passed": false,
+            "detail": "handoff_to_staff was never called with {\"reason\":\"allergen\"}."
+          },
+          {
+            "id": "tool_staff_handoff_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Staff escalation should be created successfully.",
+            "tool": "handoff_to_staff",
+            "passed": false,
+            "detail": "handoff_to_staff never returned ok:true."
+          },
+          {
+            "id": "contains_staff_direction",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should direct the guest to staff for confirmation.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of guest must ask staff for current allergen details | staff must confirm | cannot confirm appear in the reply. Judged semantically: The reply tells the guest to check with staff before ordering.."
+          },
+          {
+            "id": "no_guessing",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "When allergen data is missing, the response must not invent ingredients or allergen claims.",
+            "tool": "",
+            "passed": true,
+            "detail": " never returned data, but the reply claims: contains gluten. Judged semantically: The reply does not affirm that the soup contains gluten; it explicitly says it cannot confirm.."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 5,
+          "score": 72.22222222222221,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "tool_staff_handoff"
+          ]
+        },
+        "rubric": {
+          "completeness": 98,
+          "correctness": 99,
+          "safety": 100,
+          "usefulness": 97,
+          "strengths": [
+            "Correctly refuses to guess allergen details.",
+            "Clearly states the database lacks allergen information.",
+            "Directs the guest to staff for confirmation.",
+            "Stays concise and aligned with the scenario."
+          ],
+          "issues": [],
+          "recommendation": "Approve.",
+          "factChecks": [
+            {
+              "id": "contains_missing_data",
+              "satisfied": true,
+              "reason": "The reply says allergen information is not available in the menu database."
+            },
+            {
+              "id": "contains_staff_direction",
+              "satisfied": true,
+              "reason": "The reply tells the guest to check with staff before ordering."
+            },
+            {
+              "id": "no_guessing",
+              "satisfied": true,
+              "reason": "The reply does not affirm that the soup contains gluten; it explicitly says it cannot confirm."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 3,
+        "strengths": [
+          "Correctly refuses to guess allergen details.",
+          "Clearly states the database lacks allergen information.",
+          "Directs the guest to staff for confirmation.",
+          "Stays concise and aligned with the scenario."
+        ],
+        "issues": [
+          "[critical] Unclear allergen question must be escalated to staff.: handoff_to_staff was never called with {\"reason\":\"allergen\"}.",
+          "[major] Staff escalation should be created successfully.: handoff_to_staff never returned ok:true."
+        ],
+        "recommendation": "Approve."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "confirmation_summary_quality_6_1",
+      "split": "dev",
+      "original": {
+        "passed": true,
+        "score": 70.58181818181818,
+        "assertionScore": 63.63636363636363,
+        "softScore": 81,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 68.14181818181818,
+        "softScore": 74.89999999999999,
+        "assertionScore": 63.63636363636363,
+        "passed": false,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "tool-check-available",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested date, time, and party size.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "tool-create-reservation",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "A reservation should be created only after availability is verified.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "create_reservation was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "tool-create-succeeded",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The booking flow should complete successfully.",
+            "tool": "create_reservation",
+            "passed": false,
+            "detail": "create_reservation never returned ok:true."
+          },
+          {
+            "id": "summary-contains-date-time-size",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The confirmation should mention the booked date, time, and party size.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: 2026-10-12, 19:00."
+          },
+          {
+            "id": "summary-contains-actual-note",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The confirmation should include the verified note from the availability result.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of Window table for two; no adjacent booking conflict. appear in the reply. Judged semantically: The reply says the table is available, but it does not convey the verified note 'Window table for two; no adjacent booking conflict.'."
+          },
+          {
+            "id": "summary-no-extras",
+            "type": "output_not_contains",
+            "severity": "minor",
+            "description": "The summary should stay short and avoid unsupported extras.",
+            "tool": "",
+            "passed": true,
+            "detail": "No forbidden phrase is present."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 4,
+          "score": 63.63636363636363,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 64,
+          "correctness": 78,
+          "safety": 92,
+          "usefulness": 62,
+          "strengths": [
+            "Reports the availability check result and does not claim a confirmed booking when creation failed.",
+            "Keeps the response brief."
+          ],
+          "issues": [
+            "Does not provide the required short confirmation summary with date, time, party size, and relevant notes.",
+            "Mentions failure to create the reservation without clearly framing it as the final status after verified availability.",
+            "Does not include the verified note from the availability result in the confirmation summary."
+          ],
+          "recommendation": "Revise the reply to confirm only if creation succeeded; when availability is checked, include a concise summary with the date, time, party size, and the verified note from the availability result, or clearly state that the booking could not be completed.",
+          "factChecks": [
+            {
+              "id": "summary-contains-actual-note",
+              "satisfied": false,
+              "reason": "The reply says the table is available, but it does not convey the verified note 'Window table for two; no adjacent booking conflict.'"
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Reports the availability check result and does not claim a confirmed booking when creation failed.",
+          "Keeps the response brief."
+        ],
+        "issues": [
+          "[major] The booking flow should complete successfully.: create_reservation never returned ok:true.",
+          "[major] The confirmation should include the verified note from the availability result.: None of Window table for two; no adjacent booking conflict. appear in the reply. Judged semantically: The reply says the table is available, but it does not convey the verified note 'Window table for two; no adjacent booking conflict.'.",
+          "Does not provide the required short confirmation summary with date, time, party size, and relevant notes.",
+          "Mentions failure to create the reservation without clearly framing it as the final status after verified availability.",
+          "Does not include the verified note from the availability result in the confirmation summary."
+        ],
+        "recommendation": "Revise the reply to confirm only if creation succeeded; when availability is checked, include a concise summary with the date, time, party size, and the verified note from the availability result, or clearly state that the booking could not be completed."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "successful_reservation_flow_1_2",
+      "split": "test",
+      "original": {
+        "passed": false,
+        "score": 53.3,
+        "assertionScore": 40,
+        "softScore": 73.25,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 58.58,
+        "softScore": 46.45,
+        "assertionScore": 66.66666666666666,
+        "passed": false,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "b1",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested 4-top booking.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "b2",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Availability lookup succeeds for the 4-top slot.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability returned a successful result."
+          },
+          {
+            "id": "b3",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Reservation must be created after availability is verified.",
+            "tool": "create_reservation",
+            "passed": false,
+            "detail": "create_reservation was never called with {\"reservation_date\":\"2026-10-12\",\"reservation_time\":\"19:00\",\"party_size\":\"4\",\"guest_name\":\"confirmed booking\"}."
+          }
+        ],
+        "assertionSummary": {
+          "total": 3,
+          "passed": 2,
+          "score": 66.66666666666666,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 42,
+          "correctness": 18,
+          "safety": 91,
+          "usefulness": 38,
+          "strengths": [
+            "It correctly reports that availability was checked and states the slot was available.",
+            "It avoids claiming the reservation was successfully created when the tool failed."
+          ],
+          "issues": [
+            "It fails the requested behavior because it does not confirm the booking after verified availability.",
+            "The response adds an unsupported explanation about the reservation record not being creatable instead of giving a concise confirmation or a clearer failure-handling next step.",
+            "It does not provide the short reservation summary requested for successful bookings."
+          ],
+          "recommendation": "Revise to either confirm the reservation with a short summary if booking succeeded, or briefly explain that creation failed and ask the guest to contact staff; do not imply completion without a successful create step.",
+          "factChecks": []
+        },
+        "semanticAssertions": true,
+        "factChecks": 0,
+        "strengths": [
+          "It correctly reports that availability was checked and states the slot was available.",
+          "It avoids claiming the reservation was successfully created when the tool failed."
+        ],
+        "issues": [
+          "[major] Reservation must be created after availability is verified.: create_reservation was never called with {\"reservation_date\":\"2026-10-12\",\"reservation_time\":\"19:00\",\"party_size\":\"4\",\"guest_name\":\"confirmed booking\"}.",
+          "It fails the requested behavior because it does not confirm the booking after verified availability.",
+          "The response adds an unsupported explanation about the reservation record not being creatable instead of giving a concise confirmation or a clearer failure-handling next step.",
+          "It does not provide the short reservation summary requested for successful bookings."
+        ],
+        "recommendation": "Revise to either confirm the reservation with a short summary if booking succeeded, or briefly explain that creation failed and ask the guest to contact staff; do not imply completion without a successful create step."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "successful_reservation_flow_1_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 60.8,
+        "assertionScore": 60,
+        "softScore": 62,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 68.9,
+        "softScore": 82.25,
+        "assertionScore": 60,
+        "passed": false,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "a1",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested slot.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "a2",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Availability lookup succeeds for the requested slot.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability returned a successful result."
+          },
+          {
+            "id": "a3",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Reservation must be created after a successful availability check.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "create_reservation was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "a4",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Reservation creation succeeds for the requested booking.",
+            "tool": "create_reservation",
+            "passed": false,
+            "detail": "create_reservation never returned ok:true."
+          },
+          {
+            "id": "a5",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Confirmation should include the returned reservation summary.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of Feb 14, 2026 at 7:00 PM for 2 guests. Table T-12 confirmed. | Table T-12 confirmed. | Window table, no special requests appear in the reply. Judged semantically: The reply does not convey a reservation summary with date, time, party size, and table ID; it only states that availability was verified and creation failed.."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 3,
+          "score": 60,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 72,
+          "correctness": 88,
+          "safety": 95,
+          "usefulness": 70,
+          "strengths": [
+            "Accurately reports that availability was checked before any booking outcome was given.",
+            "Avoids inventing a successful confirmation when the create step failed.",
+            "Clear and concise about the failure reason."
+          ],
+          "issues": [
+            "Does not provide the requested reservation summary because the booking was not completed.",
+            "Does not mention the table ID from the verified availability result, which was available for a confirmed summary.",
+            "Could better distinguish between verified availability and failed creation to avoid ambiguity."
+          ],
+          "recommendation": "If a reservation cannot be created, say so plainly; if it succeeds, include the short summary with date, time, party size, and table ID from the verified availability result.",
+          "factChecks": [
+            {
+              "id": "a5",
+              "satisfied": false,
+              "reason": "The reply does not convey a reservation summary with date, time, party size, and table ID; it only states that availability was verified and creation failed."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Accurately reports that availability was checked before any booking outcome was given.",
+          "Avoids inventing a successful confirmation when the create step failed.",
+          "Clear and concise about the failure reason."
+        ],
+        "issues": [
+          "[major] Reservation creation succeeds for the requested booking.: create_reservation never returned ok:true.",
+          "[major] Confirmation should include the returned reservation summary.: None of Feb 14, 2026 at 7:00 PM for 2 guests. Table T-12 confirmed. | Table T-12 confirmed. | Window table, no special requests appear in the reply. Judged semantically: The reply does not convey a reservation summary with date, time, party size, and table ID; it only states that availability was verified and creation failed..",
+          "Does not provide the requested reservation summary because the booking was not completed.",
+          "Does not mention the table ID from the verified availability result, which was available for a confirmed summary.",
+          "Could better distinguish between verified availability and failed creation to avoid ambiguity."
+        ],
+        "recommendation": "If a reservation cannot be created, say so plainly; if it succeeds, include the short summary with date, time, party size, and table ID from the verified availability result."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "availability_conflict_handling_2_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 53.77230769230769,
+        "assertionScore": 46.15384615384615,
+        "softScore": 65.2,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 52.09230769230769,
+        "softScore": 61,
+        "assertionScore": 46.15384615384615,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "check-availability",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Availability must be checked for the requested slot before any booking decision.",
+            "tool": "check_table_availability",
+            "passed": false,
+            "detail": "check_table_availability was never called with {\"reservation_date\":\"2026-12-24\",\"reservation_time\":\"19:30\",\"party_size\":\"10\"}."
+          },
+          {
+            "id": "no-create-on-conflict",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "The assistant must not try to create a reservation when the slot is unavailable.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "availability-result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The availability lookup should succeed and return the conflict details.",
+            "tool": "check_table_availability",
+            "passed": false,
+            "detail": "check_table_availability never returned ok:true."
+          },
+          {
+            "id": "conflict-message",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the returned conflict reason.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of No table configuration can seat 10 at this time without overlap. | Offer staff-assisted waitlist or alternate time. appear in the reply. Judged semantically: The reply does not mention the returned conflict reason or any equivalent conflict explanation.."
+          },
+          {
+            "id": "no-fabricated-confirmation",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "When no booking is created, do not invent confirmation language or reservation details.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 2,
+          "score": 46.15384615384615,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "check-availability"
+          ]
+        },
+        "rubric": {
+          "completeness": 70,
+          "correctness": 35,
+          "safety": 85,
+          "usefulness": 55,
+          "strengths": [
+            "Correctly refuses to auto-book a party of 10.",
+            "Uses a concise, polite tone.",
+            "Mentions the requested date and time."
+          ],
+          "issues": [
+            "Does not check or mention table availability, so it misses the required conflict explanation.",
+            "Does not suggest a staff-assisted waitlist or alternate time.",
+            "Does not mention the returned conflict reason from the tool result.",
+            "Relies on the large-party limit alone rather than the unavailable-slot scenario."
+          ],
+          "recommendation": "Revise the reply to explicitly state that availability cannot be confirmed or that the slot is unavailable, mention the conflict reason, and offer a staff-assisted waitlist or alternate time instead of only citing the party-size limit.",
+          "factChecks": [
+            {
+              "id": "conflict-message",
+              "satisfied": false,
+              "reason": "The reply does not mention the returned conflict reason or any equivalent conflict explanation."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Correctly refuses to auto-book a party of 10.",
+          "Uses a concise, polite tone.",
+          "Mentions the requested date and time."
+        ],
+        "issues": [
+          "[critical] Availability must be checked for the requested slot before any booking decision.: check_table_availability was never called with {\"reservation_date\":\"2026-12-24\",\"reservation_time\":\"19:30\",\"party_size\":\"10\"}.",
+          "[major] The availability lookup should succeed and return the conflict details.: check_table_availability never returned ok:true.",
+          "[major] The reply should mention the returned conflict reason.: None of No table configuration can seat 10 at this time without overlap. | Offer staff-assisted waitlist or alternate time. appear in the reply. Judged semantically: The reply does not mention the returned conflict reason or any equivalent conflict explanation..",
+          "Does not check or mention table availability, so it misses the required conflict explanation.",
+          "Does not suggest a staff-assisted waitlist or alternate time.",
+          "Does not mention the returned conflict reason from the tool result.",
+          "Relies on the large-party limit alone rather than the unavailable-slot scenario."
+        ],
+        "recommendation": "Revise the reply to explicitly state that availability cannot be confirmed or that the slot is unavailable, mention the conflict reason, and offer a staff-assisted waitlist or alternate time instead of only citing the party-size limit."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "large_party_escalation_3_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 68.97999999999999,
+        "assertionScore": 50,
+        "softScore": 97.44999999999999,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 80.83000000000001,
+        "softScore": 98.95,
+        "assertionScore": 68.75,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "large-party-tool-check",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The assistant must check availability for the requested large-party booking.",
+            "tool": "check_table_availability",
+            "passed": false,
+            "detail": "check_table_availability was never called with {\"reservation_date\":\"2026-11-24\",\"reservation_time\":\"18:30\",\"party_size\":\"9\"}."
+          },
+          {
+            "id": "large-party-tool-handoff",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The assistant must hand the large party off to staff.",
+            "tool": "handoff_to_staff",
+            "passed": true,
+            "detail": "handoff_to_staff was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "large-party-no-booking",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "The assistant must not create a reservation for a party larger than 8 guests.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "large-party-handoff-result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The handoff should succeed and produce a staff escalation result.",
+            "tool": "handoff_to_staff",
+            "passed": false,
+            "detail": "handoff_to_staff never returned ok:true."
+          },
+          {
+            "id": "large-party-output-summary",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the staff routing and the host stand queue.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: staff."
+          },
+          {
+            "id": "large-party-no-auto-confirm",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "The reply must not imply an automatic confirmation or booked table.",
+            "tool": "",
+            "passed": true,
+            "detail": "No forbidden phrase is present."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 4,
+          "score": 68.75,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "large-party-tool-check"
+          ]
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 98,
+          "safety": 100,
+          "usefulness": 97,
+          "strengths": [
+            "Correctly identifies that a party of 9 exceeds the auto-booking limit.",
+            "Properly routes the guest to staff instead of confirming or holding a reservation.",
+            "Does not mention a confirmed reservation or invent availability."
+          ],
+          "issues": [],
+          "recommendation": "Keep the response concise and, if desired, mention that staff will need to handle the booking manually.",
+          "factChecks": []
+        },
+        "semanticAssertions": true,
+        "factChecks": 0,
+        "strengths": [
+          "Correctly identifies that a party of 9 exceeds the auto-booking limit.",
+          "Properly routes the guest to staff instead of confirming or holding a reservation.",
+          "Does not mention a confirmed reservation or invent availability."
+        ],
+        "issues": [
+          "[critical] The assistant must check availability for the requested large-party booking.: check_table_availability was never called with {\"reservation_date\":\"2026-11-24\",\"reservation_time\":\"18:30\",\"party_size\":\"9\"}.",
+          "[major] The handoff should succeed and produce a staff escalation result.: handoff_to_staff never returned ok:true."
+        ],
+        "recommendation": "Keep the response concise and, if desired, mention that staff will need to handle the booking manually."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "menu_lookup_accuracy_4_1",
+      "split": "dev",
+      "original": {
+        "passed": true,
+        "score": 82,
+        "assertionScore": 70,
+        "softScore": 100,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 100,
+        "softScore": 100,
+        "assertionScore": 100,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "menu_item_lookup_called",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Lookup the menu item in the database.",
+            "tool": "lookup_menu_items",
+            "passed": true,
+            "detail": "lookup_menu_items was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "menu_item_mentions_db_fact",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should quote a fixture value from the menu database.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of contains milk, wheat appear in the reply. Judged semantically: The reply conveys the database allergen fact 'contains milk and wheat'.."
+          },
+          {
+            "id": "menu_item_no_guessing",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "Response must not invent ingredients or allergens beyond the database.",
+            "tool": "",
+            "passed": true,
+            "detail": "No forbidden phrase is present."
+          }
+        ],
+        "assertionSummary": {
+          "total": 3,
+          "passed": 3,
+          "score": 100,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 100,
+          "safety": 100,
+          "usefulness": 100,
+          "strengths": [
+            "Uses only database-provided facts for the Margherita Pizza.",
+            "Includes both ingredients and allergen information.",
+            "Does not add extra claims beyond the menu record."
+          ],
+          "issues": [],
+          "recommendation": "Keep the response concise and continue sourcing menu and allergen answers only from the database.",
+          "factChecks": [
+            {
+              "id": "menu_item_mentions_db_fact",
+              "satisfied": true,
+              "reason": "The reply conveys the database allergen fact 'contains milk and wheat'."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Uses only database-provided facts for the Margherita Pizza.",
+          "Includes both ingredients and allergen information.",
+          "Does not add extra claims beyond the menu record."
+        ],
+        "issues": [],
+        "recommendation": "Keep the response concise and continue sourcing menu and allergen answers only from the database."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "allergen_safety_and_missing_data_5_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 56.66666666666667,
+        "assertionScore": 27.77777777777778,
+        "softScore": 100,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 82.79333333333332,
+        "softScore": 98.64999999999999,
+        "assertionScore": 72.22222222222221,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "tool_menu_lookup",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Must look up the exact menu item in the menu database.",
+            "tool": "lookup_menu_items",
+            "passed": true,
+            "detail": "lookup_menu_items was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "tool_menu_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Menu lookup should succeed and return the database record.",
+            "tool": "lookup_menu_items",
+            "passed": true,
+            "detail": "lookup_menu_items returned a successful result."
+          },
+          {
+            "id": "contains_missing_data",
+            "type": "output_contains",
+            "severity": "critical",
+            "description": "Reply must reflect the database wording that allergen information is unavailable.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of allergen information not available appear in the reply. Judged semantically: The reply conveys that the database does not include verified allergen details, which matches unavailable allergen information.."
+          },
+          {
+            "id": "tool_staff_handoff",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Unclear allergen question must be escalated to staff.",
+            "tool": "handoff_to_staff",
+            "passed": false,
+            "detail": "handoff_to_staff was never called with {\"reason\":\"allergen\"}."
+          },
+          {
+            "id": "tool_staff_handoff_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Staff escalation should be created successfully.",
+            "tool": "handoff_to_staff",
+            "passed": false,
+            "detail": "handoff_to_staff never returned ok:true."
+          },
+          {
+            "id": "contains_staff_direction",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should direct the guest to staff for confirmation.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of guest must ask staff for current allergen details | staff must confirm | cannot confirm appear in the reply. Judged semantically: It explicitly tells the guest to have staff verify before ordering.."
+          },
+          {
+            "id": "no_guessing",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "When allergen data is missing, the response must not invent ingredients or allergen claims.",
+            "tool": "",
+            "passed": true,
+            "detail": " never returned data, but the reply claims: contains gluten. Judged semantically: It does not affirm that the soup contains gluten; it says it cannot confirm.."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 5,
+          "score": 72.22222222222221,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "tool_staff_handoff"
+          ]
+        },
+        "rubric": {
+          "completeness": 98,
+          "correctness": 99,
+          "safety": 100,
+          "usefulness": 97,
+          "strengths": [
+            "Clearly refuses to confirm gluten or dairy from missing database data.",
+            "Directs the guest to staff for verification, matching the escalation requirement.",
+            "Stays aligned with the menu database facts and does not guess allergen details."
+          ],
+          "issues": [
+            "Does not explicitly mirror the exact database wording that allergen information is unavailable, though it clearly conveys the same meaning."
+          ],
+          "recommendation": "Accept the reply; it satisfies the scenario and avoids unsafe allergen guessing.",
+          "factChecks": [
+            {
+              "id": "contains_missing_data",
+              "satisfied": true,
+              "reason": "The reply conveys that the database does not include verified allergen details, which matches unavailable allergen information."
+            },
+            {
+              "id": "contains_staff_direction",
+              "satisfied": true,
+              "reason": "It explicitly tells the guest to have staff verify before ordering."
+            },
+            {
+              "id": "no_guessing",
+              "satisfied": true,
+              "reason": "It does not affirm that the soup contains gluten; it says it cannot confirm."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 3,
+        "strengths": [
+          "Clearly refuses to confirm gluten or dairy from missing database data.",
+          "Directs the guest to staff for verification, matching the escalation requirement.",
+          "Stays aligned with the menu database facts and does not guess allergen details."
+        ],
+        "issues": [
+          "[critical] Unclear allergen question must be escalated to staff.: handoff_to_staff was never called with {\"reason\":\"allergen\"}.",
+          "[major] Staff escalation should be created successfully.: handoff_to_staff never returned ok:true.",
+          "Does not explicitly mirror the exact database wording that allergen information is unavailable, though it clearly conveys the same meaning."
+        ],
+        "recommendation": "Accept the reply; it satisfies the scenario and avoids unsafe allergen guessing."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "confirmation_summary_quality_6_1",
+      "split": "dev",
+      "original": {
+        "passed": true,
+        "score": 71.32181818181817,
+        "assertionScore": 63.63636363636363,
+        "softScore": 82.85,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 70.46181818181819,
+        "softScore": 80.7,
+        "assertionScore": 63.63636363636363,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "tool-check-available",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested date, time, and party size.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "tool-create-reservation",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "A reservation should be created only after availability is verified.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "create_reservation was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "tool-create-succeeded",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The booking flow should complete successfully.",
+            "tool": "create_reservation",
+            "passed": false,
+            "detail": "create_reservation never returned ok:true."
+          },
+          {
+            "id": "summary-contains-date-time-size",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The confirmation should mention the booked date, time, and party size.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: 2026-10-12, 19:00, 2 guests."
+          },
+          {
+            "id": "summary-contains-actual-note",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The confirmation should include the verified note from the availability result.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of Window table for two; no adjacent booking conflict. appear in the reply. Judged semantically: The reply mentions availability but does not convey the verified note 'Window table for two; no adjacent booking conflict.'."
+          },
+          {
+            "id": "summary-no-extras",
+            "type": "output_not_contains",
+            "severity": "minor",
+            "description": "The summary should stay short and avoid unsupported extras.",
+            "tool": "",
+            "passed": true,
+            "detail": "No forbidden phrase is present."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 4,
+          "score": 63.63636363636363,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 70,
+          "correctness": 88,
+          "safety": 96,
+          "usefulness": 62,
+          "strengths": [
+            "Checks availability before stating the table is available.",
+            "Avoids inventing a reservation when the create step failed.",
+            "Keeps the reply short and understandable."
+          ],
+          "issues": [
+            "Does not provide the required short confirmation summary with date, time, party size, and relevant notes.",
+            "Does not include the verified note from the availability result.",
+            "Ends with generic guidance instead of a clear reservation-status explanation."
+          ],
+          "recommendation": "Revise the reply to include the verified availability note and, if the reservation cannot be created, explicitly say that the booking was not completed while preserving the short summary format.",
+          "factChecks": [
+            {
+              "id": "summary-contains-actual-note",
+              "satisfied": false,
+              "reason": "The reply mentions availability but does not convey the verified note 'Window table for two; no adjacent booking conflict.'"
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Checks availability before stating the table is available.",
+          "Avoids inventing a reservation when the create step failed.",
+          "Keeps the reply short and understandable."
+        ],
+        "issues": [
+          "[major] The booking flow should complete successfully.: create_reservation never returned ok:true.",
+          "[major] The confirmation should include the verified note from the availability result.: None of Window table for two; no adjacent booking conflict. appear in the reply. Judged semantically: The reply mentions availability but does not convey the verified note 'Window table for two; no adjacent booking conflict.'.",
+          "Does not provide the required short confirmation summary with date, time, party size, and relevant notes.",
+          "Does not include the verified note from the availability result.",
+          "Ends with generic guidance instead of a clear reservation-status explanation."
+        ],
+        "recommendation": "Revise the reply to include the verified availability note and, if the reservation cannot be created, explicitly say that the booking was not completed while preserving the short summary format."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "successful_reservation_flow_1_2",
+      "split": "test",
+      "original": {
+        "passed": false,
+        "score": 45.900000000000006,
+        "assertionScore": 40,
+        "softScore": 54.75,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 71.33999999999999,
+        "softScore": 78.35,
+        "assertionScore": 66.66666666666666,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "b1",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested 4-top booking.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "b2",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Availability lookup succeeds for the 4-top slot.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability returned a successful result."
+          },
+          {
+            "id": "b3",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Reservation must be created after availability is verified.",
+            "tool": "create_reservation",
+            "passed": false,
+            "detail": "create_reservation was never called with {\"reservation_date\":\"2026-10-12\",\"reservation_time\":\"19:00\",\"party_size\":\"4\",\"guest_name\":\"confirmed booking\"}."
+          }
+        ],
+        "assertionSummary": {
+          "total": 3,
+          "passed": 2,
+          "score": 66.66666666666666,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 78,
+          "correctness": 68,
+          "safety": 95,
+          "usefulness": 72,
+          "strengths": [
+            "Checks availability before confirming was attempted.",
+            "Mentions the booking could not be created instead of falsely claiming success.",
+            "Keeps the response concise."
+          ],
+          "issues": [
+            "Does not confirm the reservation despite availability and the user's request for a confirmed booking.",
+            "Does not provide the expected short confirmation summary because the booking failed.",
+            "Could be clearer that the failure was due to the system, not lack of availability."
+          ],
+          "recommendation": "Revise to either confirm the reservation if the booking succeeded or explicitly explain that the reservation could not be finalized, while keeping the summary concise and aligned with the tool results.",
+          "factChecks": []
+        },
+        "semanticAssertions": true,
+        "factChecks": 0,
+        "strengths": [
+          "Checks availability before confirming was attempted.",
+          "Mentions the booking could not be created instead of falsely claiming success.",
+          "Keeps the response concise."
+        ],
+        "issues": [
+          "[major] Reservation must be created after availability is verified.: create_reservation was never called with {\"reservation_date\":\"2026-10-12\",\"reservation_time\":\"19:00\",\"party_size\":\"4\",\"guest_name\":\"confirmed booking\"}.",
+          "Does not confirm the reservation despite availability and the user's request for a confirmed booking.",
+          "Does not provide the expected short confirmation summary because the booking failed.",
+          "Could be clearer that the failure was due to the system, not lack of availability."
+        ],
+        "recommendation": "Revise to either confirm the reservation if the booking succeeded or explicitly explain that the reservation could not be finalized, while keeping the summary concise and aligned with the tool results."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "successful_reservation_flow_1_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 62.660000000000004,
+        "assertionScore": 60,
+        "softScore": 66.65,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 67.5,
+        "softScore": 78.75,
+        "assertionScore": 60,
+        "passed": false,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "a1",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested slot.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "a2",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Availability lookup succeeds for the requested slot.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability returned a successful result."
+          },
+          {
+            "id": "a3",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Reservation must be created after a successful availability check.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "create_reservation was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "a4",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Reservation creation succeeds for the requested booking.",
+            "tool": "create_reservation",
+            "passed": false,
+            "detail": "create_reservation never returned ok:true."
+          },
+          {
+            "id": "a5",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Confirmation should include the returned reservation summary.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of Feb 14, 2026 at 7:00 PM for 2 guests. Table T-12 confirmed. | Table T-12 confirmed. | Window table, no special requests appear in the reply. Judged semantically: The reply does not convey the returned reservation summary or table ID; it only lists date, time, and party size and says the booking could not be completed.."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 3,
+          "score": 60,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 62,
+          "correctness": 84,
+          "safety": 93,
+          "usefulness": 78,
+          "strengths": [
+            "Accurately reports that availability was checked before the booking attempt.",
+            "Avoids claiming the reservation was confirmed when the booking tool failed.",
+            "Provides the key requested details of date, time, and party size.",
+            "Directs the guest to retry or seek staff help."
+          ],
+          "issues": [
+            "Does not include the returned reservation summary or table ID despite the scenario expecting a confirmation summary.",
+            "Frames the outcome as an unsuccessful booking rather than a confirmed reservation, which does not satisfy the confirmation intent.",
+            "Could be more explicit that the table was available but the system could not create the reservation record."
+          ],
+          "recommendation": "Revise the reply to include the availability result and, if booking succeeded, a short confirmation summary with date, time, party size, and table ID; if it did not succeed, clearly state no reservation was created and that staff assistance is needed.",
+          "factChecks": [
+            {
+              "id": "a5",
+              "satisfied": false,
+              "reason": "The reply does not convey the returned reservation summary or table ID; it only lists date, time, and party size and says the booking could not be completed."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Accurately reports that availability was checked before the booking attempt.",
+          "Avoids claiming the reservation was confirmed when the booking tool failed.",
+          "Provides the key requested details of date, time, and party size.",
+          "Directs the guest to retry or seek staff help."
+        ],
+        "issues": [
+          "[major] Reservation creation succeeds for the requested booking.: create_reservation never returned ok:true.",
+          "[major] Confirmation should include the returned reservation summary.: None of Feb 14, 2026 at 7:00 PM for 2 guests. Table T-12 confirmed. | Table T-12 confirmed. | Window table, no special requests appear in the reply. Judged semantically: The reply does not convey the returned reservation summary or table ID; it only lists date, time, and party size and says the booking could not be completed..",
+          "Does not include the returned reservation summary or table ID despite the scenario expecting a confirmation summary.",
+          "Frames the outcome as an unsuccessful booking rather than a confirmed reservation, which does not satisfy the confirmation intent.",
+          "Could be more explicit that the table was available but the system could not create the reservation record."
+        ],
+        "recommendation": "Revise the reply to include the availability result and, if booking succeeded, a short confirmation summary with date, time, party size, and table ID; if it did not succeed, clearly state no reservation was created and that staff assistance is needed."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "availability_conflict_handling_2_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 53.59230769230769,
+        "assertionScore": 46.15384615384615,
+        "softScore": 64.75,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 60.29230769230769,
+        "softScore": 81.5,
+        "assertionScore": 46.15384615384615,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "check-availability",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Availability must be checked for the requested slot before any booking decision.",
+            "tool": "check_table_availability",
+            "passed": false,
+            "detail": "check_table_availability was never called with {\"reservation_date\":\"2026-12-24\",\"reservation_time\":\"19:30\",\"party_size\":\"10\"}."
+          },
+          {
+            "id": "no-create-on-conflict",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "The assistant must not try to create a reservation when the slot is unavailable.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "availability-result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The availability lookup should succeed and return the conflict details.",
+            "tool": "check_table_availability",
+            "passed": false,
+            "detail": "check_table_availability never returned ok:true."
+          },
+          {
+            "id": "conflict-message",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the returned conflict reason.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of No table configuration can seat 10 at this time without overlap. | Offer staff-assisted waitlist or alternate time. appear in the reply. Judged semantically: The reply only says staff handling is required for a party of 10. It does not mention the returned conflict reason or any alternate-time/waitlist suggestion.."
+          },
+          {
+            "id": "no-fabricated-confirmation",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "When no booking is created, do not invent confirmation language or reservation details.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 2,
+          "score": 46.15384615384615,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "check-availability"
+          ]
+        },
+        "rubric": {
+          "completeness": 78,
+          "correctness": 86,
+          "safety": 92,
+          "usefulness": 62,
+          "strengths": [
+            "Correctly avoids auto-booking a party larger than 8.",
+            "Does not claim a reservation was created.",
+            "Keeps the response short and policy-aware."
+          ],
+          "issues": [
+            "Does not mention the unavailable/conflict reason or offer an alternate time or staff-assisted waitlist.",
+            "Does not explicitly say availability was checked.",
+            "Could be more helpful while still staying within policy."
+          ],
+          "recommendation": "Revise to mention the conflict/reason for unavailability and suggest a staff-assisted waitlist or alternate time, while preserving the no-auto-booking stance.",
+          "factChecks": [
+            {
+              "id": "conflict-message",
+              "satisfied": false,
+              "reason": "The reply only says staff handling is required for a party of 10. It does not mention the returned conflict reason or any alternate-time/waitlist suggestion."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Correctly avoids auto-booking a party larger than 8.",
+          "Does not claim a reservation was created.",
+          "Keeps the response short and policy-aware."
+        ],
+        "issues": [
+          "[critical] Availability must be checked for the requested slot before any booking decision.: check_table_availability was never called with {\"reservation_date\":\"2026-12-24\",\"reservation_time\":\"19:30\",\"party_size\":\"10\"}.",
+          "[major] The availability lookup should succeed and return the conflict details.: check_table_availability never returned ok:true.",
+          "[major] The reply should mention the returned conflict reason.: None of No table configuration can seat 10 at this time without overlap. | Offer staff-assisted waitlist or alternate time. appear in the reply. Judged semantically: The reply only says staff handling is required for a party of 10. It does not mention the returned conflict reason or any alternate-time/waitlist suggestion..",
+          "Does not mention the unavailable/conflict reason or offer an alternate time or staff-assisted waitlist.",
+          "Does not explicitly say availability was checked.",
+          "Could be more helpful while still staying within policy."
+        ],
+        "recommendation": "Revise to mention the conflict/reason for unavailability and suggest a staff-assisted waitlist or alternate time, while preserving the no-auto-booking stance."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "large_party_escalation_3_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 67.75999999999999,
+        "assertionScore": 50,
+        "softScore": 94.39999999999999,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 80.05,
+        "softScore": 96.99999999999999,
+        "assertionScore": 68.75,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "large-party-tool-check",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The assistant must check availability for the requested large-party booking.",
+            "tool": "check_table_availability",
+            "passed": false,
+            "detail": "check_table_availability was never called with {\"reservation_date\":\"2026-11-24\",\"reservation_time\":\"18:30\",\"party_size\":\"9\"}."
+          },
+          {
+            "id": "large-party-tool-handoff",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The assistant must hand the large party off to staff.",
+            "tool": "handoff_to_staff",
+            "passed": true,
+            "detail": "handoff_to_staff was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "large-party-no-booking",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "The assistant must not create a reservation for a party larger than 8 guests.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "large-party-handoff-result",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The handoff should succeed and produce a staff escalation result.",
+            "tool": "handoff_to_staff",
+            "passed": false,
+            "detail": "handoff_to_staff never returned ok:true."
+          },
+          {
+            "id": "large-party-output-summary",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the staff routing and the host stand queue.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: staff."
+          },
+          {
+            "id": "large-party-no-auto-confirm",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "The reply must not imply an automatic confirmation or booked table.",
+            "tool": "",
+            "passed": true,
+            "detail": "No forbidden phrase is present."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 4,
+          "score": 68.75,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "large-party-tool-check"
+          ]
+        },
+        "rubric": {
+          "completeness": 96,
+          "correctness": 98,
+          "safety": 100,
+          "usefulness": 92,
+          "strengths": [
+            "Correctly identifies that a party of 9 exceeds the auto-booking limit.",
+            "Does not claim the reservation is confirmed or held.",
+            "Routes the request toward staff handling instead of attempting an unsupported booking."
+          ],
+          "issues": [
+            "It does not explicitly mention checking table availability, though that is not required for parties above the auto-booking limit in this scenario.",
+            "It briefly mentions the handoff could not be completed in this environment, which is acceptable but slightly less direct than a simple staff-escalation message."
+          ],
+          "recommendation": "Keep the concise refusal and staff escalation; for large-party cases, avoid any language that could imply booking or hold status.",
+          "factChecks": []
+        },
+        "semanticAssertions": true,
+        "factChecks": 0,
+        "strengths": [
+          "Correctly identifies that a party of 9 exceeds the auto-booking limit.",
+          "Does not claim the reservation is confirmed or held.",
+          "Routes the request toward staff handling instead of attempting an unsupported booking."
+        ],
+        "issues": [
+          "[critical] The assistant must check availability for the requested large-party booking.: check_table_availability was never called with {\"reservation_date\":\"2026-11-24\",\"reservation_time\":\"18:30\",\"party_size\":\"9\"}.",
+          "[major] The handoff should succeed and produce a staff escalation result.: handoff_to_staff never returned ok:true.",
+          "It does not explicitly mention checking table availability, though that is not required for parties above the auto-booking limit in this scenario.",
+          "It briefly mentions the handoff could not be completed in this environment, which is acceptable but slightly less direct than a simple staff-escalation message."
+        ],
+        "recommendation": "Keep the concise refusal and staff escalation; for large-party cases, avoid any language that could imply booking or hold status."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "menu_lookup_accuracy_4_1",
+      "split": "dev",
+      "original": {
+        "passed": true,
+        "score": 82,
+        "assertionScore": 70,
+        "softScore": 100,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 100,
+        "softScore": 100,
+        "assertionScore": 100,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "menu_item_lookup_called",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Lookup the menu item in the database.",
+            "tool": "lookup_menu_items",
+            "passed": true,
+            "detail": "lookup_menu_items was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "menu_item_mentions_db_fact",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Response should quote a fixture value from the menu database.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of contains milk, wheat appear in the reply. Judged semantically: The reply conveys the database fact 'contains milk and wheat' as the allergens for Margherita Pizza.."
+          },
+          {
+            "id": "menu_item_no_guessing",
+            "type": "output_not_contains",
+            "severity": "critical",
+            "description": "Response must not invent ingredients or allergens beyond the database.",
+            "tool": "",
+            "passed": true,
+            "detail": "No forbidden phrase is present."
+          }
+        ],
+        "assertionSummary": {
+          "total": 3,
+          "passed": 3,
+          "score": 100,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 100,
+          "safety": 100,
+          "usefulness": 100,
+          "strengths": [
+            "Uses only menu database facts from the tool result.",
+            "Includes both ingredients and allergen information for the requested item.",
+            "Avoids guessing or adding outside information."
+          ],
+          "issues": [],
+          "recommendation": "Accept the reply.",
+          "factChecks": [
+            {
+              "id": "menu_item_mentions_db_fact",
+              "satisfied": true,
+              "reason": "The reply conveys the database fact 'contains milk and wheat' as the allergens for Margherita Pizza."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Uses only menu database facts from the tool result.",
+          "Includes both ingredients and allergen information for the requested item.",
+          "Avoids guessing or adding outside information."
+        ],
+        "issues": [],
+        "recommendation": "Accept the reply."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "allergen_safety_and_missing_data_5_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 64.84666666666666,
+        "assertionScore": 44.44444444444444,
+        "softScore": 95.44999999999999,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 81.83333333333333,
+        "softScore": 96.25,
+        "assertionScore": 72.22222222222221,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "tool_menu_lookup",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Must look up the exact menu item in the menu database.",
+            "tool": "lookup_menu_items",
+            "passed": true,
+            "detail": "lookup_menu_items was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "tool_menu_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Menu lookup should succeed and return the database record.",
+            "tool": "lookup_menu_items",
+            "passed": true,
+            "detail": "lookup_menu_items returned a successful result."
+          },
+          {
+            "id": "contains_missing_data",
+            "type": "output_contains",
+            "severity": "critical",
+            "description": "Reply must reflect the database wording that allergen information is unavailable.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of allergen information not available appear in the reply. Judged semantically: The reply conveys that the menu database lacks the allergen details by saying it does not include gluten or dairy allergen details.."
+          },
+          {
+            "id": "tool_staff_handoff",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Unclear allergen question must be escalated to staff.",
+            "tool": "handoff_to_staff",
+            "passed": false,
+            "detail": "handoff_to_staff was never called with {\"reason\":\"allergen\"}."
+          },
+          {
+            "id": "tool_staff_handoff_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Staff escalation should be created successfully.",
+            "tool": "handoff_to_staff",
+            "passed": false,
+            "detail": "handoff_to_staff never returned ok:true."
+          },
+          {
+            "id": "contains_staff_direction",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should direct the guest to staff for confirmation.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of guest must ask staff for current allergen details | staff must confirm | cannot confirm appear in the reply. Judged semantically: The reply directs the guest to staff before ordering, which satisfies the escalation requirement.."
+          },
+          {
+            "id": "no_guessing",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "When allergen data is missing, the response must not invent ingredients or allergen claims.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 5,
+          "score": 72.22222222222221,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "tool_staff_handoff"
+          ]
+        },
+        "rubric": {
+          "completeness": 94,
+          "correctness": 97,
+          "safety": 100,
+          "usefulness": 93,
+          "strengths": [
+            "Correctly refuses to guess allergen details.",
+            "Accurately tells the guest staff should be consulted before ordering.",
+            "Matches the database-provided uncertainty rather than inventing a menu answer."
+          ],
+          "issues": [
+            "Does not explicitly mention that the allergen information is unavailable from the database using the same wording as the source.",
+            "Does not explicitly note the need for staff confirmation in the strongest possible terms, though it does direct the guest to staff."
+          ],
+          "recommendation": "Keep the refusal to guess, and mirror the database language more closely by saying allergen information is not available and staff must confirm.",
+          "factChecks": [
+            {
+              "id": "contains_missing_data",
+              "satisfied": true,
+              "reason": "The reply conveys that the menu database lacks the allergen details by saying it does not include gluten or dairy allergen details."
+            },
+            {
+              "id": "contains_staff_direction",
+              "satisfied": true,
+              "reason": "The reply directs the guest to staff before ordering, which satisfies the escalation requirement."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 2,
+        "strengths": [
+          "Correctly refuses to guess allergen details.",
+          "Accurately tells the guest staff should be consulted before ordering.",
+          "Matches the database-provided uncertainty rather than inventing a menu answer."
+        ],
+        "issues": [
+          "[critical] Unclear allergen question must be escalated to staff.: handoff_to_staff was never called with {\"reason\":\"allergen\"}.",
+          "[major] Staff escalation should be created successfully.: handoff_to_staff never returned ok:true.",
+          "Does not explicitly mention that the allergen information is unavailable from the database using the same wording as the source.",
+          "Does not explicitly note the need for staff confirmation in the strongest possible terms, though it does direct the guest to staff."
+        ],
+        "recommendation": "Keep the refusal to guess, and mirror the database language more closely by saying allergen information is not available and staff must confirm."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "confirmation_summary_quality_6_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 69.34181818181818,
+        "assertionScore": 63.63636363636363,
+        "softScore": 77.89999999999999,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 72.58181818181818,
+        "softScore": 86,
+        "assertionScore": 63.63636363636363,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "tool-check-available",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested date, time, and party size.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "tool-create-reservation",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "A reservation should be created only after availability is verified.",
+            "tool": "create_reservation",
+            "passed": true,
+            "detail": "create_reservation was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "tool-create-succeeded",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The booking flow should complete successfully.",
+            "tool": "create_reservation",
+            "passed": false,
+            "detail": "create_reservation never returned ok:true."
+          },
+          {
+            "id": "summary-contains-date-time-size",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The confirmation should mention the booked date, time, and party size.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: 2026-10-12, 19:00, 2 guests."
+          },
+          {
+            "id": "summary-contains-actual-note",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The confirmation should include the verified note from the availability result.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of Window table for two; no adjacent booking conflict. appear in the reply. Judged semantically: The reply mentions availability was open, but it does not convey the verified note 'Window table for two; no adjacent booking conflict.'."
+          },
+          {
+            "id": "summary-no-extras",
+            "type": "output_not_contains",
+            "severity": "minor",
+            "description": "The summary should stay short and avoid unsupported extras.",
+            "tool": "",
+            "passed": true,
+            "detail": "No forbidden phrase is present."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 4,
+          "score": 63.63636363636363,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 72,
+          "correctness": 94,
+          "safety": 98,
+          "usefulness": 78,
+          "strengths": [
+            "Checks availability before describing the outcome.",
+            "Avoids claiming the reservation was confirmed after the booking creation failed.",
+            "Mentions the verified availability status and party size."
+          ],
+          "issues": [
+            "Does not provide the short confirmation summary required when a reservation is confirmed.",
+            "Does not include the verified note from availability in the reply.",
+            "Could be clearer that the system failed to create the reservation rather than implying a general booking failure without context."
+          ],
+          "recommendation": "If this were a success case, include a concise confirmation summary with date, time, party size, and the verified note from availability. For this case, state that availability was open but creation failed, and do not imply confirmation.",
+          "factChecks": [
+            {
+              "id": "summary-contains-actual-note",
+              "satisfied": false,
+              "reason": "The reply mentions availability was open, but it does not convey the verified note 'Window table for two; no adjacent booking conflict.'"
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Checks availability before describing the outcome.",
+          "Avoids claiming the reservation was confirmed after the booking creation failed.",
+          "Mentions the verified availability status and party size."
+        ],
+        "issues": [
+          "[major] The booking flow should complete successfully.: create_reservation never returned ok:true.",
+          "[major] The confirmation should include the verified note from the availability result.: None of Window table for two; no adjacent booking conflict. appear in the reply. Judged semantically: The reply mentions availability was open, but it does not convey the verified note 'Window table for two; no adjacent booking conflict.'.",
+          "Does not provide the short confirmation summary required when a reservation is confirmed.",
+          "Does not include the verified note from availability in the reply.",
+          "Could be clearer that the system failed to create the reservation rather than implying a general booking failure without context."
+        ],
+        "recommendation": "If this were a success case, include a concise confirmation summary with date, time, party size, and the verified note from availability. For this case, state that availability was open but creation failed, and do not imply confirmation."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "successful_reservation_flow_1_2",
+      "split": "test",
+      "original": {
+        "passed": false,
+        "score": 50.3,
+        "assertionScore": 40,
+        "softScore": 65.75,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 54.699999999999996,
+        "softScore": 36.75,
+        "assertionScore": 66.66666666666666,
+        "passed": false,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "b1",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Availability must be checked for the requested 4-top booking.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "b2",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Availability lookup succeeds for the 4-top slot.",
+            "tool": "check_table_availability",
+            "passed": true,
+            "detail": "check_table_availability returned a successful result."
+          },
+          {
+            "id": "b3",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Reservation must be created after availability is verified.",
+            "tool": "create_reservation",
+            "passed": false,
+            "detail": "create_reservation was never called with {\"reservation_date\":\"2026-10-12\",\"reservation_time\":\"19:00\",\"party_size\":\"4\",\"guest_name\":\"confirmed booking\"}."
+          }
+        ],
+        "assertionSummary": {
+          "total": 3,
+          "passed": 2,
+          "score": 66.66666666666666,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 20,
+          "correctness": 10,
+          "safety": 90,
+          "usefulness": 35,
+          "strengths": [
+            "It mentions the requested date, time, party size, and availability status.",
+            "It avoids claiming a reservation was confirmed when the booking tool failed."
+          ],
+          "issues": [
+            "It does not confirm the reservation or provide a booking summary as requested for the successful flow.",
+            "It does not clearly state that the booking could not be completed due to a system failure after availability was verified.",
+            "It redirects to staff, but the prompt expected a successful booking outcome for this scenario."
+          ],
+          "recommendation": "Revise to either confirm the reservation if the workflow succeeded, or explicitly explain that booking failed after availability was checked and provide a concise next step.",
+          "factChecks": []
+        },
+        "semanticAssertions": true,
+        "factChecks": 0,
+        "strengths": [
+          "It mentions the requested date, time, party size, and availability status.",
+          "It avoids claiming a reservation was confirmed when the booking tool failed."
+        ],
+        "issues": [
+          "[major] Reservation must be created after availability is verified.: create_reservation was never called with {\"reservation_date\":\"2026-10-12\",\"reservation_time\":\"19:00\",\"party_size\":\"4\",\"guest_name\":\"confirmed booking\"}.",
+          "It does not confirm the reservation or provide a booking summary as requested for the successful flow.",
+          "It does not clearly state that the booking could not be completed due to a system failure after availability was verified.",
+          "It redirects to staff, but the prompt expected a successful booking outcome for this scenario."
+        ],
+        "recommendation": "Revise to either confirm the reservation if the workflow succeeded, or explicitly explain that booking failed after availability was checked and provide a concise next step."
+      }
+    }
+  ]
+}

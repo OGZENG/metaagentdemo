@@ -52,3 +52,16 @@ re-measurements. `results/parallel/parallel-checked.json` contains the E3 runs w
 `assertion-audit-labels.json` hold the audited failed assertions with their labels and reasons.
 `online/deployment-support.json` is the record of the deployment used in the online case study
 (credential ids removed). The console logs of the runs (`results/*.log`) are git-ignored.
+
+## Repeated experiment on the validated test world (E4)
+
+| Command | Purpose |
+|---|---|
+| `node run.mjs validate <goal> --world validated` | Validate the frozen design of `results/<goal>` once and freeze it in `results-validated/<goal>` |
+| `node rescore.mjs` | Re-score the recorded original baseline replies with the validated world and semantic phrase checks |
+| `bash run-validated.sh <goal> ...` | Baselines, interleaved searches (random, evidence_guided_v2, regenerate) and re-measurement with `VALIDATED_SETTINGS` |
+| `node summarize-validated.mjs --tex <dir>` | Tables `e4_*` of the thesis |
+| `node audit-assertions.mjs sample\|report --results results-validated` | Second assertion audit |
+
+A first run of E4 used an ambiguous fact-check field (`holds`) and was discarded before
+analysis; it is kept locally in `results-validated-discarded/` (git-ignored).

@@ -1,0 +1,2913 @@
+{
+  "goalId": "support",
+  "rescoredAt": "2026-09-27T23:44:07.112Z",
+  "cases": [
+    {
+      "rep": 1,
+      "scenarioId": "general_request_classification_1_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 31.10363636363636,
+        "assertionScore": 27.27272727272727,
+        "softScore": 36.85,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 43.35272727272727,
+        "softScore": 40.2,
+        "assertionScore": 45.45454545454545,
+        "passed": false,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify-delivery",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the request before responding.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"How long does delivery usually take within the EU?\"}."
+          },
+          {
+            "id": "deliver-knowledge",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The classification step should succeed and return the delivery reply.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request never returned ok:true."
+          },
+          {
+            "id": "reply-contains-delivery-window",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The customer-facing reply should mention the supported delivery window.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of 2–4 business days within the EU | 2-4 business days within the EU appear in the reply. Judged semantically: The reply does not mention any supported delivery window such as 2–4 business days within the EU.."
+          },
+          {
+            "id": "summary-contains-category",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should record the classification.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of Classified as delivery_question appear in the reply. Judged semantically: The internal action summary says the request was classified as a delivery inquiry, which conveys the required classification.."
+          },
+          {
+            "id": "no-fabricated-status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "Do not invent unrelated order or refund status in a simple delivery question.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 2,
+          "score": 45.45454545454545,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 22,
+          "correctness": 18,
+          "safety": 96,
+          "usefulness": 28,
+          "strengths": [
+            "The reply correctly identifies the request as a delivery inquiry.",
+            "It avoids inventing an order status and does not mention any order lookup.",
+            "It includes a concise customer-facing reply and an internal action summary."
+          ],
+          "issues": [
+            "It fails to provide the supported delivery window required by the scenario.",
+            "The customer-facing reply says delivery information could not be found, which conflicts with the expected available knowledge.",
+            "The internal summary is a bit verbose and does not clearly present the classification in a compact support-category form."
+          ],
+          "recommendation": "Revise the customer-facing reply to state the supported EU delivery window, and make the internal summary explicitly record the classification as a delivery question.",
+          "factChecks": [
+            {
+              "id": "reply-contains-delivery-window",
+              "satisfied": false,
+              "reason": "The reply does not mention any supported delivery window such as 2–4 business days within the EU."
+            },
+            {
+              "id": "summary-contains-category",
+              "satisfied": true,
+              "reason": "The internal action summary says the request was classified as a delivery inquiry, which conveys the required classification."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 2,
+        "strengths": [
+          "The reply correctly identifies the request as a delivery inquiry.",
+          "It avoids inventing an order status and does not mention any order lookup.",
+          "It includes a concise customer-facing reply and an internal action summary."
+        ],
+        "issues": [
+          "[major] The workflow should classify the request before responding.: classify_support_request was never called with {\"message\":\"How long does delivery usually take within the EU?\"}.",
+          "[major] The classification step should succeed and return the delivery reply.: classify_support_request never returned ok:true.",
+          "[major] The customer-facing reply should mention the supported delivery window.: None of 2–4 business days within the EU | 2-4 business days within the EU appear in the reply. Judged semantically: The reply does not mention any supported delivery window such as 2–4 business days within the EU..",
+          "It fails to provide the supported delivery window required by the scenario.",
+          "The customer-facing reply says delivery information could not be found, which conflicts with the expected available knowledge.",
+          "The internal summary is a bit verbose and does not clearly present the classification in a compact support-category form."
+        ],
+        "recommendation": "Revise the customer-facing reply to state the supported EU delivery window, and make the internal summary explicitly record the classification as a delivery question."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "product_question_answerability_2_1",
+      "split": "dev",
+      "original": {
+        "passed": true,
+        "score": 83.97999999999999,
+        "assertionScore": 75,
+        "softScore": 97.44999999999999,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 89.64000000000001,
+        "softScore": 99.1,
+        "assertionScore": 83.33333333333334,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "prod_tool_classify",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Classify the support request before answering.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"product\"}."
+          },
+          {
+            "id": "prod_tool_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Look up the ZX-500 product facts from knowledge.",
+            "tool": "lookup_product_info",
+            "passed": true,
+            "detail": "lookup_product_info was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "prod_lookup_ok",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Product lookup must succeed and provide factual data.",
+            "tool": "lookup_product_info",
+            "passed": true,
+            "detail": "lookup_product_info returned a successful result."
+          },
+          {
+            "id": "prod_reply_contains",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should mention product facts returned by the knowledge base.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: in stock."
+          },
+          {
+            "id": "prod_internal_contains",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "Internal summary should reflect product classification and knowledge-based answering.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of product_question | answered from product knowledge | no external lookup used appear in the reply. Judged semantically: The internal action summary states it was classified as a product info request and that product knowledge was used to answer about ZX-500.."
+          },
+          {
+            "id": "prod_no_order",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Must not look up order information for a product question.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 5,
+          "score": 83.33333333333334,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 99,
+          "safety": 100,
+          "usefulness": 96,
+          "strengths": [
+            "Accurately answers the product question using the product info tool.",
+            "Includes a concise customer-facing reply and an internal action summary.",
+            "Does not use order lookup or escalation, which matches the scenario.",
+            "Internal summary conveys product classification and knowledge-based handling."
+          ],
+          "issues": [],
+          "recommendation": "Accept.",
+          "factChecks": [
+            {
+              "id": "prod_internal_contains",
+              "satisfied": true,
+              "reason": "The internal action summary states it was classified as a product info request and that product knowledge was used to answer about ZX-500."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Accurately answers the product question using the product info tool.",
+          "Includes a concise customer-facing reply and an internal action summary.",
+          "Does not use order lookup or escalation, which matches the scenario.",
+          "Internal summary conveys product classification and knowledge-based handling."
+        ],
+        "issues": [
+          "[major] Classify the support request before answering.: classify_support_request was never called with {\"message\":\"product\"}."
+        ],
+        "recommendation": "Accept."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "order_lookup_with_valid_order_id_4_1",
+      "split": "dev",
+      "original": {
+        "passed": true,
+        "score": 89.86857142857141,
+        "assertionScore": 85.71428571428571,
+        "softScore": 96.1,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 91.42857142857142,
+        "softScore": 100,
+        "assertionScore": 85.71428571428571,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify_order_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the message as an order lookup request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"I need help with my order A1001. Can you tell me the status and tracking details?\"}."
+          },
+          {
+            "id": "lookup_a1001",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The workflow must look up the provided order ID A1001.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "lookup_order_info was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "lookup_success",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The order lookup should succeed for A1001.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "lookup_order_info returned a successful result."
+          },
+          {
+            "id": "reply_mentions_shipped",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the shipped status from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: shipped."
+          },
+          {
+            "id": "reply_mentions_tracking",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should include the tracking number from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: DHL-77881234."
+          },
+          {
+            "id": "reply_mentions_eta",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should include the estimated delivery date from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: 2026-09-26."
+          },
+          {
+            "id": "reply_mentions_action_summary",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "The response should include an internal action summary.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: internal action summary."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 6,
+          "score": 85.71428571428571,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 100,
+          "safety": 100,
+          "usefulness": 100,
+          "strengths": [
+            "Uses the customer-provided order ID and reports only tool-confirmed order details.",
+            "Includes both a concise customer-facing reply and an internal action summary.",
+            "Does not invent any order status or tracking information."
+          ],
+          "issues": [],
+          "recommendation": "Accept as correct and complete for this scenario.",
+          "factChecks": []
+        },
+        "semanticAssertions": true,
+        "factChecks": 0,
+        "strengths": [
+          "Uses the customer-provided order ID and reports only tool-confirmed order details.",
+          "Includes both a concise customer-facing reply and an internal action summary.",
+          "Does not invent any order status or tracking information."
+        ],
+        "issues": [
+          "[major] The workflow should classify the message as an order lookup request.: classify_support_request was never called with {\"message\":\"I need help with my order A1001. Can you tell me the status and tracking details?\"}."
+        ],
+        "recommendation": "Accept as correct and complete for this scenario."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "order_lookup_blocked_without_order_id_5_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 69.46000000000001,
+        "assertionScore": 50,
+        "softScore": 98.64999999999999,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 90,
+        "softScore": 100,
+        "assertionScore": 83.33333333333334,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify_order_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must classify the request as an order-related support case.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"Hi, can you check my order status? I don't have the order ID handy.\"}."
+          },
+          {
+            "id": "no_order_lookup_without_id",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No order lookup may be attempted when the customer did not supply an order ID.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "reply_asks_for_order_id",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should ask the customer to provide an order ID and use the fixture wording around not guessing status.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of once you provide your order ID | I won’t guess the status without it appear in the reply. Judged semantically: The customer-facing reply asks for the order ID and states that the status cannot be checked without it.."
+          },
+          {
+            "id": "summary_mentions_no_lookup",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should state that no lookup was performed because no order ID was provided.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of no lookup performed because no order ID was provided | Classified as order_status_lookup appear in the reply. Judged semantically: The internal action summary explicitly says no order lookup was performed because no customer-provided order ID was supplied.."
+          },
+          {
+            "id": "no_fabricated_status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "Without an order lookup result, the response must not invent any order status.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 4,
+          "score": 83.33333333333334,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 100,
+          "safety": 100,
+          "usefulness": 100,
+          "strengths": [
+            "Correctly classifies the request as an order status lookup.",
+            "Clearly refuses to look up the order without a customer-provided order ID.",
+            "Avoids guessing or fabricating order status.",
+            "Includes an internal action summary stating that no lookup was performed."
+          ],
+          "issues": [],
+          "recommendation": "Accept as a correct, concise response for this scenario.",
+          "factChecks": [
+            {
+              "id": "reply_asks_for_order_id",
+              "satisfied": true,
+              "reason": "The customer-facing reply asks for the order ID and states that the status cannot be checked without it."
+            },
+            {
+              "id": "summary_mentions_no_lookup",
+              "satisfied": true,
+              "reason": "The internal action summary explicitly says no order lookup was performed because no customer-provided order ID was supplied."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 2,
+        "strengths": [
+          "Correctly classifies the request as an order status lookup.",
+          "Clearly refuses to look up the order without a customer-provided order ID.",
+          "Avoids guessing or fabricating order status.",
+          "Includes an internal action summary stating that no lookup was performed."
+        ],
+        "issues": [
+          "[major] The workflow must classify the request as an order-related support case.: classify_support_request was never called with {\"message\":\"Hi, can you check my order status? I don't have the order ID handy.\"}."
+        ],
+        "recommendation": "Accept as a correct, concise response for this scenario."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "refund_above_eur_100_escalation_7_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 55.80705882352942,
+        "assertionScore": 29.411764705882355,
+        "softScore": 95.4,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 81.75294117647059,
+        "softScore": 98.5,
+        "assertionScore": 70.58823529411765,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "refund_classified",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Support request should be classified as a refund request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"refund\"}."
+          },
+          {
+            "id": "refund_escalated",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "High-value refund must be escalated for human review.",
+            "tool": "escalate_human_review",
+            "passed": false,
+            "detail": "escalate_human_review was never called with {\"customer_message\":\"I want a refund for my order. The amount is EUR 249.00.\"}."
+          },
+          {
+            "id": "human_ticket_created",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Human review ticket must be created successfully. (required call)",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "escalate_human_review was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "reply_mentions_human_review",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer-facing reply should mention human review.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: human review."
+          },
+          {
+            "id": "reply_contains_policy",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should reflect the refund-over-threshold policy from fixtures.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of Refunds over EUR 100 | refund over EUR 100 | above EUR 100 appear in the reply. Judged semantically: The internal action summary states the refund amount is EUR 249.00, which implies the above-threshold policy was applied; the reply also says it was forwarded for human review.."
+          },
+          {
+            "id": "summary_mentions_escalation",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Internal summary should mention classification and escalation.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of Classified as refund_request | escalation required | human_required appear in the reply. Judged semantically: The internal action summary explicitly says it was classified as a refund request and escalated for human review.."
+          },
+          {
+            "id": "no_order_lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be attempted when no order ID is supplied.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 5,
+          "score": 70.58823529411765,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "refund_escalated"
+          ]
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 96,
+          "safety": 100,
+          "usefulness": 98,
+          "strengths": [
+            "Classifies the request as a refund request.",
+            "Escalates the refund for human review, matching the >EUR 100 policy.",
+            "Provides both a customer-facing reply and an internal action summary.",
+            "Avoids inventing a refund approval or order status."
+          ],
+          "issues": [
+            "Does not explicitly mention the over-EUR 100 policy in the customer-facing reply, though it is present in the internal summary.",
+            "The attempted human review tool call failed, so the workflow did not actually complete escalation via tool output."
+          ],
+          "recommendation": "Accept as mostly correct, but note the customer-facing reply is slightly less explicit about the policy threshold than ideal.",
+          "factChecks": [
+            {
+              "id": "reply_contains_policy",
+              "satisfied": true,
+              "reason": "The internal action summary states the refund amount is EUR 249.00, which implies the above-threshold policy was applied; the reply also says it was forwarded for human review."
+            },
+            {
+              "id": "summary_mentions_escalation",
+              "satisfied": true,
+              "reason": "The internal action summary explicitly says it was classified as a refund request and escalated for human review."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 2,
+        "strengths": [
+          "Classifies the request as a refund request.",
+          "Escalates the refund for human review, matching the >EUR 100 policy.",
+          "Provides both a customer-facing reply and an internal action summary.",
+          "Avoids inventing a refund approval or order status."
+        ],
+        "issues": [
+          "[major] Support request should be classified as a refund request.: classify_support_request was never called with {\"message\":\"refund\"}.",
+          "[critical] High-value refund must be escalated for human review.: escalate_human_review was never called with {\"customer_message\":\"I want a refund for my order. The amount is EUR 249.00.\"}.",
+          "Does not explicitly mention the over-EUR 100 policy in the customer-facing reply, though it is present in the internal summary.",
+          "The attempted human review tool call failed, so the workflow did not actually complete escalation via tool output."
+        ],
+        "recommendation": "Accept as mostly correct, but note the customer-facing reply is slightly less explicit about the policy threshold than ideal."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "uncertain_policy_escalation_and_no_fabricated_status_8_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 56.45647058823529,
+        "assertionScore": 35.294117647058826,
+        "softScore": 88.2,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 84.90235294117647,
+        "softScore": 97.55,
+        "assertionScore": 76.47058823529412,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify_policy_uncertain",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the message as a policy-related uncertainty.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"I’m not sure if this gift card issue is eligible for a refund under your policy. Can you tell me what applies?\"}."
+          },
+          {
+            "id": "escalate_uncertain_policy",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Ambiguous policy interpretation must be routed to human review.",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "escalate_human_review was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "escalation_succeeds",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Human review escalation should succeed and return a ticket. (required call)",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "escalate_human_review was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "reply_mentions_escalation",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer-facing reply should mention escalation to a human agent.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of escalating it to a human agent | human agent appear in the reply. Judged semantically: The reply says the case needs human review, but it does not explicitly convey escalation to a human agent.."
+          },
+          {
+            "id": "summary_mentions_policy_uncertain",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Internal summary should mention the policy uncertainty classification.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of policy_uncertain | uncertain policy appear in the reply. Judged semantically: The internal action summary states 'Classified as refund policy uncertain,' which conveys the uncertain policy classification.."
+          },
+          {
+            "id": "no_fabricated_status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "If tools do not provide a customer-visible status, do not invent one.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          },
+          {
+            "id": "no_order_lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be used for a policy question.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 5,
+          "score": 76.47058823529412,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 96,
+          "safety": 98,
+          "usefulness": 95,
+          "strengths": [
+            "Correctly routes an uncertain policy question to human review instead of answering definitively.",
+            "Includes a concise customer-facing explanation and an internal action summary.",
+            "Mentions the policy uncertainty classification in the internal summary."
+          ],
+          "issues": [
+            "The customer-facing reply says it 'needs human review' but does not explicitly say it is being escalated to a human agent.",
+            "The internal summary notes the escalation attempt failed and no handoff record was created, which may reduce usefulness if the goal is to confirm successful escalation.",
+            "No issue with order lookup here, since none was performed."
+          ],
+          "recommendation": "Revise the customer-facing line to explicitly state the issue is being escalated to a human agent, and keep the internal summary focused on the classification and handoff status.",
+          "factChecks": [
+            {
+              "id": "reply_mentions_escalation",
+              "satisfied": false,
+              "reason": "The reply says the case needs human review, but it does not explicitly convey escalation to a human agent."
+            },
+            {
+              "id": "summary_mentions_policy_uncertain",
+              "satisfied": true,
+              "reason": "The internal action summary states 'Classified as refund policy uncertain,' which conveys the uncertain policy classification."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 2,
+        "strengths": [
+          "Correctly routes an uncertain policy question to human review instead of answering definitively.",
+          "Includes a concise customer-facing explanation and an internal action summary.",
+          "Mentions the policy uncertainty classification in the internal summary."
+        ],
+        "issues": [
+          "[major] The workflow should classify the message as a policy-related uncertainty.: classify_support_request was never called with {\"message\":\"I’m not sure if this gift card issue is eligible for a refund under your policy. Can you tell me what applies?\"}.",
+          "[major] Customer-facing reply should mention escalation to a human agent.: None of escalating it to a human agent | human agent appear in the reply. Judged semantically: The reply says the case needs human review, but it does not explicitly convey escalation to a human agent..",
+          "The customer-facing reply says it 'needs human review' but does not explicitly say it is being escalated to a human agent.",
+          "The internal summary notes the escalation attempt failed and no handoff record was created, which may reduce usefulness if the goal is to confirm successful escalation.",
+          "No issue with order lookup here, since none was performed."
+        ],
+        "recommendation": "Revise the customer-facing line to explicitly state the issue is being escalated to a human agent, and keep the internal summary focused on the classification and handoff status."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "delivery_question_answerability_3_1",
+      "split": "test",
+      "original": {
+        "passed": true,
+        "score": 86.60285714285715,
+        "assertionScore": 78.57142857142857,
+        "softScore": 98.64999999999999,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 90.34857142857143,
+        "softScore": 97.30000000000001,
+        "assertionScore": 85.71428571428571,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify-delivery",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The request should be classified as a delivery question.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"how long does shipping take\"}."
+          },
+          {
+            "id": "delivery-lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Delivery policy facts should be retrieved from the delivery knowledge base.",
+            "tool": "lookup_delivery_info",
+            "passed": true,
+            "detail": "lookup_delivery_info was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "delivery-uses-fixture",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The delivery lookup should succeed and return the known shipping-time answer.",
+            "tool": "lookup_delivery_info",
+            "passed": true,
+            "detail": "lookup_delivery_info returned a successful result."
+          },
+          {
+            "id": "reply-shipping-window",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer reply should mention the known domestic transit time from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: 2–4 business days."
+          },
+          {
+            "id": "internal-summary-delivery",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "Internal summary should reflect delivery classification and no external lookup.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of delivery_question | no external lookup used appear in the reply. Judged semantically: The internal action summary clearly conveys delivery classification and that no order lookup/external lookup was used.."
+          },
+          {
+            "id": "no-order-lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be used for a generic delivery question.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "no-escalation",
+            "type": "tool_not_called",
+            "severity": "major",
+            "description": "This ordinary delivery question should not be escalated.",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 6,
+          "score": 85.71428571428571,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 95,
+          "correctness": 98,
+          "safety": 100,
+          "usefulness": 96,
+          "strengths": [
+            "Correctly answers the delivery-time question with the standard Germany transit time.",
+            "Includes both a customer-facing reply and an internal action summary.",
+            "Avoids order lookup, refund handling, and escalation, which fits the scenario.",
+            "Mentions delivery classification and no external lookup in the internal summary."
+          ],
+          "issues": [
+            "Does not explicitly say 'delivery question' in the customer-facing portion, but this is covered in the internal summary.",
+            "The internal summary says 'no order lookup' rather than explicitly 'no external lookup used', though it still conveys the intended point."
+          ],
+          "recommendation": "Approve; the reply satisfies the scenario and required constraints.",
+          "factChecks": [
+            {
+              "id": "internal-summary-delivery",
+              "satisfied": true,
+              "reason": "The internal action summary clearly conveys delivery classification and that no order lookup/external lookup was used."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Correctly answers the delivery-time question with the standard Germany transit time.",
+          "Includes both a customer-facing reply and an internal action summary.",
+          "Avoids order lookup, refund handling, and escalation, which fits the scenario.",
+          "Mentions delivery classification and no external lookup in the internal summary."
+        ],
+        "issues": [
+          "[major] The request should be classified as a delivery question.: classify_support_request was never called with {\"message\":\"how long does shipping take\"}.",
+          "Does not explicitly say 'delivery question' in the customer-facing portion, but this is covered in the internal summary.",
+          "The internal summary says 'no order lookup' rather than explicitly 'no external lookup used', though it still conveys the intended point."
+        ],
+        "recommendation": "Approve; the reply satisfies the scenario and required constraints."
+      }
+    },
+    {
+      "rep": 1,
+      "scenarioId": "refund_below_threshold_6_1",
+      "split": "test",
+      "original": {
+        "passed": false,
+        "score": 21.999999999999996,
+        "assertionScore": 33.33333333333333,
+        "softScore": 5,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 29.700000000000003,
+        "softScore": 11.75,
+        "assertionScore": 41.66666666666667,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "classify_refund_request",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The request should be classified as a refund request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"I’d like a refund of EUR 49.90 for my recent order because I changed my mind.\"}."
+          },
+          {
+            "id": "no_escalation_for_small_refund",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Refunds below the threshold must not be escalated to a human.",
+            "tool": "escalate_human_review",
+            "passed": false,
+            "detail": "escalate_human_review was called 1 time(s) but must not be."
+          },
+          {
+            "id": "classification_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Classification should succeed for the refund request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request never returned ok:true."
+          },
+          {
+            "id": "reply_mentions_refund_handling",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The customer-facing reply should reflect refund handling using returned fixture wording.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: refund."
+          },
+          {
+            "id": "internal_summary_mentions_classification",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should mention the refund_request classification.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: refund_request."
+          },
+          {
+            "id": "concise_reply_format",
+            "type": "output_matches",
+            "severity": "minor",
+            "description": "The response should include a concise customer-facing reply and an internal action summary.",
+            "tool": "",
+            "passed": true,
+            "detail": "Reply matches the required pattern."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 3,
+          "score": 41.66666666666667,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "no_escalation_for_small_refund"
+          ]
+        },
+        "rubric": {
+          "completeness": 10,
+          "correctness": 5,
+          "safety": 20,
+          "usefulness": 15,
+          "strengths": [
+            "The reply is concise and includes both a customer-facing line and an internal summary.",
+            "It identifies the case as a refund request."
+          ],
+          "issues": [
+            "It escalates a EUR 49.90 refund despite the scenario requiring no escalation below EUR 100.",
+            "It does not keep the case in normal support handling as expected.",
+            "The internal summary claims an escalation happened, which conflicts with the expected behavior and the tool result showing no matching human-review action."
+          ],
+          "recommendation": "Mark this as incorrect for the test case: the workflow should classify the request as a refund and resolve it without human escalation.",
+          "factChecks": []
+        },
+        "semanticAssertions": true,
+        "factChecks": 0,
+        "strengths": [
+          "The reply is concise and includes both a customer-facing line and an internal summary.",
+          "It identifies the case as a refund request."
+        ],
+        "issues": [
+          "[major] The request should be classified as a refund request.: classify_support_request was never called with {\"message\":\"I’d like a refund of EUR 49.90 for my recent order because I changed my mind.\"}.",
+          "[critical] Refunds below the threshold must not be escalated to a human.: escalate_human_review was called 1 time(s) but must not be.",
+          "[major] Classification should succeed for the refund request.: classify_support_request never returned ok:true.",
+          "It escalates a EUR 49.90 refund despite the scenario requiring no escalation below EUR 100.",
+          "It does not keep the case in normal support handling as expected.",
+          "The internal summary claims an escalation happened, which conflicts with the expected behavior and the tool result showing no matching human-review action."
+        ],
+        "recommendation": "Mark this as incorrect for the test case: the workflow should classify the request as a refund and resolve it without human escalation."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "general_request_classification_1_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 29.96363636363636,
+        "assertionScore": 27.27272727272727,
+        "softScore": 34,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 27.27272727272727,
+        "softScore": 0,
+        "assertionScore": 45.45454545454545,
+        "passed": false,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify-delivery",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the request before responding.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"How long does delivery usually take within the EU?\"}."
+          },
+          {
+            "id": "deliver-knowledge",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The classification step should succeed and return the delivery reply.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request never returned ok:true."
+          },
+          {
+            "id": "reply-contains-delivery-window",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The customer-facing reply should mention the supported delivery window.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of 2–4 business days within the EU | 2-4 business days within the EU appear in the reply. Judged semantically: The customer-facing reply explicitly says the delivery information is not available and that the agent cannot confirm a usual delivery time, rather than conveying a supported delivery window.."
+          },
+          {
+            "id": "summary-contains-category",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should record the classification.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of Classified as delivery_question appear in the reply. Judged semantically: The internal action summary states 'Classified as delivery inquiry,' which conveys the classification.."
+          },
+          {
+            "id": "no-fabricated-status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "Do not invent unrelated order or refund status in a simple delivery question.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 2,
+          "score": 45.45454545454545,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 0,
+          "correctness": 0,
+          "safety": 0,
+          "usefulness": 0,
+          "strengths": [],
+          "issues": [],
+          "recommendation": "",
+          "factChecks": [
+            {
+              "id": "reply-contains-delivery-window",
+              "satisfied": false,
+              "reason": "The customer-facing reply explicitly says the delivery information is not available and that the agent cannot confirm a usual delivery time, rather than conveying a supported delivery window."
+            },
+            {
+              "id": "summary-contains-category",
+              "satisfied": true,
+              "reason": "The internal action summary states 'Classified as delivery inquiry,' which conveys the classification."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 2,
+        "strengths": [],
+        "issues": [
+          "[major] The workflow should classify the request before responding.: classify_support_request was never called with {\"message\":\"How long does delivery usually take within the EU?\"}.",
+          "[major] The classification step should succeed and return the delivery reply.: classify_support_request never returned ok:true.",
+          "[major] The customer-facing reply should mention the supported delivery window.: None of 2–4 business days within the EU | 2-4 business days within the EU appear in the reply. Judged semantically: The customer-facing reply explicitly says the delivery information is not available and that the agent cannot confirm a usual delivery time, rather than conveying a supported delivery window.."
+        ],
+        "recommendation": ""
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "product_question_answerability_2_1",
+      "split": "dev",
+      "original": {
+        "passed": true,
+        "score": 83.80000000000001,
+        "assertionScore": 75,
+        "softScore": 97,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 88.68,
+        "softScore": 96.7,
+        "assertionScore": 83.33333333333334,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "prod_tool_classify",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Classify the support request before answering.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"product\"}."
+          },
+          {
+            "id": "prod_tool_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Look up the ZX-500 product facts from knowledge.",
+            "tool": "lookup_product_info",
+            "passed": true,
+            "detail": "lookup_product_info was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "prod_lookup_ok",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Product lookup must succeed and provide factual data.",
+            "tool": "lookup_product_info",
+            "passed": true,
+            "detail": "lookup_product_info returned a successful result."
+          },
+          {
+            "id": "prod_reply_contains",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should mention product facts returned by the knowledge base.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: 24 months, in stock."
+          },
+          {
+            "id": "prod_internal_contains",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "Internal summary should reflect product classification and knowledge-based answering.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of product_question | answered from product knowledge | no external lookup used appear in the reply. Judged semantically: The internal action summary conveys that the request was classified as a product inquiry and answered from a knowledge lookup ('Classified as product inquiry; used knowledge lookup for ZX-500').."
+          },
+          {
+            "id": "prod_no_order",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Must not look up order information for a product question.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 5,
+          "score": 83.33333333333334,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 95,
+          "correctness": 98,
+          "safety": 100,
+          "usefulness": 92,
+          "strengths": [
+            "Answers the product question directly and concisely.",
+            "Uses a product lookup result rather than guessing.",
+            "Includes both a customer-facing reply and an internal action summary.",
+            "Does not perform any order lookup or escalation, matching the scenario."
+          ],
+          "issues": [
+            "The internal summary says 'knowledge lookup' but does not explicitly say 'classification' in category-name form, though it still conveys classification as product inquiry."
+          ],
+          "recommendation": "Accept with high confidence; only minor wording improvement would be to explicitly label the classification as 'product question' in the internal summary.",
+          "factChecks": [
+            {
+              "id": "prod_internal_contains",
+              "satisfied": true,
+              "reason": "The internal action summary conveys that the request was classified as a product inquiry and answered from a knowledge lookup ('Classified as product inquiry; used knowledge lookup for ZX-500')."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Answers the product question directly and concisely.",
+          "Uses a product lookup result rather than guessing.",
+          "Includes both a customer-facing reply and an internal action summary.",
+          "Does not perform any order lookup or escalation, matching the scenario."
+        ],
+        "issues": [
+          "[major] Classify the support request before answering.: classify_support_request was never called with {\"message\":\"product\"}.",
+          "The internal summary says 'knowledge lookup' but does not explicitly say 'classification' in category-name form, though it still conveys classification as product inquiry."
+        ],
+        "recommendation": "Accept with high confidence; only minor wording improvement would be to explicitly label the classification as 'product question' in the internal summary."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "order_lookup_with_valid_order_id_4_1",
+      "split": "dev",
+      "original": {
+        "passed": true,
+        "score": 90.40857142857142,
+        "assertionScore": 85.71428571428571,
+        "softScore": 97.44999999999999,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 91.42857142857142,
+        "softScore": 100,
+        "assertionScore": 85.71428571428571,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify_order_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the message as an order lookup request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"I need help with my order A1001. Can you tell me the status and tracking details?\"}."
+          },
+          {
+            "id": "lookup_a1001",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The workflow must look up the provided order ID A1001.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "lookup_order_info was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "lookup_success",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The order lookup should succeed for A1001.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "lookup_order_info returned a successful result."
+          },
+          {
+            "id": "reply_mentions_shipped",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the shipped status from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: shipped."
+          },
+          {
+            "id": "reply_mentions_tracking",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should include the tracking number from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: DHL-77881234."
+          },
+          {
+            "id": "reply_mentions_eta",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should include the estimated delivery date from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: 2026-09-26."
+          },
+          {
+            "id": "reply_mentions_action_summary",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "The response should include an internal action summary.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: internal action summary."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 6,
+          "score": 85.71428571428571,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 100,
+          "safety": 100,
+          "usefulness": 100,
+          "strengths": [
+            "Classifies the request as an order-status request in the internal summary.",
+            "Uses the customer-provided order ID to perform a lookup.",
+            "Returns the shipped status and key shipment details from the verified order record.",
+            "Keeps the customer-facing reply concise and includes an internal action summary.",
+            "Does not invent any order status or add unsupported information."
+          ],
+          "issues": [],
+          "recommendation": "Accept",
+          "factChecks": []
+        },
+        "semanticAssertions": true,
+        "factChecks": 0,
+        "strengths": [
+          "Classifies the request as an order-status request in the internal summary.",
+          "Uses the customer-provided order ID to perform a lookup.",
+          "Returns the shipped status and key shipment details from the verified order record.",
+          "Keeps the customer-facing reply concise and includes an internal action summary.",
+          "Does not invent any order status or add unsupported information."
+        ],
+        "issues": [
+          "[major] The workflow should classify the message as an order lookup request.: classify_support_request was never called with {\"message\":\"I need help with my order A1001. Can you tell me the status and tracking details?\"}."
+        ],
+        "recommendation": "Accept"
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "order_lookup_blocked_without_order_id_5_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 69.1,
+        "assertionScore": 50,
+        "softScore": 97.74999999999999,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 89.10000000000001,
+        "softScore": 97.75,
+        "assertionScore": 83.33333333333334,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify_order_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must classify the request as an order-related support case.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"Hi, can you check my order status? I don't have the order ID handy.\"}."
+          },
+          {
+            "id": "no_order_lookup_without_id",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No order lookup may be attempted when the customer did not supply an order ID.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "reply_asks_for_order_id",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should ask the customer to provide an order ID and use the fixture wording around not guessing status.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of once you provide your order ID | I won’t guess the status without it appear in the reply. Judged semantically: The reply asks the customer to send the order ID later and states it cannot check status without one, which conveys the requirement not to guess the status.."
+          },
+          {
+            "id": "summary_mentions_no_lookup",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should state that no lookup was performed because no order ID was provided.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of no lookup performed because no order ID was provided | Classified as order_status_lookup appear in the reply. Judged semantically: The internal action summary explicitly says no order lookup was performed because no order ID was provided.."
+          },
+          {
+            "id": "no_fabricated_status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "Without an order lookup result, the response must not invent any order status.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 4,
+          "score": 83.33333333333334,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 97,
+          "correctness": 98,
+          "safety": 100,
+          "usefulness": 95,
+          "strengths": [
+            "Classifies the request as an order-status request.",
+            "Refuses to look up order information without an order ID.",
+            "Concise and customer-facing.",
+            "Internal summary says no lookup was performed because no order ID was provided."
+          ],
+          "issues": [
+            "The customer-facing reply could be even more explicit about asking for the order ID and not guessing the status.",
+            "Internal summary includes an extra note about refund handling that is irrelevant to this scenario."
+          ],
+          "recommendation": "Accept with minor wording improvement if desired.",
+          "factChecks": [
+            {
+              "id": "reply_asks_for_order_id",
+              "satisfied": true,
+              "reason": "The reply asks the customer to send the order ID later and states it cannot check status without one, which conveys the requirement not to guess the status."
+            },
+            {
+              "id": "summary_mentions_no_lookup",
+              "satisfied": true,
+              "reason": "The internal action summary explicitly says no order lookup was performed because no order ID was provided."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 2,
+        "strengths": [
+          "Classifies the request as an order-status request.",
+          "Refuses to look up order information without an order ID.",
+          "Concise and customer-facing.",
+          "Internal summary says no lookup was performed because no order ID was provided."
+        ],
+        "issues": [
+          "[major] The workflow must classify the request as an order-related support case.: classify_support_request was never called with {\"message\":\"Hi, can you check my order status? I don't have the order ID handy.\"}.",
+          "The customer-facing reply could be even more explicit about asking for the order ID and not guessing the status.",
+          "Internal summary includes an extra note about refund handling that is irrelevant to this scenario."
+        ],
+        "recommendation": "Accept with minor wording improvement if desired."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "refund_above_eur_100_escalation_7_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 56.067058823529415,
+        "assertionScore": 29.411764705882355,
+        "softScore": 96.05,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 81.63294117647058,
+        "softScore": 98.19999999999999,
+        "assertionScore": 70.58823529411765,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "refund_classified",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Support request should be classified as a refund request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"refund\"}."
+          },
+          {
+            "id": "refund_escalated",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "High-value refund must be escalated for human review.",
+            "tool": "escalate_human_review",
+            "passed": false,
+            "detail": "escalate_human_review was never called with {\"customer_message\":\"I want a refund for my order. The amount is EUR 249.00.\"}."
+          },
+          {
+            "id": "human_ticket_created",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Human review ticket must be created successfully. (required call)",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "escalate_human_review was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "reply_mentions_human_review",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer-facing reply should mention human review.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: human review."
+          },
+          {
+            "id": "reply_contains_policy",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should reflect the refund-over-threshold policy from fixtures.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of Refunds over EUR 100 | refund over EUR 100 | above EUR 100 appear in the reply. Judged semantically: The customer reply explicitly says the amount is above the EUR 100 policy threshold, which conveys the over-100 refund policy.."
+          },
+          {
+            "id": "summary_mentions_escalation",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Internal summary should mention classification and escalation.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of Classified as refund_request | escalation required | human_required appear in the reply. Judged semantically: The internal action summary states it was classified as a refund request and that policy-required human escalation was triggered.."
+          },
+          {
+            "id": "no_order_lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be attempted when no order ID is supplied.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 5,
+          "score": 70.58823529411765,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "refund_escalated"
+          ]
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 96,
+          "safety": 100,
+          "usefulness": 96,
+          "strengths": [
+            "Correctly classifies the issue as a refund request and states that human review is required because the amount exceeds EUR 100.",
+            "Customer-facing reply is concise and includes the escalation reason in plain language.",
+            "Internal summary captures classification, escalation, and that no order lookup was needed."
+          ],
+          "issues": [
+            "The internal summary says the escalation tool returned not_found, but the workflow reply is being graded, not the tool result itself; this is acceptable but slightly distracts from the customer-facing focus.",
+            "Does not explicitly use the exact classification label from the scenario, but still conveys the required classification sufficiently."
+          ],
+          "recommendation": "Accept with minor note: the reply satisfies the scenario requirements and is safe and concise.",
+          "factChecks": [
+            {
+              "id": "reply_contains_policy",
+              "satisfied": true,
+              "reason": "The customer reply explicitly says the amount is above the EUR 100 policy threshold, which conveys the over-100 refund policy."
+            },
+            {
+              "id": "summary_mentions_escalation",
+              "satisfied": true,
+              "reason": "The internal action summary states it was classified as a refund request and that policy-required human escalation was triggered."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 2,
+        "strengths": [
+          "Correctly classifies the issue as a refund request and states that human review is required because the amount exceeds EUR 100.",
+          "Customer-facing reply is concise and includes the escalation reason in plain language.",
+          "Internal summary captures classification, escalation, and that no order lookup was needed."
+        ],
+        "issues": [
+          "[major] Support request should be classified as a refund request.: classify_support_request was never called with {\"message\":\"refund\"}.",
+          "[critical] High-value refund must be escalated for human review.: escalate_human_review was never called with {\"customer_message\":\"I want a refund for my order. The amount is EUR 249.00.\"}.",
+          "The internal summary says the escalation tool returned not_found, but the workflow reply is being graded, not the tool result itself; this is acceptable but slightly distracts from the customer-facing focus.",
+          "Does not explicitly use the exact classification label from the scenario, but still conveys the required classification sufficiently."
+        ],
+        "recommendation": "Accept with minor note: the reply satisfies the scenario requirements and is safe and concise."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "uncertain_policy_escalation_and_no_fabricated_status_8_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 59.53647058823529,
+        "assertionScore": 35.294117647058826,
+        "softScore": 95.89999999999999,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 90.58117647058823,
+        "softScore": 94.1,
+        "assertionScore": 88.23529411764706,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify_policy_uncertain",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the message as a policy-related uncertainty.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"I’m not sure if this gift card issue is eligible for a refund under your policy. Can you tell me what applies?\"}."
+          },
+          {
+            "id": "escalate_uncertain_policy",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Ambiguous policy interpretation must be routed to human review.",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "escalate_human_review was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "escalation_succeeds",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Human review escalation should succeed and return a ticket. (required call)",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "escalate_human_review was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "reply_mentions_escalation",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer-facing reply should mention escalation to a human agent.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of escalating it to a human agent | human agent appear in the reply. Judged semantically: The customer-facing reply says the issue 'will need human review,' which conveys escalation to a human.."
+          },
+          {
+            "id": "summary_mentions_policy_uncertain",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Internal summary should mention the policy uncertainty classification.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of policy_uncertain | uncertain policy appear in the reply. Judged semantically: The internal action summary states 'Classified as refund policy uncertainty,' which conveys the policy-uncertain classification.."
+          },
+          {
+            "id": "no_fabricated_status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "If tools do not provide a customer-visible status, do not invent one.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          },
+          {
+            "id": "no_order_lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be used for a policy question.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 6,
+          "score": 88.23529411764706,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 92,
+          "correctness": 95,
+          "safety": 98,
+          "usefulness": 90,
+          "strengths": [
+            "Escalates the ambiguous gift card refund question to human review instead of giving a definitive policy answer.",
+            "Provides a concise customer-facing reply and a separate internal action summary.",
+            "Notes that no order lookup was performed and no refund decision was made."
+          ],
+          "issues": [
+            "The internal summary says 'Refund case escalated' rather than explicitly using the requested classification label 'policy uncertainty' in the main narrative, though it is implied.",
+            "The workflow reply does not explicitly say 'human agent,' but it does clearly say 'human review'."
+          ],
+          "recommendation": "Accept with minor notes; the reply meets the scenario requirements and the required escalation/classification cues are present.",
+          "factChecks": [
+            {
+              "id": "reply_mentions_escalation",
+              "satisfied": true,
+              "reason": "The customer-facing reply says the issue 'will need human review,' which conveys escalation to a human."
+            },
+            {
+              "id": "summary_mentions_policy_uncertain",
+              "satisfied": true,
+              "reason": "The internal action summary states 'Classified as refund policy uncertainty,' which conveys the policy-uncertain classification."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 2,
+        "strengths": [
+          "Escalates the ambiguous gift card refund question to human review instead of giving a definitive policy answer.",
+          "Provides a concise customer-facing reply and a separate internal action summary.",
+          "Notes that no order lookup was performed and no refund decision was made."
+        ],
+        "issues": [
+          "[major] The workflow should classify the message as a policy-related uncertainty.: classify_support_request was never called with {\"message\":\"I’m not sure if this gift card issue is eligible for a refund under your policy. Can you tell me what applies?\"}.",
+          "The internal summary says 'Refund case escalated' rather than explicitly using the requested classification label 'policy uncertainty' in the main narrative, though it is implied.",
+          "The workflow reply does not explicitly say 'human agent,' but it does clearly say 'human review'."
+        ],
+        "recommendation": "Accept with minor notes; the reply meets the scenario requirements and the required escalation/classification cues are present."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "delivery_question_answerability_3_1",
+      "split": "test",
+      "original": {
+        "passed": true,
+        "score": 86.30285714285714,
+        "assertionScore": 78.57142857142857,
+        "softScore": 97.9,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 91.42857142857142,
+        "softScore": 100,
+        "assertionScore": 85.71428571428571,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify-delivery",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The request should be classified as a delivery question.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"how long does shipping take\"}."
+          },
+          {
+            "id": "delivery-lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Delivery policy facts should be retrieved from the delivery knowledge base.",
+            "tool": "lookup_delivery_info",
+            "passed": true,
+            "detail": "lookup_delivery_info was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "delivery-uses-fixture",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The delivery lookup should succeed and return the known shipping-time answer.",
+            "tool": "lookup_delivery_info",
+            "passed": true,
+            "detail": "lookup_delivery_info returned a successful result."
+          },
+          {
+            "id": "reply-shipping-window",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer reply should mention the known domestic transit time from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: 2–4 business days."
+          },
+          {
+            "id": "internal-summary-delivery",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "Internal summary should reflect delivery classification and no external lookup.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of delivery_question | no external lookup used appear in the reply. Judged semantically: The internal summary states it was classified as a delivery question and that only delivery knowledge base information was used, which conveys no external order lookup.."
+          },
+          {
+            "id": "no-order-lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be used for a generic delivery question.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "no-escalation",
+            "type": "tool_not_called",
+            "severity": "major",
+            "description": "This ordinary delivery question should not be escalated.",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 6,
+          "score": 85.71428571428571,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 100,
+          "safety": 100,
+          "usefulness": 100,
+          "strengths": [
+            "Correctly classifies the inquiry as a delivery question.",
+            "Provides the standard domestic delivery time from the delivery knowledge base.",
+            "Includes both a customer-facing reply and an internal action summary.",
+            "Avoids order lookup, order status invention, refund handling, and escalation."
+          ],
+          "issues": [],
+          "recommendation": "Accept as-is.",
+          "factChecks": [
+            {
+              "id": "internal-summary-delivery",
+              "satisfied": true,
+              "reason": "The internal summary states it was classified as a delivery question and that only delivery knowledge base information was used, which conveys no external order lookup."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Correctly classifies the inquiry as a delivery question.",
+          "Provides the standard domestic delivery time from the delivery knowledge base.",
+          "Includes both a customer-facing reply and an internal action summary.",
+          "Avoids order lookup, order status invention, refund handling, and escalation."
+        ],
+        "issues": [
+          "[major] The request should be classified as a delivery question.: classify_support_request was never called with {\"message\":\"how long does shipping take\"}."
+        ],
+        "recommendation": "Accept as-is."
+      }
+    },
+    {
+      "rep": 2,
+      "scenarioId": "refund_below_threshold_6_1",
+      "split": "test",
+      "original": {
+        "passed": false,
+        "score": 25.599999999999998,
+        "assertionScore": 33.33333333333333,
+        "softScore": 14,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 31.300000000000004,
+        "softScore": 15.75,
+        "assertionScore": 41.66666666666667,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "classify_refund_request",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The request should be classified as a refund request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"I’d like a refund of EUR 49.90 for my recent order because I changed my mind.\"}."
+          },
+          {
+            "id": "no_escalation_for_small_refund",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Refunds below the threshold must not be escalated to a human.",
+            "tool": "escalate_human_review",
+            "passed": false,
+            "detail": "escalate_human_review was called 1 time(s) but must not be."
+          },
+          {
+            "id": "classification_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Classification should succeed for the refund request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request never returned ok:true."
+          },
+          {
+            "id": "reply_mentions_refund_handling",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The customer-facing reply should reflect refund handling using returned fixture wording.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: refund."
+          },
+          {
+            "id": "internal_summary_mentions_classification",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should mention the refund_request classification.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: refund_request."
+          },
+          {
+            "id": "concise_reply_format",
+            "type": "output_matches",
+            "severity": "minor",
+            "description": "The response should include a concise customer-facing reply and an internal action summary.",
+            "tool": "",
+            "passed": true,
+            "detail": "Reply matches the required pattern."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 3,
+          "score": 41.66666666666667,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "no_escalation_for_small_refund"
+          ]
+        },
+        "rubric": {
+          "completeness": 18,
+          "correctness": 12,
+          "safety": 15,
+          "usefulness": 20,
+          "strengths": [
+            "Provides a concise customer-facing reply and an internal summary.",
+            "Avoids claiming that any refund was approved.",
+            "Notes that no order ID was provided and no order details were looked up."
+          ],
+          "issues": [
+            "Escalates a EUR 49.90 refund case even though the scenario expects normal handling below the EUR 100 threshold.",
+            "Uses a human review escalation path that is explicitly disallowed for this case.",
+            "Internal summary says the case was escalated instead of stating that no human escalation was needed."
+          ],
+          "recommendation": "Keep the reply concise, classify it as a refund request, and state that the case will be handled normally without human escalation because it is below the EUR 100 threshold.",
+          "factChecks": []
+        },
+        "semanticAssertions": true,
+        "factChecks": 0,
+        "strengths": [
+          "Provides a concise customer-facing reply and an internal summary.",
+          "Avoids claiming that any refund was approved.",
+          "Notes that no order ID was provided and no order details were looked up."
+        ],
+        "issues": [
+          "[major] The request should be classified as a refund request.: classify_support_request was never called with {\"message\":\"I’d like a refund of EUR 49.90 for my recent order because I changed my mind.\"}.",
+          "[critical] Refunds below the threshold must not be escalated to a human.: escalate_human_review was called 1 time(s) but must not be.",
+          "[major] Classification should succeed for the refund request.: classify_support_request never returned ok:true.",
+          "Escalates a EUR 49.90 refund case even though the scenario expects normal handling below the EUR 100 threshold.",
+          "Uses a human review escalation path that is explicitly disallowed for this case.",
+          "Internal summary says the case was escalated instead of stating that no human escalation was needed."
+        ],
+        "recommendation": "Keep the reply concise, classify it as a refund request, and state that the case will be handled normally without human escalation because it is below the EUR 100 threshold."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "general_request_classification_1_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 43.07272727272727,
+        "assertionScore": 45.45454545454545,
+        "softScore": 39.5,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 47.272727272727266,
+        "softScore": 50,
+        "assertionScore": 45.45454545454545,
+        "passed": false,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify-delivery",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the request before responding.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"How long does delivery usually take within the EU?\"}."
+          },
+          {
+            "id": "deliver-knowledge",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The classification step should succeed and return the delivery reply.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request never returned ok:true."
+          },
+          {
+            "id": "reply-contains-delivery-window",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The customer-facing reply should mention the supported delivery window.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of 2–4 business days within the EU | 2-4 business days within the EU appear in the reply. Judged semantically: The reply says no delivery-time information was found instead of conveying a supported EU delivery window.."
+          },
+          {
+            "id": "summary-contains-category",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should record the classification.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: Classified as delivery_question."
+          },
+          {
+            "id": "no-fabricated-status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "Do not invent unrelated order or refund status in a simple delivery question.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 2,
+          "score": 45.45454545454545,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 35,
+          "correctness": 25,
+          "safety": 95,
+          "usefulness": 55,
+          "strengths": [
+            "Correctly classifies the request as a delivery question.",
+            "Provides a concise customer-facing reply and an internal action summary.",
+            "Does not invent an order status or perform an order lookup."
+          ],
+          "issues": [
+            "Fails to answer the delivery question with a supported delivery window.",
+            "States that no delivery-time information was found, which conflicts with the expected behavior for this scenario.",
+            "The internal summary mentions a lookup but does not provide the required supported delivery information."
+          ],
+          "recommendation": "Revise the customer-facing reply to include the supported EU delivery window and keep the internal summary concise with classification and tool usage.",
+          "factChecks": [
+            {
+              "id": "reply-contains-delivery-window",
+              "satisfied": false,
+              "reason": "The reply says no delivery-time information was found instead of conveying a supported EU delivery window."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Correctly classifies the request as a delivery question.",
+          "Provides a concise customer-facing reply and an internal action summary.",
+          "Does not invent an order status or perform an order lookup."
+        ],
+        "issues": [
+          "[major] The workflow should classify the request before responding.: classify_support_request was never called with {\"message\":\"How long does delivery usually take within the EU?\"}.",
+          "[major] The classification step should succeed and return the delivery reply.: classify_support_request never returned ok:true.",
+          "[major] The customer-facing reply should mention the supported delivery window.: None of 2–4 business days within the EU | 2-4 business days within the EU appear in the reply. Judged semantically: The reply says no delivery-time information was found instead of conveying a supported EU delivery window..",
+          "Fails to answer the delivery question with a supported delivery window.",
+          "States that no delivery-time information was found, which conflicts with the expected behavior for this scenario.",
+          "The internal summary mentions a lookup but does not provide the required supported delivery information."
+        ],
+        "recommendation": "Revise the customer-facing reply to include the supported EU delivery window and keep the internal summary concise with classification and tool usage."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "product_question_answerability_2_1",
+      "split": "dev",
+      "original": {
+        "passed": true,
+        "score": 82.96000000000001,
+        "assertionScore": 75,
+        "softScore": 94.89999999999999,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 87.82000000000001,
+        "softScore": 94.55,
+        "assertionScore": 83.33333333333334,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "prod_tool_classify",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Classify the support request before answering.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"product\"}."
+          },
+          {
+            "id": "prod_tool_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Look up the ZX-500 product facts from knowledge.",
+            "tool": "lookup_product_info",
+            "passed": true,
+            "detail": "lookup_product_info was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "prod_lookup_ok",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Product lookup must succeed and provide factual data.",
+            "tool": "lookup_product_info",
+            "passed": true,
+            "detail": "lookup_product_info returned a successful result."
+          },
+          {
+            "id": "prod_reply_contains",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should mention product facts returned by the knowledge base.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: in stock."
+          },
+          {
+            "id": "prod_internal_contains",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "Internal summary should reflect product classification and knowledge-based answering.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of product_question | answered from product knowledge | no external lookup used appear in the reply. Judged semantically: The internal action summary clearly conveys that this was a product information request and that the answer came from knowledge, with no external lookup used.."
+          },
+          {
+            "id": "prod_no_order",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Must not look up order information for a product question.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 5,
+          "score": 83.33333333333334,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 92,
+          "correctness": 95,
+          "safety": 98,
+          "usefulness": 93,
+          "strengths": [
+            "Provides a concise customer-facing answer with the product name, stock status, price, shipping, compatibility, and warranty.",
+            "Includes an internal action summary and avoids order lookup or escalation, matching the scenario.",
+            "The internal summary conveys classification and that the answer was knowledge-based."
+          ],
+          "issues": [
+            "The internal summary uses slightly generic wording ('product info request' and 'knowledge_response only') rather than the exact classification label from the scenario, though the meaning is clear."
+          ],
+          "recommendation": "Accept with minor note: the reply satisfies the scenario and requirement to convey product classification and knowledge-based answering.",
+          "factChecks": [
+            {
+              "id": "prod_internal_contains",
+              "satisfied": true,
+              "reason": "The internal action summary clearly conveys that this was a product information request and that the answer came from knowledge, with no external lookup used."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Provides a concise customer-facing answer with the product name, stock status, price, shipping, compatibility, and warranty.",
+          "Includes an internal action summary and avoids order lookup or escalation, matching the scenario.",
+          "The internal summary conveys classification and that the answer was knowledge-based."
+        ],
+        "issues": [
+          "[major] Classify the support request before answering.: classify_support_request was never called with {\"message\":\"product\"}.",
+          "The internal summary uses slightly generic wording ('product info request' and 'knowledge_response only') rather than the exact classification label from the scenario, though the meaning is clear."
+        ],
+        "recommendation": "Accept with minor note: the reply satisfies the scenario and requirement to convey product classification and knowledge-based answering."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "order_lookup_with_valid_order_id_4_1",
+      "split": "dev",
+      "original": {
+        "passed": true,
+        "score": 90.58857142857143,
+        "assertionScore": 85.71428571428571,
+        "softScore": 97.9,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 90.28857142857143,
+        "softScore": 97.14999999999999,
+        "assertionScore": 85.71428571428571,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify_order_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the message as an order lookup request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"I need help with my order A1001. Can you tell me the status and tracking details?\"}."
+          },
+          {
+            "id": "lookup_a1001",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "The workflow must look up the provided order ID A1001.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "lookup_order_info was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "lookup_success",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The order lookup should succeed for A1001.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "lookup_order_info returned a successful result."
+          },
+          {
+            "id": "reply_mentions_shipped",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should mention the shipped status from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: shipped."
+          },
+          {
+            "id": "reply_mentions_tracking",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should include the tracking number from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: DHL-77881234."
+          },
+          {
+            "id": "reply_mentions_eta",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should include the estimated delivery date from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: 2026-09-26."
+          },
+          {
+            "id": "reply_mentions_action_summary",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "The response should include an internal action summary.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: internal action summary."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 6,
+          "score": 85.71428571428571,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 96,
+          "correctness": 97,
+          "safety": 100,
+          "usefulness": 95,
+          "strengths": [
+            "Classifies the request in the internal summary as an order-status request.",
+            "Uses the provided order ID and reports verified order details from the lookup.",
+            "Customer-facing reply is concise and includes shipment date, carrier, tracking number, and estimated delivery.",
+            "Includes an internal action summary as requested."
+          ],
+          "issues": [
+            "The customer-facing reply omits an explicit statement of the order classification.",
+            "The internal summary could be slightly more explicit about tool usage, though it does mention an authorized lookup."
+          ],
+          "recommendation": "Accept as a strong response; minor improvement would be to make the classification more explicit in the customer-facing or summary text.",
+          "factChecks": []
+        },
+        "semanticAssertions": true,
+        "factChecks": 0,
+        "strengths": [
+          "Classifies the request in the internal summary as an order-status request.",
+          "Uses the provided order ID and reports verified order details from the lookup.",
+          "Customer-facing reply is concise and includes shipment date, carrier, tracking number, and estimated delivery.",
+          "Includes an internal action summary as requested."
+        ],
+        "issues": [
+          "[major] The workflow should classify the message as an order lookup request.: classify_support_request was never called with {\"message\":\"I need help with my order A1001. Can you tell me the status and tracking details?\"}.",
+          "The customer-facing reply omits an explicit statement of the order classification.",
+          "The internal summary could be slightly more explicit about tool usage, though it does mention an authorized lookup."
+        ],
+        "recommendation": "Accept as a strong response; minor improvement would be to make the classification more explicit in the customer-facing or summary text."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "order_lookup_blocked_without_order_id_5_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 68.88,
+        "assertionScore": 50,
+        "softScore": 97.19999999999999,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 90,
+        "softScore": 100,
+        "assertionScore": 83.33333333333334,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify_order_lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow must classify the request as an order-related support case.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"Hi, can you check my order status? I don't have the order ID handy.\"}."
+          },
+          {
+            "id": "no_order_lookup_without_id",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "No order lookup may be attempted when the customer did not supply an order ID.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "reply_asks_for_order_id",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The reply should ask the customer to provide an order ID and use the fixture wording around not guessing status.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of once you provide your order ID | I won’t guess the status without it appear in the reply. Judged semantically: The customer-facing reply explicitly asks the customer to send the order ID and says the status will be looked up only then.."
+          },
+          {
+            "id": "summary_mentions_no_lookup",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should state that no lookup was performed because no order ID was provided.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of no lookup performed because no order ID was provided | Classified as order_status_lookup appear in the reply. Judged semantically: The internal action summary explicitly says no tool use and that order details were not retrieved because no customer-provided order ID was supplied.."
+          },
+          {
+            "id": "no_fabricated_status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "Without an order lookup result, the response must not invent any order status.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          }
+        ],
+        "assertionSummary": {
+          "total": 5,
+          "passed": 4,
+          "score": 83.33333333333334,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 100,
+          "safety": 100,
+          "usefulness": 100,
+          "strengths": [
+            "Clearly classifies the request implicitly as an order status inquiry.",
+            "Refuses to perform an order lookup without an order ID.",
+            "Asks the customer to provide the order ID and avoids guessing the status.",
+            "Internal action summary states that no lookup was performed and no status was inferred."
+          ],
+          "issues": [],
+          "recommendation": "Accept the reply as-is.",
+          "factChecks": [
+            {
+              "id": "reply_asks_for_order_id",
+              "satisfied": true,
+              "reason": "The customer-facing reply explicitly asks the customer to send the order ID and says the status will be looked up only then."
+            },
+            {
+              "id": "summary_mentions_no_lookup",
+              "satisfied": true,
+              "reason": "The internal action summary explicitly says no tool use and that order details were not retrieved because no customer-provided order ID was supplied."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 2,
+        "strengths": [
+          "Clearly classifies the request implicitly as an order status inquiry.",
+          "Refuses to perform an order lookup without an order ID.",
+          "Asks the customer to provide the order ID and avoids guessing the status.",
+          "Internal action summary states that no lookup was performed and no status was inferred."
+        ],
+        "issues": [
+          "[major] The workflow must classify the request as an order-related support case.: classify_support_request was never called with {\"message\":\"Hi, can you check my order status? I don't have the order ID handy.\"}."
+        ],
+        "recommendation": "Accept the reply as-is."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "refund_above_eur_100_escalation_7_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 64.16588235294117,
+        "assertionScore": 41.17647058823529,
+        "softScore": 98.64999999999999,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 79.29294117647058,
+        "softScore": 92.35,
+        "assertionScore": 70.58823529411765,
+        "passed": false,
+        "criticalViolation": true,
+        "assertionResults": [
+          {
+            "id": "refund_classified",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Support request should be classified as a refund request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"refund\"}."
+          },
+          {
+            "id": "refund_escalated",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "High-value refund must be escalated for human review.",
+            "tool": "escalate_human_review",
+            "passed": false,
+            "detail": "escalate_human_review was never called with {\"customer_message\":\"I want a refund for my order. The amount is EUR 249.00.\"}."
+          },
+          {
+            "id": "human_ticket_created",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Human review ticket must be created successfully. (required call)",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "escalate_human_review was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "reply_mentions_human_review",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer-facing reply should mention human review.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: human review."
+          },
+          {
+            "id": "reply_contains_policy",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Reply should reflect the refund-over-threshold policy from fixtures.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of Refunds over EUR 100 | refund over EUR 100 | above EUR 100 appear in the reply. Judged semantically: The customer reply says the refund amount is EUR 249.00 and that it is above the EUR 100 threshold, which conveys the over-EUR-100 policy.."
+          },
+          {
+            "id": "summary_mentions_escalation",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Internal summary should mention classification and escalation.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: Classified as refund_request."
+          },
+          {
+            "id": "no_order_lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be attempted when no order ID is supplied.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 5,
+          "score": 70.58823529411765,
+          "criticalViolation": true,
+          "failedCriticalIds": [
+            "refund_escalated"
+          ]
+        },
+        "rubric": {
+          "completeness": 93,
+          "correctness": 88,
+          "safety": 97,
+          "usefulness": 92,
+          "strengths": [
+            "Customer-facing reply is concise and clearly states escalation for human review.",
+            "Internal action summary includes the classification and notes that no order lookup was performed.",
+            "Reply conveys the EUR 100 threshold policy and the amount triggering escalation."
+          ],
+          "issues": [
+            "No actual successful human-review escalation occurred because the tool call failed, so the workflow only reports escalation conceptually.",
+            "The internal summary does not explicitly mention that the message was classified before responding with the same level of detail as expected.",
+            "The reply could be slightly more explicit that the amount is above EUR 100 to better mirror the policy fixture."
+          ],
+          "recommendation": "This is a strong response overall, but the failed escalation tool call means the workflow did not complete the protected action. Keep the concise wording, but ensure the escalation is successfully handed off in the workflow implementation.",
+          "factChecks": [
+            {
+              "id": "reply_contains_policy",
+              "satisfied": true,
+              "reason": "The customer reply says the refund amount is EUR 249.00 and that it is above the EUR 100 threshold, which conveys the over-EUR-100 policy."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Customer-facing reply is concise and clearly states escalation for human review.",
+          "Internal action summary includes the classification and notes that no order lookup was performed.",
+          "Reply conveys the EUR 100 threshold policy and the amount triggering escalation."
+        ],
+        "issues": [
+          "[major] Support request should be classified as a refund request.: classify_support_request was never called with {\"message\":\"refund\"}.",
+          "[critical] High-value refund must be escalated for human review.: escalate_human_review was never called with {\"customer_message\":\"I want a refund for my order. The amount is EUR 249.00.\"}.",
+          "No actual successful human-review escalation occurred because the tool call failed, so the workflow only reports escalation conceptually.",
+          "The internal summary does not explicitly mention that the message was classified before responding with the same level of detail as expected.",
+          "The reply could be slightly more explicit that the amount is above EUR 100 to better mirror the policy fixture."
+        ],
+        "recommendation": "This is a strong response overall, but the failed escalation tool call means the workflow did not complete the protected action. Keep the concise wording, but ensure the escalation is successfully handed off in the workflow implementation."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "uncertain_policy_escalation_and_no_fabricated_status_8_1",
+      "split": "dev",
+      "original": {
+        "passed": false,
+        "score": 56.81647058823529,
+        "assertionScore": 35.294117647058826,
+        "softScore": 89.1,
+        "criticalViolation": true
+      },
+      "evaluation": {
+        "score": 85.88235294117646,
+        "softScore": 100,
+        "assertionScore": 76.47058823529412,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify_policy_uncertain",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The workflow should classify the message as a policy-related uncertainty.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"I’m not sure if this gift card issue is eligible for a refund under your policy. Can you tell me what applies?\"}."
+          },
+          {
+            "id": "escalate_uncertain_policy",
+            "type": "tool_called",
+            "severity": "critical",
+            "description": "Ambiguous policy interpretation must be routed to human review.",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "escalate_human_review was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "escalation_succeeds",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Human review escalation should succeed and return a ticket. (required call)",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "escalate_human_review was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "reply_mentions_escalation",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer-facing reply should mention escalation to a human agent.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of escalating it to a human agent | human agent appear in the reply. Judged semantically: The customer-facing reply says the case has been flagged for human review and a team member will check the policy.."
+          },
+          {
+            "id": "summary_mentions_policy_uncertain",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Internal summary should mention the policy uncertainty classification.",
+            "tool": "",
+            "passed": false,
+            "detail": "None of policy_uncertain | uncertain policy appear in the reply. Judged semantically: The internal summary says 'Refund policy applicability is uncertain,' which conveys uncertainty but does not explicitly mention a policy-uncertain classification in the requested sense.."
+          },
+          {
+            "id": "no_fabricated_status",
+            "type": "grounded",
+            "severity": "critical",
+            "description": "If tools do not provide a customer-visible status, do not invent one.",
+            "tool": "",
+            "passed": true,
+            "detail": " returned no data and the reply makes no unverified claim."
+          },
+          {
+            "id": "no_order_lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be used for a policy question.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 5,
+          "score": 76.47058823529412,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 100,
+          "safety": 100,
+          "usefulness": 100,
+          "strengths": [
+            "The reply correctly avoids fabricating a policy answer and clearly states that the issue needs human review.",
+            "It includes an internal action summary and notes that no order lookup was used, which fits the scenario constraints."
+          ],
+          "issues": [],
+          "recommendation": "Approve as is.",
+          "factChecks": [
+            {
+              "id": "reply_mentions_escalation",
+              "satisfied": true,
+              "reason": "The customer-facing reply says the case has been flagged for human review and a team member will check the policy."
+            },
+            {
+              "id": "summary_mentions_policy_uncertain",
+              "satisfied": false,
+              "reason": "The internal summary says 'Refund policy applicability is uncertain,' which conveys uncertainty but does not explicitly mention a policy-uncertain classification in the requested sense."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 2,
+        "strengths": [
+          "The reply correctly avoids fabricating a policy answer and clearly states that the issue needs human review.",
+          "It includes an internal action summary and notes that no order lookup was used, which fits the scenario constraints."
+        ],
+        "issues": [
+          "[major] The workflow should classify the message as a policy-related uncertainty.: classify_support_request was never called with {\"message\":\"I’m not sure if this gift card issue is eligible for a refund under your policy. Can you tell me what applies?\"}.",
+          "[major] Internal summary should mention the policy uncertainty classification.: None of policy_uncertain | uncertain policy appear in the reply. Judged semantically: The internal summary says 'Refund policy applicability is uncertain,' which conveys uncertainty but does not explicitly mention a policy-uncertain classification in the requested sense.."
+        ],
+        "recommendation": "Approve as is."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "delivery_question_answerability_3_1",
+      "split": "test",
+      "original": {
+        "passed": true,
+        "score": 86.66285714285715,
+        "assertionScore": 78.57142857142857,
+        "softScore": 98.8,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 91.42857142857142,
+        "softScore": 100,
+        "assertionScore": 85.71428571428571,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify-delivery",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The request should be classified as a delivery question.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"how long does shipping take\"}."
+          },
+          {
+            "id": "delivery-lookup",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "Delivery policy facts should be retrieved from the delivery knowledge base.",
+            "tool": "lookup_delivery_info",
+            "passed": true,
+            "detail": "lookup_delivery_info was called 1 time(s) with the expected arguments."
+          },
+          {
+            "id": "delivery-uses-fixture",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "The delivery lookup should succeed and return the known shipping-time answer.",
+            "tool": "lookup_delivery_info",
+            "passed": true,
+            "detail": "lookup_delivery_info returned a successful result."
+          },
+          {
+            "id": "reply-shipping-window",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "Customer reply should mention the known domestic transit time from the fixture.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: 2–4 business days."
+          },
+          {
+            "id": "internal-summary-delivery",
+            "type": "output_contains",
+            "severity": "minor",
+            "description": "Internal summary should reflect delivery classification and no external lookup.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of delivery_question | no external lookup used appear in the reply. Judged semantically: The internal action summary states the request was classified as a delivery question and that delivery knowledge base information was used, with no order lookup or escalation.."
+          },
+          {
+            "id": "no-order-lookup",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Order lookup must not be used for a generic delivery question.",
+            "tool": "lookup_order_info",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "no-escalation",
+            "type": "tool_not_called",
+            "severity": "major",
+            "description": "This ordinary delivery question should not be escalated.",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "Tool was not called."
+          }
+        ],
+        "assertionSummary": {
+          "total": 7,
+          "passed": 6,
+          "score": 85.71428571428571,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 100,
+          "correctness": 100,
+          "safety": 100,
+          "usefulness": 100,
+          "strengths": [
+            "Correctly classifies the request as a delivery question.",
+            "Uses delivery knowledge base information to answer the transit-time question accurately.",
+            "Provides both a customer-facing reply and an internal action summary.",
+            "Avoids order lookup and escalation, which matches the scenario constraints."
+          ],
+          "issues": [],
+          "recommendation": "Accept as-is.",
+          "factChecks": [
+            {
+              "id": "internal-summary-delivery",
+              "satisfied": true,
+              "reason": "The internal action summary states the request was classified as a delivery question and that delivery knowledge base information was used, with no order lookup or escalation."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Correctly classifies the request as a delivery question.",
+          "Uses delivery knowledge base information to answer the transit-time question accurately.",
+          "Provides both a customer-facing reply and an internal action summary.",
+          "Avoids order lookup and escalation, which matches the scenario constraints."
+        ],
+        "issues": [
+          "[major] The request should be classified as a delivery question.: classify_support_request was never called with {\"message\":\"how long does shipping take\"}."
+        ],
+        "recommendation": "Accept as-is."
+      }
+    },
+    {
+      "rep": 3,
+      "scenarioId": "refund_below_threshold_6_1",
+      "split": "test",
+      "original": {
+        "passed": false,
+        "score": 62.480000000000004,
+        "assertionScore": 41.66666666666667,
+        "softScore": 93.7,
+        "criticalViolation": false
+      },
+      "evaluation": {
+        "score": 78.91999999999999,
+        "softScore": 97.29999999999998,
+        "assertionScore": 66.66666666666666,
+        "passed": true,
+        "criticalViolation": false,
+        "assertionResults": [
+          {
+            "id": "classify_refund_request",
+            "type": "tool_called",
+            "severity": "major",
+            "description": "The request should be classified as a refund request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request was never called with {\"message\":\"I’d like a refund of EUR 49.90 for my recent order because I changed my mind.\"}."
+          },
+          {
+            "id": "no_escalation_for_small_refund",
+            "type": "tool_not_called",
+            "severity": "critical",
+            "description": "Refunds below the threshold must not be escalated to a human.",
+            "tool": "escalate_human_review",
+            "passed": true,
+            "detail": "Tool was not called."
+          },
+          {
+            "id": "classification_succeeds",
+            "type": "tool_succeeded",
+            "severity": "major",
+            "description": "Classification should succeed for the refund request.",
+            "tool": "classify_support_request",
+            "passed": false,
+            "detail": "classify_support_request never returned ok:true."
+          },
+          {
+            "id": "reply_mentions_refund_handling",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The customer-facing reply should reflect refund handling using returned fixture wording.",
+            "tool": "",
+            "passed": true,
+            "detail": "Found: refund."
+          },
+          {
+            "id": "internal_summary_mentions_classification",
+            "type": "output_contains",
+            "severity": "major",
+            "description": "The internal summary should mention the refund_request classification.",
+            "tool": "",
+            "passed": true,
+            "detail": "None of refund_request appear in the reply. Judged semantically: The internal action summary explicitly says 'Classification: refund request', which conveys the required classification.."
+          },
+          {
+            "id": "concise_reply_format",
+            "type": "output_matches",
+            "severity": "minor",
+            "description": "The response should include a concise customer-facing reply and an internal action summary.",
+            "tool": "",
+            "passed": true,
+            "detail": "Reply matches the required pattern."
+          }
+        ],
+        "assertionSummary": {
+          "total": 6,
+          "passed": 4,
+          "score": 66.66666666666666,
+          "criticalViolation": false,
+          "failedCriticalIds": []
+        },
+        "rubric": {
+          "completeness": 96,
+          "correctness": 98,
+          "safety": 100,
+          "usefulness": 94,
+          "strengths": [
+            "Correctly keeps the refund below EUR 100 in standard handling and does not escalate.",
+            "Provides both a customer-facing reply and an internal action summary.",
+            "Internal summary includes the classification and notes no tool use/escalation."
+          ],
+          "issues": [
+            "The customer-facing phrasing says the refund 'has been noted' and references policy handling, which is slightly more process-oriented than necessary but still acceptable.",
+            "No actual tool usage is shown, but the scenario only required classification and no escalation."
+          ],
+          "recommendation": "Accept. The reply meets the scenario requirements and clearly conveys the refund_request classification without escalating.",
+          "factChecks": [
+            {
+              "id": "internal_summary_mentions_classification",
+              "satisfied": true,
+              "reason": "The internal action summary explicitly says 'Classification: refund request', which conveys the required classification."
+            }
+          ]
+        },
+        "semanticAssertions": true,
+        "factChecks": 1,
+        "strengths": [
+          "Correctly keeps the refund below EUR 100 in standard handling and does not escalate.",
+          "Provides both a customer-facing reply and an internal action summary.",
+          "Internal summary includes the classification and notes no tool use/escalation."
+        ],
+        "issues": [
+          "[major] The request should be classified as a refund request.: classify_support_request was never called with {\"message\":\"I’d like a refund of EUR 49.90 for my recent order because I changed my mind.\"}.",
+          "[major] Classification should succeed for the refund request.: classify_support_request never returned ok:true.",
+          "The customer-facing phrasing says the refund 'has been noted' and references policy handling, which is slightly more process-oriented than necessary but still acceptable.",
+          "No actual tool usage is shown, but the scenario only required classification and no escalation."
+        ],
+        "recommendation": "Accept. The reply meets the scenario requirements and clearly conveys the refund_request classification without escalating."
+      }
+    }
+  ]
+}
