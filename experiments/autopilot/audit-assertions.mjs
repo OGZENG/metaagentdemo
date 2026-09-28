@@ -24,7 +24,7 @@ import { ROOT } from './lib/api.mjs'
 // --results results-validated audits the repeated experiment on the validated test world.
 const resultsIndex = process.argv.indexOf('--results')
 const RES = join(ROOT, resultsIndex > 0 ? process.argv[resultsIndex + 1] : 'results')
-const texPrefix = resultsIndex > 0 && process.argv[resultsIndex + 1] === 'results-validated' ? 'e4' : 'e1'
+const texPrefix = { 'results-validated': 'e4', 'results-repaired': 'e5' }[resultsIndex > 0 ? process.argv[resultsIndex + 1] : ''] || 'e1'
 const SAMPLE = join(RES, 'assertion-audit-sample.json')
 const LABELS = join(RES, 'assertion-audit-labels.json')
 const read = (file) => JSON.parse(readFileSync(file, 'utf8'))

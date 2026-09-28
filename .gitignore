@@ -123,3 +123,4 @@ apps/*/
 
 # E4 runs discarded after the fact-check field bug (see thesis section 6.5)
 experiments/autopilot/results-validated-discarded/
+experiments/autopilot/results-repaired-discarded/

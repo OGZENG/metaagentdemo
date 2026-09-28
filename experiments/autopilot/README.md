@@ -65,3 +65,16 @@ re-measurements. `results/parallel/parallel-checked.json` contains the E3 runs w
 
 A first run of E4 used an ambiguous fact-check field (`holds`) and was discarded before
 analysis; it is kept locally in `results-validated-discarded/` (git-ignored).
+
+## Repeated experiment on the repaired environment (E5)
+
+| Command | Purpose |
+|---|---|
+| `node run.mjs prepare <goal> --world repaired [--heldout 8]` | Extend the held-out suite, repair the environment (add fixtures for unanswered required tools) and validate; freezes `results-repaired/<goal>/design.json` |
+| `WORLD=repaired bash run-validated.sh <goal> ...` | Same protocol as E4 on the repaired world |
+| `node summarize-validated.mjs --world repaired --tex <dir>` | Tables `e5_*` of the thesis (compared with E4) |
+
+Three searches were aborted by infrastructure failures and rerun. A further attempt of
+`support/search-evidence_guided_v2-2` was started by mistake after the valid rerun (the
+v2 selector had abstained in both rounds, a legitimate outcome); it is kept locally in
+`results-repaired-discarded/` (git-ignored) and excluded from the analysis.
