@@ -78,3 +78,29 @@ Three searches were aborted by infrastructure failures and rerun. A further atte
 `support/search-evidence_guided_v2-2` was started by mistake after the valid rerun (the
 v2 selector had abstained in both rounds, a legitimate outcome); it is kept locally in
 `results-repaired-discarded/` (git-ignored) and excluded from the analysis.
+
+## E5 with a self-hosted open-weight model (Qwen)
+
+The E5 protocol rerun with Qwen3.5-9B for every role (design reuse, crew execution,
+grading, operator selection), on the frozen designs of `results-repaired/`. The model is
+served by vLLM on the chair's GPU server (one RTX 4080, 16 GB; FP8 quantization at load
+time, thinking disabled, `qwen3_coder` tool parser) and reached through an SSH tunnel:
+
+```
+ssh -N -L 8000:127.0.0.1:8000 <user>@<server>
+```
+
+`model-qwen.json` is `model.json` with `modelName: qwen3.5-9b`, `basepath:
+http://localhost:8000/v1`, temperature 0.7 (Qwen's recommendation for non-thinking
+mode) and a Flowise credential holding the vLLM API key.
+
+| Command | Purpose |
+|---|---|
+| `node run.mjs <command> <goal> --world repaired --model qwen` | Any command with `model-<name>.json`, results in `results-repaired-<name>/`; without its own design, the frozen design of the world is reused |
+| `bash run-qwen.sh <goal> ...` | E5 protocol (baselines, random / evidence_guided_v2 / regenerate × 3, confirm) on Qwen |
+| `node compare-models.mjs [--json <file>]` | Baselines, pooled searches, operators and re-measured crews of gpt-5.4-mini vs. Qwen |
+
+The first insurance baseline lost one case to a timeout while the machine was suspended;
+it is kept as `insurance/baseline-sleep-timeout.json` and was rerun. Six searches were
+aborted by Node's 5-minute response-header limit before `lib/api.mjs` switched to an
+undici agent without that limit; they wrote no result and were rerun.

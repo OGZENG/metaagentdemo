@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { Agent, fetch } from 'undici'
 
 /**
  * Minimal Flowise API client for headless experiments.
@@ -35,6 +36,10 @@ const API_KEY = env.FLOWISE_API_KEY || ''
 export const STUDIO_TIMEOUT = 15 * 60 * 1000
 export const EXECUTION_TIMEOUT = 8 * 60 * 1000
 
+// Node's fetch gives up after 5 minutes without response headers, which a slow
+// self-hosted model under load exceeds; the timeouts above are the only limit.
+const dispatcher = new Agent({ headersTimeout: 0, bodyTimeout: 0 })
+
 export class ApiError extends Error {
     constructor(message, status) {
         super(message)
@@ -64,7 +69,8 @@ export const request = async (method, path, body, { timeout = STUDIO_TIMEOUT, re
                 method,
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
                 body: body === undefined ? undefined : JSON.stringify(body),
-                signal: controller.signal
+                signal: controller.signal,
+                dispatcher
             })
             const text = await response.text()
             let data

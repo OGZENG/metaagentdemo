@@ -25,8 +25,12 @@ const flag = (name, fallback) => {
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'))
 const writeJson = (file, value) => writeFileSync(file, JSON.stringify(value, null, 2))
 const goals = readJson(join(ROOT, 'goals.json'))
-const selectedChatModel = readJson(join(ROOT, 'model.json'))
-const cheapChatModel = existsSync(join(ROOT, 'cheap-model.json')) ? readJson(join(ROOT, 'cheap-model.json')) : undefined
+// --model <name>: run with model-<name>.json instead of model.json (e.g. the
+// self-hosted Qwen model), with its own results folder; no cheap model.
+const modelName = flag('model', null)
+const selectedChatModel = readJson(join(ROOT, modelName ? `model-${modelName}.json` : 'model.json'))
+const cheapChatModel =
+    !modelName && existsSync(join(ROOT, 'cheap-model.json')) ? readJson(join(ROOT, 'cheap-model.json')) : undefined
 
 const goalEntry = goals.find((entry) => entry.id === goalId)
 if (!goalEntry) {
@@ -43,10 +47,13 @@ if (!WORLDS[world]) {
     process.exit(1)
 }
 const SETTINGS = world === 'original' ? DEFAULT_SETTINGS : VALIDATED_SETTINGS
-const resultsRoot = WORLDS[world]
+const resultsRoot = modelName ? `${WORLDS[world]}-${modelName}` : WORLDS[world]
 const dir = join(ROOT, resultsRoot, goalId)
 mkdirSync(dir, { recursive: true })
 const designFile = join(dir, 'design.json')
+// Without its own design (from `design --model`), a model run reuses the frozen
+// design of the same world, so only the model that executes the crews changes.
+const readDesign = () => readJson(existsSync(designFile) ? designFile : join(ROOT, WORLDS[world], goalId, 'design.json'))
 const baselineFile = join(dir, 'baseline.json')
 const modelInfo = {
     model: selectedChatModel.inputs?.modelName,
@@ -117,7 +124,7 @@ const commands = {
     },
 
     async baseline() {
-        const { design, goal } = readJson(designFile)
+        const { design, goal } = readDesign()
         const reps = Number(flag('reps', 1))
         const compiled = await compileTrial({
             goal,
@@ -143,7 +150,7 @@ const commands = {
     },
 
     async search() {
-        const { design, goal } = readJson(designFile)
+        const { design, goal } = readDesign()
         const base = readJson(baselineFile)
         const strategy = flag('strategy', 'evidence_guided')
         const rep = Number(flag('rep', 1))
@@ -181,7 +188,7 @@ const commands = {
  * runs or was noise amplified by selection.
  */
 commands.confirm = async () => {
-    const { design, goal } = readJson(designFile)
+    const { design, goal } = readDesign()
     const reps = Number(flag('reps', 2))
     const { dev, test } = splitScenarios(design.scenarios)
     const base = readJson(baselineFile)
