@@ -104,3 +104,19 @@ The first insurance baseline lost one case to a timeout while the machine was su
 it is kept as `insurance/baseline-sleep-timeout.json` and was rerun. Six searches were
 aborted by Node's 5-minute response-header limit before `lib/api.mjs` switched to an
 undici agent without that limit; they wrote no result and were rerun.
+
+## External baselines (Qwen)
+
+On the same frozen test worlds and with the same grader and settings, measured three
+times each:
+
+| Command | Purpose |
+|---|---|
+| `node baselines.mjs run single <goal> --model qwen` | One agent with every declared tool and the full contract (CrewIR compiler) |
+| `node baselines.mjs run single_goal <goal> --model qwen` | The same agent with only the goal text as its system prompt |
+| `node baselines.mjs generate-flowise <goal> --model qwen` | Flowise's built-in one-shot generator on the goal and the tool list (up to 3 attempts) |
+| `node baselines.mjs audit-flowise --model qwen` | Count what the generated flows still need by hand; they are skeletons and are not executed |
+| `node compare-external.mjs [--json <file>]` | Autopilot crew vs. both single-agent baselines |
+
+Results: `results-repaired-qwen/<goal>/external-*.json`, `external-flowise-audit.json`,
+`compare-external.json`.

@@ -1,0 +1,212 @@
+{
+  "support": {
+    "autopilot": {
+      "devPass": 0.8333333333333334,
+      "testPass": 0.7666666666666666,
+      "allPass": 0.7916666666666666,
+      "assertionScore": 74.82105108943345,
+      "tokens": 4146.111111111111,
+      "latency": 12.275222222222222,
+      "modelCalls": 4.055555555555555,
+      "failures": 0,
+      "cases": 48
+    },
+    "single": {
+      "devPass": 0.8333333333333334,
+      "testPass": 0.6333333333333333,
+      "allPass": 0.7083333333333334,
+      "assertionScore": 79.79395944469475,
+      "tokens": 3652.222222222222,
+      "latency": 10.086666666666668,
+      "modelCalls": 2.0555555555555554,
+      "failures": 0,
+      "cases": 48
+    },
+    "single_goal": {
+      "devPass": 0.888888888888889,
+      "testPass": 0.7333333333333334,
+      "allPass": 0.7916666666666666,
+      "assertionScore": 83.36194850900733,
+      "tokens": 2554.0555555555557,
+      "latency": 10.7065,
+      "modelCalls": 2.2222222222222223,
+      "failures": 0,
+      "cases": 48
+    }
+  },
+  "helpdesk": {
+    "autopilot": {
+      "devPass": 1,
+      "testPass": 1,
+      "allPass": 1,
+      "assertionScore": 98.71345029239765,
+      "tokens": 3785.4444444444443,
+      "latency": 10.713611111111113,
+      "modelCalls": 3.8333333333333335,
+      "failures": 0,
+      "cases": 57
+    },
+    "single": {
+      "devPass": 1,
+      "testPass": 0.9487179487179488,
+      "allPass": 0.9649122807017544,
+      "assertionScore": 97.15045188729398,
+      "tokens": 2680.5555555555557,
+      "latency": 8.905,
+      "modelCalls": 1.8333333333333333,
+      "failures": 0,
+      "cases": 57
+    },
+    "single_goal": {
+      "devPass": 0.8333333333333334,
+      "testPass": 0.8162393162393163,
+      "allPass": 0.8070175438596491,
+      "assertionScore": 85.76636813478918,
+      "tokens": 1502.388888888889,
+      "latency": 9.402444444444445,
+      "modelCalls": 1.6666666666666667,
+      "failures": 1,
+      "cases": 57
+    }
+  },
+  "travel": {
+    "autopilot": {
+      "devPass": 0.9444444444444445,
+      "testPass": 0.8787878787878788,
+      "allPass": 0.9019607843137255,
+      "assertionScore": 89.7378408408315,
+      "tokens": 10074.444444444445,
+      "latency": 31.504388888888887,
+      "modelCalls": 5,
+      "failures": 0,
+      "cases": 51
+    },
+    "single": {
+      "devPass": 0.8333333333333334,
+      "testPass": 0.8787878787878788,
+      "allPass": 0.8627450980392157,
+      "assertionScore": 89.73708514643087,
+      "tokens": 7140.722222222223,
+      "latency": 21.659944444444445,
+      "modelCalls": 2.5555555555555554,
+      "failures": 0,
+      "cases": 51
+    },
+    "single_goal": {
+      "devPass": 0.7222222222222222,
+      "testPass": 0.6969696969696969,
+      "allPass": 0.7058823529411765,
+      "assertionScore": 81.834192209213,
+      "tokens": 4955.5,
+      "latency": 19.040888888888887,
+      "modelCalls": 2.5555555555555554,
+      "failures": 0,
+      "cases": 51
+    }
+  },
+  "hr_leave": {
+    "autopilot": {
+      "devPass": 0.3333333333333333,
+      "testPass": 0.3666666666666667,
+      "allPass": 0.3541666666666667,
+      "assertionScore": 80.40798165162984,
+      "tokens": 11977.277777777777,
+      "latency": 25.194277777777774,
+      "modelCalls": 5.944444444444445,
+      "failures": 0,
+      "cases": 48
+    },
+    "single": {
+      "devPass": 0.5,
+      "testPass": 0.43333333333333335,
+      "allPass": 0.4583333333333333,
+      "assertionScore": 85.38329545131437,
+      "tokens": 12849.333333333334,
+      "latency": 24.08,
+      "modelCalls": 4.666666666666667,
+      "failures": 0,
+      "cases": 48
+    },
+    "single_goal": {
+      "devPass": 0.5555555555555555,
+      "testPass": 0.5,
+      "allPass": 0.5208333333333334,
+      "assertionScore": 84.63542982215584,
+      "tokens": 8388.055555555555,
+      "latency": 18.098277777777778,
+      "modelCalls": 4.666666666666667,
+      "failures": 0,
+      "cases": 48
+    }
+  },
+  "restaurant": {
+    "autopilot": {
+      "devPass": 0.5555555555555555,
+      "testPass": 0.34722222222222215,
+      "allPass": 0.4222222222222222,
+      "assertionScore": 59.814750064750065,
+      "tokens": 7099.222222222223,
+      "latency": 13.511333333333333,
+      "modelCalls": 6,
+      "failures": 1,
+      "cases": 45
+    },
+    "single": {
+      "devPass": 0.4444444444444444,
+      "testPass": 0.3703703703703704,
+      "allPass": 0.4,
+      "assertionScore": 71.79027454027454,
+      "tokens": 4219.777777777777,
+      "latency": 10.74261111111111,
+      "modelCalls": 2.3333333333333335,
+      "failures": 0,
+      "cases": 45
+    },
+    "single_goal": {
+      "devPass": 0.38888888888888884,
+      "testPass": 0.6296296296296297,
+      "allPass": 0.5333333333333333,
+      "assertionScore": 78.68533626866962,
+      "tokens": 2872.222222222222,
+      "latency": 10.091055555555558,
+      "modelCalls": 2.388888888888889,
+      "failures": 0,
+      "cases": 45
+    }
+  },
+  "insurance": {
+    "autopilot": {
+      "devPass": 0.5476190476190476,
+      "testPass": 0.49966329966329964,
+      "allPass": 0.48148148148148145,
+      "assertionScore": 73.08649108195928,
+      "tokens": 54071.142857142855,
+      "latency": 50.619190476190475,
+      "modelCalls": 18.857142857142858,
+      "failures": 4,
+      "cases": 54
+    },
+    "single": {
+      "devPass": 0.4523809523809524,
+      "testPass": 0.4761904761904762,
+      "allPass": 0.4074074074074074,
+      "assertionScore": 62.72388023993034,
+      "tokens": 12011.285714285714,
+      "latency": 17.212142857142855,
+      "modelCalls": 4.619047619047619,
+      "failures": 7,
+      "cases": 54
+    },
+    "single_goal": {
+      "devPass": 0.42857142857142855,
+      "testPass": 0.48484848484848486,
+      "allPass": 0.4444444444444444,
+      "assertionScore": 71.53370663962602,
+      "tokens": 9358,
+      "latency": 16.356857142857145,
+      "modelCalls": 4.809523809523809,
+      "failures": 2,
+      "cases": 54
+    }
+  }
+}

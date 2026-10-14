@@ -1,0 +1,128 @@
+{
+  "model": "qwen3.5-9b",
+  "temperature": 0.7,
+  "rows": [
+    {
+      "goal": "support",
+      "attempts": 3,
+      "generated": true,
+      "nodes": 13,
+      "modelNodes": 4,
+      "needModelAndPrompt": 4,
+      "toolNodes": 5,
+      "conditionNodes": 4,
+      "loopNodes": 1,
+      "humanInputNodes": 0,
+      "replyNodes": 0,
+      "selectedTools": [
+        "agentAsTool",
+        "classify_support_request"
+      ],
+      "unknownTools": [
+        "classify_support_request"
+      ],
+      "declaredToolsUsable": 0,
+      "manualSteps": 14
+    },
+    {
+      "goal": "helpdesk",
+      "attempts": 1,
+      "generated": true,
+      "nodes": 13,
+      "modelNodes": 5,
+      "needModelAndPrompt": 5,
+      "toolNodes": 3,
+      "conditionNodes": 1,
+      "loopNodes": 0,
+      "humanInputNodes": 0,
+      "replyNodes": 4,
+      "selectedTools": [
+        "composio",
+        "customTool"
+      ],
+      "unknownTools": [],
+      "declaredToolsUsable": 0,
+      "manualSteps": 9
+    },
+    {
+      "goal": "travel",
+      "attempts": 2,
+      "generated": true,
+      "nodes": 10,
+      "modelNodes": 2,
+      "needModelAndPrompt": 2,
+      "toolNodes": 4,
+      "conditionNodes": 0,
+      "loopNodes": 0,
+      "humanInputNodes": 1,
+      "replyNodes": 2,
+      "selectedTools": [
+        "search_flights",
+        "present_itinerary_for_approval"
+      ],
+      "unknownTools": [
+        "search_flights",
+        "present_itinerary_for_approval"
+      ],
+      "declaredToolsUsable": 0,
+      "manualSteps": 6
+    },
+    {
+      "goal": "hr_leave",
+      "attempts": 1,
+      "generated": true,
+      "nodes": 7,
+      "modelNodes": 0,
+      "needModelAndPrompt": 0,
+      "toolNodes": 5,
+      "conditionNodes": 1,
+      "loopNodes": 0,
+      "humanInputNodes": 0,
+      "replyNodes": 0,
+      "selectedTools": [
+        "composio"
+      ],
+      "unknownTools": [],
+      "declaredToolsUsable": 0,
+      "manualSteps": 6
+    },
+    {
+      "goal": "restaurant",
+      "attempts": 1,
+      "generated": true,
+      "nodes": 17,
+      "modelNodes": 7,
+      "needModelAndPrompt": 7,
+      "toolNodes": 5,
+      "conditionNodes": 6,
+      "loopNodes": 1,
+      "humanInputNodes": 0,
+      "replyNodes": 2,
+      "selectedTools": [
+        "composio"
+      ],
+      "unknownTools": [],
+      "declaredToolsUsable": 0,
+      "manualSteps": 19
+    },
+    {
+      "goal": "insurance",
+      "attempts": 1,
+      "generated": true,
+      "nodes": 7,
+      "modelNodes": 2,
+      "needModelAndPrompt": 2,
+      "toolNodes": 3,
+      "conditionNodes": 1,
+      "loopNodes": 1,
+      "humanInputNodes": 0,
+      "replyNodes": 0,
+      "selectedTools": [
+        "customTool"
+      ],
+      "unknownTools": [],
+      "declaredToolsUsable": 0,
+      "manualSteps": 7
+    }
+  ]
+}
